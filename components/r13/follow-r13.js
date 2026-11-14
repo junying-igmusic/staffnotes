@@ -68,6 +68,7 @@ const CSS = `
   (document.head || document.documentElement).appendChild(s);
 })();
 const RM = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches), CANCEL = {};
+const snT = s => window.snT ? window.snT(s) : s;
 
 NS['r13/follow-r13'] = function(root, opt){
   opt = opt || {}; const base = opt.base || (() => {});
@@ -79,7 +80,7 @@ NS['r13/follow-r13'] = function(root, opt){
   }));
   root.innerHTML = `<div class="f-stage"><div class="f-card">
     <div class="pg a">${mns.a}</div>
-    <div class="pg b" role="img" aria-label="Mozart, Piano Sonata K. 545, second page">${mns.b}</div>
+    <div class="pg b" role="img" aria-label="${snT('Mozart, Piano Sonata K. 545, second page')}">${mns.b}</div>
     <div class="box"></div></div></div>`;
   const stage = root.querySelector('.f-stage'), box = root.querySelector('.box'), pgs = {a:root.querySelector('.pg.a'), b:root.querySelector('.pg.b')};
   // 谱页上沿和 board 算法一致：框高换成框单位后，谱页在框里竖直居中（834×1194 时正好 41）

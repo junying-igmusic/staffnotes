@@ -8,6 +8,8 @@
 (function(){
 if (window.SNSKit) return;
 const K = window.SNSKit = {};
+// 多语言：snT 来自 components/r13/i18n-r13.js（这里的词在 i18n/pens.json）；没载入时原样返回英文
+const snT = K.snT = (s, v) => window.snT ? window.snT(s, v) : s.replace(/\{(\w+)\}/g, (m, k) => v && k in v ? v[k] : m);
 const cs = document.currentScript;
 K.base = cs && cs.src ? new URL('..', cs.src).href : 'components/';   // r13：副本在 components/r13/，素材还在 components/assets/
 K.asset = n => K.base + 'assets/' + n;
@@ -286,11 +288,11 @@ K.palette = function(opts){
     const row = h('div','k-row '+(vertical?'v':'h'));
     const ur = h('div','k-ur');
     const un = h('button','k-btn',K.sf('undo')), re = h('button','k-btn',K.sf('redo'));
-    un.dataset.k='undo'; re.dataset.k='redo'; un.setAttribute('aria-label','Undo'); re.setAttribute('aria-label','Redo');
+    un.dataset.k='undo'; re.dataset.k='redo'; un.setAttribute('aria-label',snT('Undo')); re.setAttribute('aria-label',snT('Redo'));
     ur.append(un,re);
     const tools = h('div','k-tools');
     K.TOOLS.forEach(t=>{
-      const b = h('button','k-tool'); b.dataset.k='tool'; b.dataset.t=t; b.setAttribute('aria-label',{monoline:'Monoline Pen',crayon:'Crayon',highlighter:'Highlighter',eraser:'Eraser'}[t]);
+      const b = h('button','k-tool'); b.dataset.k='tool'; b.dataset.t=t; b.setAttribute('aria-label',snT({monoline:'Monoline Pen',crayon:'Crayon',highlighter:'Highlighter',eraser:'Eraser'}[t]));
       const clip = h('div','k-clip'); const img = h('img'); img.alt=''; img.draggable=false;
       clip.appendChild(img); b.appendChild(clip);
       if (vertical) clip.style.transform = `rotate(${edge==='l'?90:-90}deg) translateY(${0}px)`;
@@ -300,10 +302,10 @@ K.palette = function(opts){
       tools.appendChild(b);
     });
     const colors = h('div','k-grid k-colors');
-    K.INKS.forEach((c,i)=>{ const d=h('button','k-dot',`<b style="background:${c}"></b>`); d.dataset.k='color'; d.dataset.i=i; d.setAttribute('aria-label',K.INK_NAMES[i]); colors.appendChild(d); });
+    K.INKS.forEach((c,i)=>{ const d=h('button','k-dot',`<b style="background:${c}"></b>`); d.dataset.k='color'; d.dataset.i=i; d.setAttribute('aria-label',snT(K.INK_NAMES[i])); colors.appendChild(d); });
     const acts = h('div','k-grid k-acts');
     [['lasso',K.sf('lasso'),'Lasso Selection'],['shape','','Shapes'],['more',K.svgIcon('PaletteMore',24),'More Tools'],['layers','','Layers and Groups']].forEach(([k,ic,l])=>{
-      const a=h('button','k-act '+k,ic); a.dataset.k=k; a.setAttribute('aria-label',l); acts.appendChild(a);
+      const a=h('button','k-act '+k,ic); a.dataset.k=k; a.setAttribute('aria-label',snT(l)); acts.appendChild(a);
     });
     acts.append(h('span'),h('span'));
     row.append(ur, tools, colors, acts);
@@ -400,8 +402,8 @@ K.settings = function(tool, st, onChange){
   const p = h('div','k-pop k-set');
   p.style.width = (er?320:264)+'px';
   let html = '';
-  if (er) html += `<div class="k-seg"><button data-m="0" class="${st.whole?'':'sel'}">Partial Strokes</button><button data-m="1" class="${st.whole?'sel':''}">Whole Strokes</button></div>`;
-  html += `<div class="k-widths ${er?'er':''}">` + K.WIDTHS[tool].map((w,i)=>`<button class="k-w ${st.wi[tool]===i?'sel':''}" data-i="${i}" aria-label="Preset ${i+1} of ${K.WIDTHS[tool].length}, ${w} points">${er?`<i style="width:${13+6*i}px;height:${13+6*i}px"></i>`:`<svg viewBox="0 0 27 27"><path d="${CURVE}" fill="none" stroke="currentColor" stroke-width="${i+1}" stroke-linecap="round" stroke-linejoin="round"/></svg>`}</button>`).join('') + '</div>';
+  if (er) html += `<div class="k-seg"><button data-m="0" class="${st.whole?'':'sel'}">${snT('Partial Strokes')}</button><button data-m="1" class="${st.whole?'sel':''}">${snT('Whole Strokes')}</button></div>`;
+  html += `<div class="k-widths ${er?'er':''}">` + K.WIDTHS[tool].map((w,i)=>`<button class="k-w ${st.wi[tool]===i?'sel':''}" data-i="${i}" aria-label="${snT('Preset {i} of {n}, {w} points',{i:i+1,n:K.WIDTHS[tool].length,w})}">${er?`<i style="width:${13+6*i}px;height:${13+6*i}px"></i>`:`<svg viewBox="0 0 27 27"><path d="${CURVE}" fill="none" stroke="currentColor" stroke-width="${i+1}" stroke-linecap="round" stroke-linejoin="round"/></svg>`}</button>`).join('') + '</div>';
   if (!er) html += `<div class="k-op" style="--ink:${K.INKS[st.color]}"><div class="tr"></div><div class="th"></div></div>`;
   html += '<div class="arrow"></div>';
   p.innerHTML = html;
@@ -436,13 +438,13 @@ K.tipIcon = c => `<svg class="tip" viewBox="0 0 16 18"><path d="M8 1.2 13 8v2.4H
 K.layers = function(st, used, onToggle){
   const p = h('div','k-pop k-lay');
   function render(){
-    let html = `<div class="seg"><span>${K.ICON.layersFill}Group 1</span><span>${K.ICON.layers}</span><span>${K.ICON.layers}</span></div>`;
-    html += `<div class="gt"><i>${K.ICON.editOff}</i><span>Group 1</span><i>${K.ICON.eye}</i></div>`;
+    let html = `<div class="seg"><span>${K.ICON.layersFill}${snT('Group 1')}</span><span>${K.ICON.layers}</span><span>${K.ICON.layers}</span></div>`;
+    html += `<div class="gt"><i>${K.ICON.editOff}</i><span>${snT('Group 1')}</span><i>${K.ICON.eye}</i></div>`;
     const list = used();
-    if (!list.length) html += `<div class="empty">No annotations yet</div>`;
+    if (!list.length) html += `<div class="empty">${snT('No annotations yet')}</div>`;
     list.forEach(ci=>{
       const off = st.hidden[ci];
-      html += `<div class="ly ${off?'off':''}" data-i="${ci}">${K.tipIcon(K.INKS[ci])}<div class="nm">${K.INK_NAMES[ci]} Layer</div><i class="eye" data-i="${ci}" role="button" aria-label="${off?'Show layer':'Hide layer'}">${off?K.ICON.eyeOff:K.ICON.eye}</i><i>${K.ICON.editOff}</i><i class="tr">${K.ICON.trash}</i></div>`;
+      html += `<div class="ly ${off?'off':''}" data-i="${ci}">${K.tipIcon(K.INKS[ci])}<div class="nm">${snT('{c} Layer',{c:snT(K.INK_NAMES[ci])})}</div><i class="eye" data-i="${ci}" role="button" aria-label="${snT(off?'Show layer':'Hide layer')}">${off?K.ICON.eyeOff:K.ICON.eye}</i><i>${K.ICON.editOff}</i><i class="tr">${K.ICON.trash}</i></div>`;
     });
     html += '<div class="arrow"></div>';
     p.innerHTML = html;
@@ -572,7 +574,7 @@ K.reduced = () => window.matchMedia && matchMedia('(prefers-reduced-motion: redu
 })();
 /* Board: "Try the crayon". Live replica of the reader with the floating annotation palette. */
 (function(){
-const K = window.SNSKit;
+const K = window.SNSKit, snT = K.snT;
 window.SNSims = window.SNSims || {};
 const P = '.sns-board';
 const WF = 1.33;                       // palette points -> stage points for stroke widths
@@ -591,7 +593,7 @@ SNSims['r13/board-r13'] = function(root, opts){
 
   const stage = K.h('div','k-stage'); root.appendChild(stage);
   const pr = (()=>{ const w = W-48; return {x:24, y:Math.max(16,(H-w*1839/1300)/2), w}; })();   // clean paper card: just the page
-  const page = K.h('img','k-page'); page.alt='Mozart, Piano Sonata in C major, K. 545, first page'; page.draggable=false;
+  const page = K.h('img','k-page'); page.alt=snT('Mozart, Piano Sonata in C major, K. 545, first page'); page.draggable=false;
   page.src = K.asset('k545-p1.jpg');
   Object.assign(page.style,{left:pr.x+'px',top:pr.y+'px',width:pr.w+'px'});
   page.onload = ()=>root.classList.add('ready');
@@ -621,7 +623,7 @@ SNSims['r13/board-r13'] = function(root, opts){
     undo: ['<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>', 'Undone']
   };
   const note = K.h('div','k-note off'); note.style.top = '16px'; stage.appendChild(note);
-  const pill = name => { if (name){ note.innerHTML = `${PILL[name][0]}<span>${PILL[name][1]}</span>`; note.classList.remove('off'); } else note.classList.add('off'); };
+  const pill = name => { if (name){ note.innerHTML = `${PILL[name][0]}<span>${snT(PILL[name][1])}</span>`; note.classList.remove('off'); } else note.classList.add('off'); };
 
   /* ---------- state ---------- */
   const st = {tool:'crayon', color:2, wi:Object.assign({},K.DEF_W), op:Object.assign({},K.DEF_OP), whole:false, hidden:{}, layersOpen:false, pencilOnly:false, lastInk:'crayon', shapeKind:'rectangle'};
@@ -896,7 +898,7 @@ SNSims['r13/board-r13'] = function(root, opts){
   function refreshLayers(){ if (openPop && openPop.kind==='layers') { openPop.el.render(); placePop(); } }
   function moreMenu(){
     const m = K.h('div','k-pop k-menu');
-    m.innerHTML = `<button class="po"><span class="ck">${st.pencilOnly?'✓':''}</span><span class="tx">Draw Only with Apple Pencil</span>${K.sf('applepencil')}</button><div class="arrow"></div>`;
+    m.innerHTML = `<button class="po"><span class="ck">${st.pencilOnly?'✓':''}</span><span class="tx">${snT('Draw Only with Apple Pencil')}</span>${K.sf('applepencil')}</button><div class="arrow"></div>`;
     m.addEventListener('pointerdown', e=>e.stopPropagation());
     m.querySelector('.po').onclick = ()=>{ st.pencilOnly = !st.pencilOnly; closePops(); };
     return m;
@@ -904,7 +906,7 @@ SNSims['r13/board-r13'] = function(root, opts){
   /* AnnotationShape menu: Rectangle, Ellipse, Line, Arrow with their SF Symbols */
   function shapeMenu(){
     const m = K.h('div','k-pop k-menu');
-    m.innerHTML = K.SHAPES.map(([k,t])=>`<button data-kind="${k}"><span class="tx">${t}</span>${K.sf(k)}</button>`).join('') + '<div class="arrow"></div>';
+    m.innerHTML = K.SHAPES.map(([k,t])=>`<button data-kind="${k}"><span class="tx">${snT(t)}</span>${K.sf(k)}</button>`).join('') + '<div class="arrow"></div>';
     m.addEventListener('pointerdown', e=>e.stopPropagation());
     m.querySelectorAll('button').forEach(b=>b.onclick=()=>{ st.shapeKind = b.dataset.kind; closePops(); pal.update(); });
     return m;

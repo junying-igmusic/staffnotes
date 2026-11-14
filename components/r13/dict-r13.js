@@ -41,6 +41,7 @@ function matches(q){
   const all = Object.keys(T);
   return [...all.filter(t => t === q), ...all.filter(t => t !== q && t.startsWith(q)), ...all.filter(t => !t.startsWith(q) && t.split(' ').some(w => w.startsWith(q)))];
 }
+const tr = (s, v) => window.snT ? snT(s, v) : s;
 const esc = s => s.replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'})[c]);
 const SERIF = '"Timeless Serif",Georgia,serif';
 const CSS = `
@@ -120,11 +121,11 @@ NS['r13/dict-r13'] = function(root){
   if (getComputedStyle(root).position === 'static') root.style.position = 'relative';
   root.innerHTML = `<div class="d-stage">
     <div class="mark" style="left:${ALG.x - 2}px;top:${ALG.y - 2}px;width:${ALG.w + 4}px;height:${ALG.h + 4}px"></div>
-    <div class="hit" role="button" aria-label="Look up Allegro" style="left:${ALG.x - 8}px;top:${ALG.y - 8}px;width:${ALG.w + 16}px;height:${ALG.h + 16}px"></div>
+    <div class="hit" role="button" aria-label="${tr('Look up {term}', {term: 'Allegro'})}" style="left:${ALG.x - 8}px;top:${ALG.y - 8}px;width:${ALG.w + 16}px;height:${ALG.h + 16}px"></div>
     <svg class="ring" viewBox="0 0 34 34"><circle cx="17" cy="17" r="15.5"/></svg>
     <div class="pw"><div class="pn">
-      <div class="hd"><button class="bk" type="button" aria-label="Search results" tabindex="-1">${ICON.back}</button><b>Dictionary</b></div>
-      <div class="ct"><div class="sf">${ICON.search}<span class="q"></span><button class="cx" type="button" aria-label="Clear" tabindex="-1">${ICON.clear}</button></div><div class="rs"><div class="ri"></div></div></div>
+      <div class="hd"><button class="bk" type="button" aria-label="${tr('Search results')}" tabindex="-1">${ICON.back}</button><b>${tr('Dictionary')}</b></div>
+      <div class="ct"><div class="sf">${ICON.search}<span class="q"></span><button class="cx" type="button" aria-label="${tr('Clear')}" tabindex="-1">${ICON.clear}</button></div><div class="rs"><div class="ri"></div></div></div>
     </div></div>
     <div class="snd"></div></div>`;
   const $ = s => root.querySelector(s);
@@ -162,22 +163,22 @@ NS['r13/dict-r13'] = function(root){
   }
   function card(t){
     const e = T[t], rel = RELATED[t] || [];
-    return `<div class="hw">${esc(t)}</div><div class="sh">${esc(e[0])}</div><div class="dt">${esc(e[1])}</div>` +
-      (rel.length ? `<div class="rl">Related entries</div>${rel.map(r => `<button class="rb" type="button" tabindex="-1" data-t="${esc(r)}">${esc(r)}</button>`).join('')}` : '');
+    return `<div class="hw">${esc(t)}</div><div class="sh">${esc(tr(e[0]))}</div><div class="dt">${esc(tr(e[1]))}</div>` +
+      (rel.length ? `<div class="rl">${tr('Related entries')}</div>${rel.map(r => `<button class="rb" type="button" tabindex="-1" data-t="${esc(r)}">${esc(r)}</button>`).join('')}` : '');
   }
   let lastView = '';
   function render(anim){
     const M = mode(), cr = st.focus ? '<i class="cr"></i>' : '';
-    qEl.innerHTML = st.q ? esc(st.q) + cr : cr + '<span class="ph">Search musical terms</span>';
+    qEl.innerHTML = st.q ? esc(st.q) + cr : cr + `<span class="ph">${tr('Search musical terms')}</span>`;
     sf.classList.toggle('fo', st.focus);
     cx.classList.toggle('on', !!st.q);
     bk.classList.toggle('on', M.k === 'detail');
     const view = M.k + ':' + (M.t || M.m.join('|'));
     if (view !== lastView){
       let html = '';
-      if (M.k === 'list') html = M.m.map((t, i) => `${i ? '<i class="dv"></i>' : ''}<button class="row" type="button" tabindex="-1" data-t="${esc(t)}"><div class="tw">${esc(t)}</div><div class="sub">${esc(T[t][0])}</div></button>`).join('');
+      if (M.k === 'list') html = M.m.map((t, i) => `${i ? '<i class="dv"></i>' : ''}<button class="row" type="button" tabindex="-1" data-t="${esc(t)}"><div class="tw">${esc(t)}</div><div class="sub">${esc(tr(T[t][0]))}</div></button>`).join('');
       else if (M.k === 'single' || M.k === 'detail') html = card(M.t);
-      else if (M.k === 'none') html = `<div class="nr">${ICON.search}No result</div>`;
+      else if (M.k === 'none') html = `<div class="nr">${ICON.search}${tr('No result')}</div>`;
       const fresh = anim && (M.k === 'single' || M.k === 'detail');
       ri.innerHTML = html ? `<div class="vw${fresh ? ' in' : ''}">${html}</div>` : '';
       rs.scrollTop = 0; lastView = view;

@@ -2,9 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>(()=>{try{const P={zh:'/zh/','zh-hant':'/zh-hant/',de:'/de/'};let l=localStorage.getItem('sn-lang');
+if(!l)for(const x of navigator.languages||[navigator.language||'']){const v=x.toLowerCase();if(v.startsWith('en')){l='en';break}if(v.startsWith('de')){l='de';break}
+if(v.startsWith('zh')){l=/hant|-tw|-hk|-mo/.test(v)?'zh-hant':'zh';break}}
+if(P[l])location.replace(P[l]+location.search+location.hash)}catch(e){}})()</script>
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>StaffNotes · Sheet music that follows you</title>
+<link rel="alternate" hreflang="en" href="https://staffnotes.igmusictech.com/">
+<link rel="alternate" hreflang="zh-Hans" href="https://staffnotes.igmusictech.com/zh/">
+<link rel="alternate" hreflang="zh-Hant" href="https://staffnotes.igmusictech.com/zh-hant/">
+<link rel="alternate" hreflang="de" href="https://staffnotes.igmusictech.com/de/">
+<link rel="alternate" hreflang="x-default" href="https://staffnotes.igmusictech.com/">
 <link rel="icon" href="assets/logo-mark.svg" type="image/svg+xml">
 <style>
 @font-face{font-family:"Timeless Serif";src:url(assets/TimelessSerif-Book.ttf) format("truetype");font-display:swap}
@@ -16,6 +25,12 @@
   --serif:"Timeless Serif",Georgia,serif;--sans:"Timeless Sans",-apple-system,system-ui,sans-serif;
   --ease:cubic-bezier(.2,.7,.2,1);--wrap:min(1180px,calc(100vw - 48px));
 }
+/* 中文：拉丁字母照旧用 Timeless，汉字落到苹方；德语长词自动断字 */
+:root:lang(zh-Hans){--serif:"Timeless Serif",Georgia,"PingFang SC","Noto Sans SC",sans-serif;--sans:"Timeless Sans",-apple-system,system-ui,"PingFang SC","Noto Sans SC",sans-serif}
+:root:lang(zh-Hant){--serif:"Timeless Serif",Georgia,"PingFang TC","Noto Sans TC",sans-serif;--sans:"Timeless Sans",-apple-system,system-ui,"PingFang TC","Noto Sans TC",sans-serif}
+:root:lang(zh) body{letter-spacing:0}
+:root:lang(zh) p,:root:lang(zh) li,:root:lang(zh) h3,:root:lang(zh) .label{text-wrap:pretty}
+:root:lang(de) h1,:root:lang(de) h2,:root:lang(de) h3,:root:lang(de) p,:root:lang(de) li{-webkit-hyphens:auto;hyphens:auto}
 *{box-sizing:border-box;margin:0;padding:0}
 html{background:var(--paper)}
 body{font-family:var(--sans);font-weight:400;color:var(--ink);background:var(--paper);font-size:16px;line-height:1.45;letter-spacing:-.01em;-webkit-font-smoothing:antialiased;overflow-x:hidden}
@@ -63,6 +78,17 @@ body>*:not(.nav):not(.totop){transition:opacity var(--veil-ms,0ms) ease}
 .nav.dark .links .slider{background:rgba(255,255,255,.12)}
 .nav.dark .store{background:#fff;color:#0B0C0E}
 .menu-btn{display:none}
+/* 语言：电脑在菜单右边、App Store 左边，手机挨着 Menu；下拉照手机菜单的样子，挂在按钮正下方。导航条宽度跟内容走，长语言不挤折行 */
+.nav{width:max-content}
+.lang{position:relative}
+.lang-btn{height:44px;min-width:44px;padding:0 12px;border-radius:999px;background:rgba(120,120,120,.1);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);font-size:13px;font-weight:500;letter-spacing:.02em;transition:background .3s,color .3s}
+.nav.dark .lang-btn,.nav.dark .menu-btn{background:rgba(255,255,255,.08);color:#F2F2F4}
+.langs{display:none;position:absolute;top:52px;left:50%;transform:translateX(-50%);flex-direction:column;padding:8px;border-radius:18px;background:rgba(246,246,244,.96);box-shadow:0 12px 40px -12px rgba(41,45,56,.25);white-space:nowrap}
+.nav.dark .langs{background:rgba(28,30,36,.96);color:#F2F2F4}
+.lang.open .langs{display:flex}
+.langs a{line-height:44px;padding:0 24px;text-align:center;font-size:14px;opacity:.85}
+.langs a[aria-current]{color:var(--blue);opacity:1}
+.nav.dark .langs a[aria-current]{color:#B0BBF0}
 
 /* HERO */
 .hero{position:relative;height:100vh;min-height:640px;overflow:hidden;background:#DCDEDD}
@@ -305,6 +331,7 @@ h1,h2,h3{text-wrap:balance}
 .plan{background:var(--card);border-radius:32px;padding:40px 40px 34px;border:1px solid transparent;transition:background .35s,border-color .35s}
 .plan:hover{background:#FCFBF8;border-color:var(--line)}
 .plan.pro{border-color:var(--blue)}
+.pill.basic:hover{background:none;color:var(--blue)}
 .plan .top{display:flex;justify-content:space-between;align-items:baseline}
 .plan h3{font-family:var(--serif);font-weight:400;font-size:40px;letter-spacing:-.03em}
 .plan .price{font-size:13px;color:var(--ink2);margin:6px 0 30px}
@@ -350,8 +377,9 @@ footer .legal span{margin-left:auto}
 .totop:hover{background:rgba(63,82,159,.08)}
 
 @media (max-width:900px){
-  .links{display:none}.menu-btn{display:flex;height:44px;align-items:center;padding:0 16px;border-radius:12px;background:rgba(120,120,120,.1);backdrop-filter:blur(20px);font-size:14px}
+  .links{display:none}.menu-btn{display:flex;height:44px;align-items:center;padding:0 16px;border-radius:999px;background:rgba(120,120,120,.1);backdrop-filter:blur(20px);font-size:14px}
   .nav{width:calc(100vw - 32px);justify-content:space-between}.nav .store{order:3}
+  .nav{justify-content:flex-start}.menu-btn{margin-left:auto}.lang{margin-right:auto}
   .grid2,.row,.sketch .head,.pricing .head,footer .cols{grid-template-columns:1fr}
   .label{margin-bottom:22px}
   .show-head{display:block;margin-bottom:40px}
@@ -381,8 +409,9 @@ footer .legal span{margin-left:auto}
   .big .w{opacity:1;filter:none}
 }
 </style>
-<link rel="stylesheet" href="components/r13/dot-r13.css?v=7ebcdae7">
-<link rel="stylesheet" href="components/r13/onescore-r13.css?v=7ebcdae7">
+<link rel="stylesheet" href="components/r13/dot-r13.css?v=c2310438">
+<link rel="stylesheet" href="components/r13/onescore-r13.css?v=c2310438">
+<script src="components/r13/i18n-r13.js?v=c2310438"></script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="sn-mark" viewBox="145 248 510 302"><g data-key="q8xqzuy8nm" transform="translate(400 399.3127136230469) rotate(-90) scale(1 -1)"><path  transform="scale(1.1682242990654206) translate(-125 -214)" d="M92 132C91 128 90 123 90 120C91 116 93 114 97 114C107 114 123 126 130 128C141 132 155 135 169 135C178 135 187 133 195 131C205 129 214 124 223 118C238 106 250 88 250 67C250 30 220 0 183 0C146 0 116 30 116 67V77C83 77 33 17 26 11C22 9 19 7 16 7C8 7 4 18 4 28V34C7 57 24 83 37 102C50 120 59 139 71 157C89 187 108 216 125 246C131 255 155 284 155 300C155 303 154 306 152 308C151 309 149 310 147 310C139 310 126 302 120 300C109 296 95 293 81 293C72 293 63 295 55 297C45 299 36 304 27 310C12 322 0 340 0 361C0 398 30 428 67 428C104 428 134 398 134 361V351C167 351 217 411 224 417C230 421 233 421 235 421C244 421 247 416 247 408C247 382 213 327 206 316L104 155C101 150 95 141 92 132Z"/></g></symbol></svg>
@@ -401,6 +430,7 @@ footer .legal span{margin-left:auto}
     <a href="#faq" data-s="faq">FAQ</a>
   </div>
   <button class="menu-btn" type="button" aria-expanded="false" aria-controls="links">Menu</button>
+  <div class="lang" id="lang"><button class="lang-btn" type="button" aria-expanded="false" aria-controls="langs" aria-label="Language: English">EN</button><div class="langs" id="langs"><a href="/" hreflang="en" lang="en" data-l="en">English</a><a href="/zh/" hreflang="zh-Hans" lang="zh-Hans" data-l="zh">简体中文</a><a href="/zh-hant/" hreflang="zh-Hant" lang="zh-Hant" data-l="zh-hant">繁體中文</a><a href="/de/" hreflang="de" lang="de" data-l="de">Deutsch</a></div></div>
   <a class="store" aria-disabled="true"><svg viewBox="0 0 24 24"><path d="M16.37 12.6c-.02-2.28 1.86-3.38 1.95-3.43-1.06-1.55-2.71-1.77-3.3-1.79-1.4-.14-2.74.83-3.45.83-.71 0-1.81-.81-2.97-.79-1.53.02-2.94.89-3.73 2.26-1.59 2.76-.41 6.84 1.14 9.08.76 1.1 1.66 2.33 2.84 2.28 1.14-.05 1.57-.74 2.95-.74 1.38 0 1.77.74 2.97.71 1.23-.02 2-1.11 2.75-2.21.87-1.27 1.22-2.5 1.24-2.57-.03-.01-2.38-.91-2.39-3.63zM14.1 5.9c.63-.76 1.05-1.82.94-2.87-.9.04-2 .6-2.65 1.36-.58.67-1.09 1.75-.95 2.78 1 .08 2.03-.51 2.66-1.27z"/></svg><span><b>Coming soon</b></span></a>
 </nav>
 
@@ -436,7 +466,7 @@ footer .legal span{margin-left:auto}
       </div>
       <div class="os-copy">
       <div class="fx-copy">
-        <div class="label"><span>Import</span>Any PDF · single or batch · no typing</div>
+        <div class="label"><span>Import</span>Any PDF · single or batch · no typing <b class="basic-tag">Basic</b></div>
         <h2 class="sec-title"><span class="ln">Drop in a PDF.</span> <span class="ln">It knows the piece.</span></h2>
         <div class="fx-run">
         <div class="fx-nodes"><i></i><i></i><i></i><i></i></div>
@@ -449,7 +479,7 @@ footer .legal span{margin-left:auto}
       </div>
       </div>
         <div class="os-chcopy sk-g on" data-ch="pen" data-side="L" data-beats="5">
-          <div class="label"><span>Annotate</span>3 pens · 6 colors · 5 widths each</div>
+          <div class="label"><span>Annotate</span>3 pens · 6 colors · 5 widths each <b class="basic-tag">Basic</b></div>
           <h2 class="sec-title">Mark it like paper.</h2>
           <p>The pens, colors and widths from the app. Try them on this page with your mouse or finger.</p>
           <ul>
@@ -461,7 +491,7 @@ footer .legal span{margin-left:auto}
           </ul>
         </div>
         <div class="os-chcopy sk-g on" data-ch="lay" data-side="R" data-beats="2">
-          <div class="label"><span>Layers</span>Groups · 6 colors each · every color is a layer</div>
+          <div class="label"><span>Layers</span>Groups · 6 colors each · every color is a layer <b class="basic-tag">Basic</b></div>
           <h2 class="sec-title">Keep every version on one score.</h2>
           <p>Hide, lock or delete any color. Groups keep teacher's marks, fingering and stage copy apart.</p>
           <ul>
@@ -479,7 +509,7 @@ footer .legal span{margin-left:auto}
           </ul>
         </div>
         <div class="os-chcopy sk-g on" data-ch="prac" data-side="R" data-beats="3">
-          <div class="label"><span>Practice tools</span>Metronome · Tuner · Reference · all free</div>
+          <div class="label"><span>Practice tools</span>Metronome · Tuner · Reference <b class="basic-tag">Basic</b></div>
           <h2 class="sec-title">Your practice tools, on the score.</h2>
           <p>They open over the page, so you never leave the music to use them.</p>
           <ul>
@@ -489,7 +519,7 @@ footer .legal span{margin-left:auto}
           </ul>
         </div>
         <div class="os-chcopy sk-g on" data-ch="am" data-side="L" data-beats="2">
-          <div class="label"><span>Apple Music</span>Recordings of this exact work · many pianists</div>
+          <div class="label"><span>Apple Music</span>Recordings of this exact work · many pianists <b class="basic-tag">Basic</b></div>
           <h2 class="sec-title">Hear the piece you're reading.</h2>
           <p>Pick a recording and it plays in a panel over the score.</p>
           <ul>
@@ -498,7 +528,7 @@ footer .legal span{margin-left:auto}
           </ul>
         </div>
         <div class="os-chcopy sk-g on" data-ch="turn" data-side="R" data-beats="3">
-          <div class="label"><span>Page turns</span>Page preview · Go to Page · next movement</div>
+          <div class="label"><span>Page turns</span>Page preview · Go to Page · next movement <b class="basic-tag">Basic</b></div>
           <h2 class="sec-title">Get to any page without flipping.</h2>
           <p>One PDF holds the whole sonata. The page bar at the bottom gets you anywhere in it.</p>
           <ul>
@@ -535,7 +565,7 @@ footer .legal span{margin-left:auto}
 <section class="lib wrap" id="library" data-nav="organize" data-theme="light">
   <div class="cols">
     <div>
-      <div class="label rv" style="margin-bottom:26px"><span>Online Library</span>Public-domain scores · grouped by edition</div>
+      <div class="label rv" style="margin-bottom:26px"><span>Online Library</span>Public-domain scores · grouped by edition <b class="basic-tag">Basic</b></div>
       <h2 class="sec-title rv"><span class="ln">Free scores,</span> <span class="ln">sorted and named.</span></h2>
       <p class="rv" style="--i:1">Search by work, composer or catalog number. Urtext, manuscripts, edited editions and arrangements come grouped, and the score you pick lands in your library already named.</p>
     </div>
@@ -561,12 +591,12 @@ footer .legal span{margin-left:auto}
 <section id="stats" data-theme="light">
   <div class="st wrap">
       <div class="st-top">
-        <div class="label rv" style="margin-bottom:26px"><span>Practice statistics</span>By day · by piece · by composer</div>
+        <div class="label rv" style="margin-bottom:26px"><span>Practice statistics</span>By day · by piece · by composer <b class="basic-tag">Basic</b></div>
         <h2 class="sec-title rv"><span class="ln">See what you practiced</span> <span class="ln">this month.</span></h2>
         <p class="rv" style="--i:1">StaffNotes counts how long each score is open. Nothing to start or log, and it stays on your iPad.</p>
       </div>
       <div class="sim" data-sim="stats" aria-label="Sample statistics for one month"></div>
-      <script src="components/stats.js?v=7ebcdae7" defer></script>
+      <script src="components/stats.js?v=c2310438" defer></script>
     </div>
 </section>
 
@@ -583,12 +613,12 @@ footer .legal span{margin-left:auto}
 <!-- PRICING -->
 <section class="pricing wrap" id="pricing" data-theme="light">
   <div class="head">
-    <div class="label rv"><span>Pricing</span>Free · Pro</div>
-    <h2 class="sec-title rv"><span class="ln">Start free.</span> <span class="ln">Go Pro for page turning.</span></h2>
+    <div class="label rv"><span>Pricing</span>Basic · Pro</div>
+    <h2 class="sec-title rv"><span class="ln">Basic is free.</span> <span class="ln">Go Pro for page turning.</span></h2>
   </div>
   <div class="plans">
     <div class="plan rv">
-      <div class="top"><h3>Free</h3></div>
+      <div class="top"><h3>Basic</h3><span class="pill basic">Basic</span></div>
       <div class="price">Free on the App Store</div>
       <ul>
         <li>PDF import, recognized automatically</li>
@@ -608,7 +638,7 @@ footer .legal span{margin-left:auto}
       <div class="top"><h3>Pro</h3><span class="pill on">Pro</span></div>
       <div class="price">Price shown in the App Store</div>
       <ul>
-        <li>Everything in Free</li>
+        <li>Everything in Basic</li>
         <li class="plus">Automatic page turning</li>
         <li class="plus">Measure numbers</li>
         <li class="plus">Music dictionary</li>
@@ -629,7 +659,7 @@ footer .legal span{margin-left:auto}
       <div class="qa open"><button>Do I need an Apple Pencil?<i>+</i></button><div class="a"><div><p>No. Reading, turning pages and every practice tool work with your fingers. For writing on the score, a Pencil feels closest to paper.</p></div></div></div>
       <div class="qa"><button>Where do my scores come from?<i>+</i></button><div class="a"><div><p>Your own PDFs, from Files or any app that shares a PDF, or straight from the built-in online library of public-domain scores.</p></div></div></div>
       <div class="qa"><button>Do my markings change the PDF?<i>+</i></button><div class="a"><div><p>No. Markings live on layers above the page. Export an annotated copy with the layers you pick whenever you need one.</p></div></div></div>
-      <div class="qa"><button>What is free and what is Pro?<i>+</i></button><div class="a"><div><p>Importing, reading, annotating, the library and all practice tools are free. Automatic page turning, measure numbers, the music dictionary, cloud sync, MusicXML and forScore import are Pro.</p></div></div></div>
+      <div class="qa"><button>What is in Basic and what is in Pro?<i>+</i></button><div class="a"><div><p>Importing, reading, annotating, the library and all practice tools are in Basic, which is free. Automatic page turning, measure numbers, the music dictionary, cloud sync, MusicXML and forScore import are Pro.</p></div></div></div>
       <div class="qa"><button>Can I bring my forScore markings?<i>+</i></button><div class="a"><div><p>Yes. Pro imports forScore .4sc and .4sb files with their annotations.</p></div></div></div>
       <div class="qa"><button>Which languages does it speak?<i>+</i></button><div class="a"><div><p>English, Deutsch and 中文. Piece names follow your language where the catalogue has them.</p></div></div></div>
     </div>
@@ -666,7 +696,8 @@ function split(el){
   const walk = n => [...n.childNodes].forEach(c=>{
     if(c.nodeType===3){
       const frag=document.createDocumentFragment();
-      c.textContent.split(/(\s+)/).forEach(t=>{ if(!t) return; if(/^\s+$/.test(t)) frag.append(t); else { const s=document.createElement('span'); s.className='w'; s.textContent=t; frag.append(s);} });
+      // 中文没有空格，一个字算一个词
+      c.textContent.split(/(\s+)/).flatMap(t=>/[\u3000-\u9fff\uff00-\uffef]/.test(t)?t.match(/[\u3000-\u9fff\uff00-\uffef]|[^\u3000-\u9fff\uff00-\uffef]+/g):[t]).forEach(t=>{ if(!t) return; if(/^\s+$/.test(t)) frag.append(t); else { const s=document.createElement('span'); s.className='w'; s.textContent=t; frag.append(s);} });
       c.replaceWith(frag);
     } else if(c.nodeType===1 && c.tagName!=='BR') walk(c);
   });
@@ -687,7 +718,7 @@ const simFiles = {};
 function simFactory(name){
   return simFiles[name] ??= new Promise(done=>{
     if(SNSims[name]) return done(SNSims[name]);
-    const s=document.createElement('script'); s.src=`components/${name}.js?v=7ebcdae7`; s.async=true;
+    const s=document.createElement('script'); s.src=`components/${name}.js?v=c2310438`; s.async=true;
     s.onload=()=>done(SNSims[name]||null); s.onerror=()=>{ s.remove(); done(null); };
     document.head.appendChild(s);
   });
@@ -730,10 +761,21 @@ links.addEventListener('mouseleave',()=>moveSlider(current));
 const osSec=document.querySelector('section.os');
 /* 手机：Menu 展开 7 项，点一项或点外面就收起 */
 const menuBtn=$('.menu-btn');
-const menu=on=>{ nav.classList.toggle('open',on); menuBtn.setAttribute('aria-expanded',on); };
-menuBtn.addEventListener('click',e=>{ e.stopPropagation(); menu(!nav.classList.contains('open')); });
+const menu=on=>{ if(on) nav.style.setProperty('--mx',(menuBtn.offsetLeft+menuBtn.offsetWidth/2)+'px'); nav.classList.toggle('open',on); menuBtn.setAttribute('aria-expanded',on); };
+menuBtn.addEventListener('click',e=>{ e.stopPropagation(); langOpen(false); menu(!nav.classList.contains('open')); });
 navA.forEach(a=>a.addEventListener('click',()=>menu(false)));
 document.addEventListener('click',e=>{ if(nav.classList.contains('open') && !links.contains(e.target)) menu(false); });
+/* 语言：下拉和 Menu 互斥；选了就记下来，下次打开根地址直接进这个语言，带着当前位置走 */
+const lang=$('#lang'), langBtn=lang.querySelector('.lang-btn'), LG=window.SN_LANG||'en';
+const langOpen=on=>{ lang.classList.toggle('open',on); langBtn.setAttribute('aria-expanded',on); };
+langBtn.textContent={en:'EN',zh:'简','zh-hant':'繁',de:'DE'}[LG];
+lang.querySelectorAll('a').forEach(a=>{
+  if(a.dataset.l===LG) a.setAttribute('aria-current','true');
+  if(/\.html$/.test(location.pathname)) a.href=location.pathname+(a.dataset.l==='en'?'':'?lang='+a.dataset.l);
+  a.addEventListener('click',e=>{ e.preventDefault(); try{ localStorage.setItem('sn-lang',a.dataset.l); }catch(_){} location.href=a.href.split('#')[0]+location.hash; });
+});
+langBtn.addEventListener('click',e=>{ e.stopPropagation(); menu(false); langOpen(!lang.classList.contains('open')); });
+document.addEventListener('click',e=>{ if(lang.classList.contains('open') && !lang.contains(e.target)) langOpen(false); });
 
 /* pointer */
 let mx=0,my=0,sx=0,sy=0;
@@ -852,7 +894,7 @@ requestAnimationFrame(frame);
     const id=a.getAttribute('href').slice(1); e.preventDefault(); if(!id) return;
     const el=document.getElementById(id); if(!el) return;
     stop(); requestAnimationFrame(()=>glide(el));
-    history.replaceState(null,'','#'+id);
+    history.replaceState(null,'',location.pathname+'#'+id);
   });
 })();
 
@@ -888,6 +930,6 @@ requestAnimationFrame(frame);
 /* FAQ */
 $$('.qa button').forEach(b=>b.onclick=()=>{ const q=b.parentElement, was=q.classList.contains('open'); $$('.qa').forEach(x=>x.classList.remove('open')); if(!was) q.classList.add('open'); });
 </script>
-<script src="components/r13/onescore-r13.js?v=7ebcdae7"></script>
+<script src="components/r13/onescore-r13.js?v=c2310438"></script>
 </body>
 </html>

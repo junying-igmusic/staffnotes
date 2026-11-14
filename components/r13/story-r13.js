@@ -16,6 +16,9 @@ window.SNSims = window.SNSims || {};
 const W = 780, H = 580, A = (document.currentScript && document.currentScript.src) ? new URL('../assets/', document.currentScript.src).href : 'components/assets/';
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const LAST = 4;
+// 多语言：界面字走 i18n-r13.js 的 snT（词表 i18n/organize.json）；作曲家名、乐章速度术语、文件名照 App 不翻。时长照 App ScorePresentation.duration：中文「分钟」，德语小数逗号加「Min.」
+const snT = (s, v) => window.snT ? window.snT(s, v) : s.replace(/\{(\w+)\}/g, (m, k) => v && k in v ? v[k] : m);
+const min = v => snT('{n} min', {n: window.SN_LANG === 'de' ? String(v).replace('.', ',') : v});
 
 // 图书馆卡片沿用 App 的 LibraryCardMetrics：145:205，列间距 18
 const CW = 134.8, CH = 190, GAP = 18, X0 = 17, R1 = 76, R2 = 346, R3 = R1 + CH + 30;
@@ -126,6 +129,8 @@ ${G(3)} .card{opacity:0;transform:scale(.94);transition-delay:calc(.15s*var(--k)
 /* Save to Library：等字段展示完、列表滚回顶才浮上来，随后圆点按它 */
 .sns-story .sv{position:absolute;left:50%;bottom:12px;height:32px;margin-left:-62px;width:124px;border-radius:16px;background:#3F529F;color:#fff;font-size:15px;display:grid;place-items:center;opacity:0;translate:0 8px;transition:opacity calc(.3s*var(--k)),translate calc(.45s*var(--k)) cubic-bezier(.2,.7,.2,1)}
 .sns-story[data-s="2"] .sv{opacity:1;translate:0 0;transition-delay:calc(${TF+.12+FL}s*var(--k));animation:snsTap calc(.35s*var(--k)) calc(${TV+.2}s*var(--k)) ease both}
+/* 德语「In Mediathek sichern」比 124 px 宽：按钮跟着字宽，仍然居中 */
+:root:lang(de) .sns-story .sv{left:0;right:0;width:max-content;margin:0 auto;padding:0 16px}
 .sns-story .tp{opacity:0;--tl:.7s}
 .sns-story .tp::after{content:"";position:absolute;inset:0;border-radius:50%;border:calc(var(--dotu,30px)*.06) solid rgba(41,45,56,.28);opacity:0;pointer-events:none}
 .sns-story[data-s="2"] .tp.t2{--td:${TV}s}
@@ -235,7 +240,7 @@ function folder(o, i){
   const pv = `<div class="pv" style="background-image:url(${P[o.pa]})"></div>` + (o.hit ? `<div class="pv new" style="background-image:url(${P[0]})"></div>` : '');
   const body = o.cmp
     ? `<div class="av" style="background-image:url(${A}cmp-${o.cmp}.jpg)"></div><div class="t"><span class="f">${o.first}</span><span class="z">${o.last}</span></div>`
-    : `${o.png ? `<div class="ic" style="-webkit-mask-image:url(${A}fld-${o.png}.png);mask-image:url(${A}fld-${o.png}.png)"></div>` : folderSvg}<div class="t"><small>${o.years}</small>${o.label}</div>`;
+    : `${o.png ? `<div class="ic" style="-webkit-mask-image:url(${A}fld-${o.png}.png);mask-image:url(${A}fld-${o.png}.png)"></div>` : folderSvg}<div class="t"><small>${o.years}</small>${snT(o.label)}</div>`;
   const n = o.hit ? `<span class="a">${o.n}</span><span class="b">${o.n+1}</span>` : `<span class="a">${o.n}</span>`;
   return `<div class="it c${i%5} ${o.cmp?'cmp':'per'}${o.hit?' hit':''}" style="left:${colX(i%5)}px;top:${o.y}px;--i:${o.i}"><div class="bp"></div>${pv}<div class="cv"><div class="dots">···</div><div class="n">${n}</div>${body}</div></div>`;
 }
@@ -255,12 +260,14 @@ SNSims['r13/story-r13'] = function(root){
     // 图标照 App 的 LibraryFolderCoverStyle：period:modern 用 early20，period:contemporary 用 modern（留声机，fld-modern.png 由 App 的 LibraryFolder-modern.pdf 渲成）
     {label:'Contemporary', years:'1945 –', png:'modern', n:3, pa:2}];
   const check = (s=12) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>`;
-  const meta = [['m1','Piano Sonata No. 16 in C Major, K. 545',300],['m2','Wolfgang Amadeus Mozart · 1756 – 1791',230],['m3','Classical · 11.5 min',110]];
-  const mvs = [['1.','Allegro','C Major','3.5 min',1],['2.','Andante','G Major','6 min',5],['3.','Rondo: Allegretto','C Major','1.5 min',9]];
+  // 标题照 App ScoreSavedNames：德语界面用目录里的德语标题，中文界面和英语一样
+  const t545 = snT('Piano Sonata No. 16 in C Major, K. 545');
+  const meta = [['m1',t545,300],['m2','Wolfgang Amadeus Mozart · 1756 – 1791',230],['m3',`${snT('Classical')} · ${min(11.5)}`,110]];
+  const mvs = [['1.','Allegro',snT('C Major'),min(3.5),1],['2.','Andante',snT('G Major'),min(6),5],['3.','Rondo: Allegretto',snT('C Major'),min(1.5),9]];
   const chev = '<svg width="9" height="14" viewBox="0 0 9 14" fill="none" stroke="#292D38" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m1.5 1.5 5.5 5.5-5.5 5.5"/></svg>';
   const roll = n => `<span class="dg"><span>${Array.from({length:n},(_,i)=>`<span>${i+1}</span>`).join('')}</span></span>`;
   const gl = b => `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#292D38" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="${b?'M12 6l-6 6 6 6M19 6l-6 6 6 6':'M5 6l6 6-6 6M12 6l6 6-6 6'}"/></svg>`;
-  const scores = [['k',P[0],'Piano Sonata No. 16 in C Major, K. 545'],['',P[5],'Sonata in C, KV 545']];
+  const scores = [['k',P[0],t545],['',P[5],'Sonata in C, KV 545']];
   // Choose individual fields 展开后的行：照 App importableFields 的顺序，只放这份谱子识别到的字段；时期是选择器，不带勾
   const ico = d => `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#292D38" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
   const icons = {
@@ -269,30 +276,30 @@ SNSims['r13/story-r13'] = function(root){
     music: '<path d="M9 17.5V6l10-2v11.5"/><circle cx="6.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="15.5" r="2.5"/>',
     timer: '<circle cx="12" cy="13.5" r="7"/><path d="M12 10v3.5l2.4 1.6M10 3.5h4"/>',
     piano: '<rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M9.2 13v6M14.8 13v6M7.8 5v8h2.8V5M13.4 5v8h2.8V5"/>'};
-  const fields = [['book','Title','Piano Sonata No. 16 in C Major, K. 545',1],['person','Composer','Wolfgang Amadeus Mozart',1],['','Life dates','1756 – 1791',1],
-    ['','Catalogue number','K. 545',1],['music','Work type','Piano Sonata',1],['','Period and Style','Classical',0],['','Year composed','1788',1],
-    ['','Key','C Major',1],['timer','Estimated duration','11.5 min',1],['piano','Main instruments','Piano',1]];
+  const fields = [['book','Title',t545,1],['person','Composer','Wolfgang Amadeus Mozart',1],['','Life dates','1756 – 1791',1],
+    ['','Catalogue number','K. 545',1],['music','Work type',snT('Piano Sonata'),1],['','Period and Style',snT('Classical'),0],['','Year composed','1788',1],
+    ['','Key',snT('C Major'),1],['timer','Estimated duration',min(11.5),1],['piano','Main instruments',snT('Piano'),1]];
 
   root.innerHTML = `<div class="st">
     <div class="card">
-      <div class="nb" style="left:12px">Previous</div><div class="h sb">Import Score</div><div class="nb" style="right:12px">Skip</div>
+      <div class="nb" style="left:12px">${snT('Previous')}</div><div class="h sb">${snT('Import Score')}</div><div class="nb" style="right:12px">${snT('Skip')}</div>
       <div class="bd"><div class="bi">
       <div class="meta">${meta.map(([c,t,w],i)=>`<div class="${c}"><span class="rx${i?'':' sb'}" style="--i:${i};display:block">${t}</span><i class="sk" style="--i:${i};width:${w}px"></i></div>`).join('')}</div>
       <div class="ct">
-        <div class="ch"><span class="rx sb" style="--i:4">Contents</span><i class="sk" style="--i:4;width:80px"></i><span class="cb" style="--i:4">${check()}</span></div>
-        ${mvs.map(([n,t,k,d,pg],j)=>`<div class="mr"><span class="rx" style="--i:${j+5}">${n}</span><span class="rx" style="--i:${j+5}">${t}</span><span class="pp" style="--j:${j};--n:${pg}">p.&nbsp;${roll(pg)}</span><span class="rx k" style="--i:${j+5}">${k}</span><span class="rx d" style="--i:${j+5}">${d}</span><span class="cb" style="--i:${j+5}">${check()}</span><i class="sk" style="--i:${j+5};width:${[220,250,280][j]}px"></i></div>`).join('')}
-        <div class="cf"><span class="rx" style="--i:8">Choose individual fields</span><span class="rx" style="--i:8"><span class="ex">${chev}</span></span><i class="sk" style="--i:8;width:170px"></i></div>
-        ${fields.map(([ic,l,v,c],i)=>`<div class="fr" style="--i:${i}"><span>${ic?ico(icons[ic]):''}</span><span class="fy">${l}</span><span>${v}</span>${c?`<span class="fk">${check()}</span>`:'<span></span>'}</div>`).join('')}
+        <div class="ch"><span class="rx sb" style="--i:4">${snT('Contents')}</span><i class="sk" style="--i:4;width:80px"></i><span class="cb" style="--i:4">${check()}</span></div>
+        ${mvs.map(([n,t,k,d,pg],j)=>`<div class="mr"><span class="rx" style="--i:${j+5}">${n}</span><span class="rx" style="--i:${j+5}">${t}</span><span class="pp" style="--j:${j};--n:${pg}">${snT('p. {n}').replace(/ /g,'&nbsp;').replace('{n}',roll(pg))}</span><span class="rx k" style="--i:${j+5}">${k}</span><span class="rx d" style="--i:${j+5}">${d}</span><span class="cb" style="--i:${j+5}">${check()}</span><i class="sk" style="--i:${j+5};width:${[220,250,280][j]}px"></i></div>`).join('')}
+        <div class="cf"><span class="rx" style="--i:8">${snT('Choose individual fields')}</span><span class="rx" style="--i:8"><span class="ex">${chev}</span></span><i class="sk" style="--i:8;width:170px"></i></div>
+        ${fields.map(([ic,l,v,c],i)=>`<div class="fr" style="--i:${i}"><span>${ic?ico(icons[ic]):''}</span><span class="fy">${snT(l)}</span><span>${v}</span>${c?`<span class="fk">${check()}</span>`:'<span></span>'}</div>`).join('')}
       </div>
       </div></div>
-      <div class="sv">Save to Library</div>
+      <div class="sv">${snT('Save to Library')}</div>
       <i class="tp snd t2" style="left:${KW/2}px;top:${KH-28}px"></i>
       <i class="tp snd t2f" style="left:${KW-41}px;top:${300+36+3*39+18+20}px"></i>
     </div>
     <div class="lib">
-      <div class="hd" style="top:${R1-40}px;--i:0">Composers <small>9</small></div>
+      <div class="hd" style="top:${R1-40}px;--i:0">${snT('Composers')} <small>9</small></div>
       ${cmps.map((o,i)=>folder({...o,y:R1,i:i+1},i)).join('')}
-      <div class="hd per" style="top:${R2-40}px;--i:3">Periods <small>8</small></div>
+      <div class="hd per" style="top:${R2-40}px;--i:3">${snT('Periods')} <small>8</small></div>
       ${pers.map((o,i)=>folder({...o,y:R2,i:i+4},i)).join('')}
       ${scores.map(([c,src,t],i)=>`<div class="sc ${c}" style="left:${colX(i+1)}px;--i:${i}"><div class="th" style="background-image:url(${src})"></div><p>${t}<small>Wolfgang Amadeus Mozart</small></p></div>`).join('')}
       <i class="tp snd t4" style="left:${colX(4)+CW/2}px;top:${R1+CH/2}px"></i>
@@ -302,11 +309,11 @@ SNSims['r13/story-r13'] = function(root){
     <div class="doc a"><div class="pg"><div class="scan"></div></div><div class="fn">Scan 2026-11-03.pdf</div></div>
     <i class="tp snd t1d" style="left:${W/2}px;top:${H/2-18}px"></i>
     <div class="rd">
-      <div class="ttl"><span class="t1">1. Allegro · Piano Sonata No. 16 in C Major, K. 545<small>Wolfgang Amadeus Mozart · 1756 – 1791</small></span><span class="t2">2. Andante · Piano Sonata No. 16 in C Major, K. 545<small>Wolfgang Amadeus Mozart · 1756 – 1791</small></span></div>
+      <div class="ttl"><span class="t1">1. Allegro · ${t545}<small>Wolfgang Amadeus Mozart · 1756 – 1791</small></span><span class="t2">2. Andante · ${t545}<small>Wolfgang Amadeus Mozart · 1756 – 1791</small></span></div>
       <div class="vp"><div class="p1" style="background-image:url(${A}k545-p1.jpg)"></div><div class="p5" style="background-image:url(${A}k545-p5.jpg)"></div></div>
       <div class="bar">
         <div class="mvb pr">${gl(1)}1. Allegro</div>
-        <div class="pgc">Page<span class="pn"><span class="q1">1 / 12</span><span class="q2">5 / 12</span></span><i></i></div>
+        <div class="pgc">${snT('Page')}<span class="pn"><span class="q1">1 / 12</span><span class="q2">5 / 12</span></span><i></i></div>
         <div class="mvb nx n1">2. Andante${gl(0)}</div>
         <div class="mvb nx n2">3. Rondo: Allegretto${gl(0)}</div>
       </div>

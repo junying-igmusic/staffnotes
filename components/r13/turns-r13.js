@@ -27,6 +27,8 @@ const base = (()=>{ const c = document.currentScript && document.currentScript.s
 const PAGES = [1,2,3,4,5,6], THUMBS = [1,2,3,4,5,6];
 const MOV = ['1. Allegro','2. Andante','3. Rondo: Allegretto'], MSTART = [1,5,9];
 const mvOf = p => p >= 9 ? 2 : p >= 5 ? 1 : 0;
+// 多语言：界面字查 i18n/turns-stats.json，照 App 的 Page / Bar 译法；乐章名是意大利文速度术语，各语言都不译
+const T = s => window.snT ? snT(s) : s;
 // 每页第一小节和本乐章小节总数（照谱面核过）
 const BAR = {1:[1,73],2:[18,73],3:[36,73],4:[55,73],5:[1,74],6:[17,74]};
 // 胶囊：单项 92 宽，页码加小节两项 146 宽，高度不变
@@ -142,7 +144,7 @@ NS['r13/turns-r13'] = function(root){
   root.classList.add('sns-turns');
   root.innerHTML = '';
   const RM = reduced();
-  const TTL = i => `${MOV[i]} · Piano Sonata No. 16 in C Major, K. 545<small>Wolfgang Amadeus Mozart · 1756 – 1791</small>`;
+  const TTL = i => `${MOV[i]} · ${T('Piano Sonata No. 16 in C Major, K. 545')}<small>${T('Wolfgang Amadeus Mozart')} · 1756 – 1791</small>`;
   const KEYS = [1,2,3,4,5,6,7,8,9].map(n=>`<span class="k" data-k="${n}">${n}</span>`).join('') + `<span class="k e"></span><span class="k" data-k="0">0</span><span class="k bk">${bksp}</span>`;
   root.innerHTML = `<i class="bk"></i><div class="t-stage">
     <div class="t-card">${PAGES.map(p=>`<div class="pg${p===1?' p1':''}" data-p="${p}"${p===1?'':` style="background-image:url(${base}p${p}.jpg)"`}></div>`).join('')}<i class="tfl"></i><i class="bfl"></i></div>
@@ -150,12 +152,12 @@ NS['r13/turns-r13'] = function(root){
     <div class="bar">
       <div class="mv tpr">${gl(1)}<span></span></div>
       <div class="cv pv">${chev(1)}</div>
-      <div class="tpill"><span class="h pg"><span class="lb">Page</span><span class="pn"></span></span><span class="dv"></span><span class="h br"><span class="lb">Bar</span><span class="pn"></span></span><i></i></div>
+      <div class="tpill"><span class="h pg"><span class="lb">${T('Page')}</span><span class="pn"></span></span><span class="dv"></span><span class="h br"><span class="lb">${T('Bar')}</span><span class="pn"></span></span><i></i></div>
       <div class="cv nx">${chev(0)}</div>
       <div class="mv nx"><span></span>${gl(0)}</div>
     </div>
     <div class="th"><div class="im">${THUMBS.map(p=>`<div data-p="${p}" style="background-image:url(${base}t${p}.jpg)"></div>`).join('')}</div><span class="mt"></span><b></b></div>
-    <div class="pad"><div class="row"><div class="fld"><span class="chip">Page</span><span class="ty"></span></div><div class="go">${goArrow}</div></div><div class="tcap">/ ${N}</div><div class="kp">${KEYS}</div></div>
+    <div class="pad"><div class="row"><div class="fld"><span class="chip">${T('Page')}</span><span class="ty"></span></div><div class="go">${goArrow}</div></div><div class="tcap">/ ${N}</div><div class="kp">${KEYS}</div></div>
     <div class="snd"></div>
   </div>`;
   const $ = s => root.querySelector(s);
@@ -203,7 +205,7 @@ NS['r13/turns-r13'] = function(root){
     }
     // 数字面板
     ty.textContent = st.typed; goB.classList.toggle('ok', !!st.typed);
-    chip.textContent = st.pmode === 'bar' ? 'Bar' : 'Page'; chip.classList.toggle('bm', st.pmode === 'bar');
+    chip.textContent = T(st.pmode === 'bar' ? 'Bar' : 'Page'); chip.classList.toggle('bm', st.pmode === 'bar');
     tcap.textContent = st.pmode === 'bar' ? `/ ${(BAR[p] || BAR[1])[1]}` : `/ ${N}`;
     $('.pad .k.bk').style.opacity = st.typed ? 1 : '';
   }

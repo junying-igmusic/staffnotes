@@ -141,6 +141,8 @@ const I={
  chevR:svg('<path d="M9.5 6l6 6-6 6"/>'),chevL:svg('<path d="M14.5 6 8.5 12l6 6"/>'),
  note:svg('<path d="M9 17.5V6l10-2v11.5"/><circle cx="6.8" cy="17.5" r="2.3"/><circle cx="16.8" cy="15.5" r="2.3"/>')
 };
+// 界面字接多语言：页面没加载 i18n-r13.js 时照原样返回英文；演奏者名字不翻
+const loc=(s,v)=>window.snT?snT(s,v):s;
 const GRAYS=['#B9BCC2','#A6AAB2','#C7C9CD','#9A9EA6','#B0B3B9','#C0C2C6','#A9ADB4','#BCBFC4'];
 const VERS=[{p:'Mitsuko Uchida'},{p:'Maria João Pires'},{p:'András Schiff'},{p:'Daniel Barenboim'},{p:'Glenn Gould'},{p:'Ingrid Haebler'},{p:'Walter Gieseking'},{p:'Lili Kraus'}];
 const ROW='Piano Sonata No. 16, K. 545';
@@ -162,7 +164,7 @@ SNSims['r13/applemusic-r13']=function(root){
    <div class="ol" data-k="olL"></div><div class="ol" data-k="olR"></div>
    <div class="pn gl vis gone" data-k="pn">
     <div class="full" data-k="full">
-     <div class="top" data-k="top"><span class="grab"></span><button class="col" data-k="col" aria-label="Collapse">${I.upl}</button><button class="lb" data-k="lb" aria-label="Hide list">${I.list}</button></div>
+     <div class="top" data-k="top"><span class="grab"></span><button class="col" data-k="col" aria-label="${loc('Collapse')}">${I.upl}</button><button class="lb" data-k="lb" aria-label="${loc('Hide list')}">${I.list}</button></div>
      <div class="np">
       <div class="row1"><span class="cv" data-k="ncv">${I.note}</span><span class="tx"><b data-k="nt2"></b><i data-k="na"></i></span>
        <button class="tb" data-k="pv">${I.prev}</button><button class="tb pl" data-k="pp"></button><button class="tb" data-k="nx">${I.next}</button></div>
@@ -170,19 +172,19 @@ SNSims['r13/applemusic-r13']=function(root){
      </div>
      <div class="body">
       <div class="amp" data-k="ps"><div class="sc"><div data-k="scin" style="transition:transform .9s ${EZ}">
-       ${VERS.map((v,i)=>`<div class="vr" data-v="${i}"><span class="cv" style="background:${GRAYS[i]}">${I.note}</span><span class="tx"><b>${ROW}</b><i>${v.p}</i></span><span data-k="vw${i}"></span>${I.chevR.replace('<svg','<svg class="chev"')}</div>`).join('')}
+       ${VERS.map((v,i)=>`<div class="vr" data-v="${i}"><span class="cv" style="background:${GRAYS[i]}">${I.note}</span><span class="tx"><b>${loc(ROW)}</b><i>${v.p}</i></span><span data-k="vw${i}"></span>${I.chevR.replace('<svg','<svg class="chev"')}</div>`).join('')}
       </div></div></div>
       <div class="amp r" data-k="pm">
-       <div class="bk" data-k="bk">${I.chevL}Recordings</div>
-       <div class="hd"><span class="cv" data-k="hcv">${I.note}</span><span class="tx"><b>${WORK}</b><i data-k="hsub"></i></span></div>
+       <div class="bk" data-k="bk">${I.chevL}${loc('Recordings')}</div>
+       <div class="hd"><span class="cv" data-k="hcv">${I.note}</span><span class="tx"><b>${loc(WORK)}</b><i data-k="hsub"></i></span></div>
        <div data-k="ml"></div>
       </div>
      </div>
     </div>
     <div class="bar x" data-k="bar">
      <div class="bh" data-k="bh"><span class="grab"></span></div>
-     <button class="tb c" data-k="bcol" aria-label="Collapse">${I.upl}</button>
-     <span class="cv" data-k="bcv" aria-label="Show list">${I.note}</span>
+     <button class="tb c" data-k="bcol" aria-label="${loc('Collapse')}">${I.upl}</button>
+     <span class="cv" data-k="bcv" aria-label="${loc('Show list')}">${I.note}</span>
      <span class="prg"><u data-k="bbu"></u></span>
      <button class="tb" data-k="bpv">${I.prev}</button><button class="tb pl" data-k="bpp"></button><button class="tb" data-k="bnx">${I.next}</button>
     </div>
@@ -220,7 +222,7 @@ SNSims['r13/applemusic-r13']=function(root){
   let ver=0,mov=0,el=84,playing=true,rot=0,raf=0,lastT=0,tick=0;
   const renderTrack=()=>{const v=VERS[ver],m=MOVS[mov];
     ['ncv','hcv','rc','bcv'].forEach(x=>$(x).style.background=GRAYS[ver]);
-    $('nt2').textContent=m[0];$('na').textContent=`${v.p} · ${COMP}`;$('ct').textContent=m[0];$('ca').textContent=v.p;$('hsub').textContent=v.p;
+    $('nt2').textContent=m[0];$('na').textContent=`${v.p} · ${loc(COMP)}`;$('ct').textContent=m[0];$('ca').textContent=v.p;$('hsub').textContent=v.p;
     $('ml').innerHTML=MOVS.map((x,i)=>`<div class="mr${i===mov?' cur':''}" data-m="${i}"><span class="n">${i===mov?wf:i+1}</span><b>${x[0].replace(/^[IV]+\. /,'')}</b><span>${mmss(x[1])}</span></div>`).join('');
     VERS.forEach((_,i)=>$('vw'+i).innerHTML=i===ver?wf:'');
     ['pv','bpv'].forEach(x=>$(x).classList.toggle('dis',mov===0));['nx','bnx'].forEach(x=>$(x).classList.toggle('dis',mov===MOVS.length-1));
@@ -246,7 +248,7 @@ SNSims['r13/applemusic-r13']=function(root){
 
   /* ---------- 形状：完整面板 ↔ 竖条，胶囊 ---------- */
   const showShape=()=>{const v=listCollapsed;$('full').className='full'+(v?' x':' in');$('bar').className='bar'+(v?' in':' x');
-    $('lb').setAttribute('aria-label',v?'Show list':'Hide list')};
+    $('lb').setAttribute('aria-label',loc(v?'Show list':'Hide list'))};
   const settle=()=>{geo=home(place,size());apply(geo,radius())};
   const setList=c=>{if(c===listCollapsed)return;listCollapsed=c;showShape();settle();say(c?'dock':'list')};
   const present=()=>{if(open)return;open=true;capWidth();

@@ -38,9 +38,12 @@
 .os-chcopy.live{pointer-events:auto!important}
 .os .os-chcopy.sk-g{transition:none}
 .os .os-chcopy h2.sec-title{font-size:clamp(36px,3.4vw,58px)}
-.os .sk-g li span{opacity:0;transform:translateY(6px);transition:max-height .45s var(--ease),opacity .35s ease,transform .45s var(--ease)}
-.os .sk-g li.on span,.os .sk-g li:hover span{opacity:1;transform:none}
+.os .sk-g li span{max-height:none;height:0;opacity:0;transform:translateY(6px);transition:height .45s var(--ease),opacity .35s ease,transform .45s var(--ease)}
+.os .sk-g li:hover span{max-height:none}
+.os .sk-g li.on span{height:var(--dh,auto);opacity:1;transform:none}
 .pro-tag{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:999px;background:var(--blue);color:#fff;font-size:11px;font-weight:600;line-height:18px;vertical-align:2px;letter-spacing:.02em}
+/* Basic 和 Pro 同一个尺寸：Pro 实心蓝，Basic 只描蓝边 */
+.basic-tag{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--blue);color:var(--blue);font-size:11px;font-weight:600;line-height:18px;vertical-align:2px;letter-spacing:.02em}
 /* 统计单独一块，在在线曲库后面、Pro 横条前面 */
 #stats{padding:150px 0 120px}
 #stats .st{margin-top:0;margin-bottom:0}
@@ -51,7 +54,7 @@
   #stats{padding:110px 0 80px}
   #stats .st-top{margin-bottom:36px}
   /* Menu 展开：7 项竖排，挂在菜单条下面 */
-  .nav.open .links{display:flex;position:absolute;top:52px;left:50%;transform:translateX(-50%);flex-direction:column;align-items:stretch;height:auto;padding:8px;border-radius:18px;background:rgba(246,246,244,.96);box-shadow:0 12px 40px -12px rgba(41,45,56,.25)}
+  .nav.open .links{display:flex;position:absolute;top:52px;left:var(--mx,50%);transform:translateX(-50%);flex-direction:column;align-items:stretch;height:auto;padding:8px;border-radius:18px;background:rgba(246,246,244,.96);box-shadow:0 12px 40px -12px rgba(41,45,56,.25)}
   .nav.open.dark .links{background:rgba(28,30,36,.96)}
   .nav.open .links a{line-height:44px;padding:0 28px;text-align:center}
   .nav.open .links .slider{display:none}
@@ -85,7 +88,7 @@
   /* 不叠影：旧的一条 .15s 淡掉，新的等它走完再淡入 */
   .os .sk-g li{grid-area:1/1;border-top:0;padding:0;opacity:0;transform:translateY(8px);transition:opacity .15s ease,transform 0s .15s,color .3s}
   .os .sk-g li.on,.os .sk-g ul:not(:has(.on)) li:first-child{opacity:1;transform:none;transition:opacity .35s ease .15s,transform .5s var(--ease) .15s,color .3s}
-  .os .sk-g li span,.os .sk-g li.on span{max-height:none;opacity:1;transform:none;margin-top:4px}
+  .os .sk-g li span,.os .sk-g li.on span{max-height:none;height:auto;opacity:1;transform:none;margin-top:4px}
 }
 
 /* 右下角播放 / 暂停：和左下角批注条左右对称（离边 20 px、一样高 41 px）；只在一张谱钉住时出现，那时回到顶部的按钮让到它上面 */

@@ -10,6 +10,9 @@ const INKS = ['#B64C50','#39836B','#3F529F','#D9AC2B','#8064AD','#292D38'];
 const NAMES = ['Red','Green','Blue','Gold','Purple','Black'];
 const GROUPS = ['Lesson','Fingering','Stage'];
 const ACCENT = '#3F529F', INK = '#292D38';
+// 多语言：snT 来自 components/r13/i18n-r13.js（这里的词在 i18n/pens.json）；没载入时原样返回英文
+const snT = (s, v) => window.snT ? window.snT(s, v) : s.replace(/\{(\w+)\}/g, (m, k) => v && k in v ? v[k] : m);
+const layerName = c => snT('{c} Layer', {c: snT(NAMES[c])});
 
 /* ---------- icons (24 grid; linear = normal, soft duotone + accent = hidden / locked) ---------- */
 const S = (body, sw) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw||1.5}" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
@@ -147,6 +150,8 @@ const CSS = `
 .sns-layers .l-alert.on{transform:translate(-50%,-50%) scale(var(--ps,1));opacity:1;pointer-events:auto}
 .sns-layers .l-alert h4{margin:0 0 6px;font-size:17px;line-height:22px;font-weight:600}
 .sns-layers .l-alert p{margin:0 0 18px;font-size:13.5px;line-height:18px;color:rgba(41,45,56,.72)}
+/* 德语页给正文开了自动断字，App 的弹窗不断字 */
+.sns-layers .l-alert p{-webkit-hyphens:manual;hyphens:manual}
 .sns-layers .l-alert .bt{display:flex;gap:10px}
 .sns-layers .l-alert .bt span{flex:1;height:46px;border-radius:23px;background:rgba(118,118,128,.12);display:grid;place-items:center;font-size:16px;font-weight:500;cursor:pointer}
 .sns-layers .l-alert .bt .del{color:#C9433F;font-weight:600}
@@ -178,7 +183,7 @@ NS['r13/layers-r13'] = function(root, opts){
   const pan = document.createElement('div'); pan.className = 'l-pan';
   const dim = document.createElement('div'); dim.className = 'l-dim';
   const alertEl = document.createElement('div'); alertEl.className = 'l-alert';
-  alertEl.innerHTML = `<h4></h4><p>${DEL_MSG}</p><div class="bt"><span class="cn">Cancel</span><span class="del">Delete</span></div>`;
+  alertEl.innerHTML = `<h4></h4><p>${snT(DEL_MSG)}</p><div class="bt"><span class="cn">${snT('Cancel')}</span><span class="del">${snT('Delete')}</span></div>`;
   const touch = document.createElement('div'); touch.className = 'snd';
   Object.assign(touch.style, {opacity:0, transition:'opacity .25s, transform .12s'});
   stage.append(card, pan, dim, alertEl, touch);
@@ -192,7 +197,7 @@ NS['r13/layers-r13'] = function(root, opts){
   const gone = (g, c) => !!(st.hidden[g][c] || st.deleted[g][c]);
 
   /* panel */
-  pan.innerHTML = `<div class="seg">${GROUPS.map((n,i)=>`<span data-g="${i}"><i></i><b>${n}</b></span>`).join('')}</div>
+  pan.innerHTML = `<div class="seg">${GROUPS.map((n,i)=>`<span data-g="${i}"><i></i><b>${snT(n)}</b></span>`).join('')}</div>
     <div class="gt"><span class="slot glock"><i class="ic"></i></span><span class="nm"></span><span class="slot geye"><i class="ic"></i></span></div><div class="rows"></div>`;
   const segs = [...pan.querySelectorAll('.seg span')], rowsEl = pan.querySelector('.rows');
   function renderRows(){
@@ -200,7 +205,7 @@ NS['r13/layers-r13'] = function(root, opts){
     rowsEl.innerHTML = live(g).map(c=>{
       const off = !!st.hidden[g][c], lk = !!st.locked[g][c], ask = !!pend && pend[0]===g && pend[1]===c;
       // App：锁上的层不能删，垃圾桶变灰
-      return `<div class="ly" data-c="${c}">${tip(INKS[c])}<div class="nm">${NAMES[c]} Layer</div>`+
+      return `<div class="ly" data-c="${c}">${tip(INKS[c])}<div class="nm">${layerName(c)}</div>`+
         `<i class="ic eye ${off?'act':''}">${off?ICON.eyeOff:ICON.eye}</i><i class="ic lk ${lk?'act':''}">${lk?ICON.lock:ICON.unlock}</i><i class="ic tr ${lk?'off':''}">${ask?ICON.trashOn:ICON.trash}</i></div>`;
     }).join('');
   }
@@ -208,7 +213,7 @@ NS['r13/layers-r13'] = function(root, opts){
     const g = st.g;
     pan.classList.toggle('open', st.open);
     segs.forEach((s,i)=>{ s.classList.toggle('on', i===g); s.querySelector('i').innerHTML = i===g ? ICON.stackOn : ICON.stack; });
-    pan.querySelector('.gt .nm').textContent = GROUPS[g];
+    pan.querySelector('.gt .nm').textContent = snT(GROUPS[g]);
     const gl = pan.querySelector('.glock .ic'); gl.classList.toggle('act', st.glocked[g]); gl.innerHTML = st.glocked[g] ? ICON.lock : ICON.unlock;
     const allOff = live(g).every(c=>st.hidden[g][c]);
     const ge = pan.querySelector('.geye .ic'); ge.classList.toggle('act', allOff); ge.innerHTML = allOff ? ICON.eyeOff : ICON.eye;
@@ -219,7 +224,7 @@ NS['r13/layers-r13'] = function(root, opts){
   // 把当前状态告诉阅读器：在哪一组、Lesson 组哪几层藏着或删了
   function report(soft){ onGroup(st.g, soft); usedColours(0).forEach(c=>onEye(c, gone(0, c), soft)); }
   // 删一层：照 App 先弹确认；点 Delete 那一行收起，谱上那种颜色消失
-  function ask(g, c){ pend = [g, c]; alertEl.querySelector('h4').textContent = `Delete “${NAMES[c]} Layer”?`; dim.classList.add('on'); alertEl.classList.add('on'); renderRows(); }
+  function ask(g, c){ pend = [g, c]; alertEl.querySelector('h4').textContent = snT('Delete “{name}”?', {name: layerName(c)}); dim.classList.add('on'); alertEl.classList.add('on'); renderRows(); }
   function closeAsk(){ pend = null; dim.classList.remove('on'); alertEl.classList.remove('on'); }
   function del(g, c){
     closeAsk(); st.deleted[g][c] = true;

@@ -52,6 +52,7 @@ function buildA(){
 let G = null, wasDesk = null, api = null, rd = null, played = false, shown = -1, lastZ = -1, lastC = -1, lastE = -1;
 function layout(){
   const vh = innerHeight, W = pin.clientWidth, d = desk();
+  descH();
   if(d !== wasDesk){
     wasDesk = d;
     [sim, copyEl, fxCopy, sbox, prog, rbox, rprog, ...CH.map(c => c.copy)].forEach(e => e.removeAttribute('style'));
@@ -344,7 +345,7 @@ const playing = () => autoOn && (!RMq || userPlay);
 let pbOn = null, pbShow = null;
 function syncPlay(){
   const on = playing(); if(on === pbOn) return; pbOn = on;
-  pIc.innerHTML = on ? PB_I.pause : PB_I.play; pbtn.setAttribute('aria-label', on ? 'Pause autoplay' : 'Play autoplay');
+  pIc.innerHTML = on ? PB_I.pause : PB_I.play; pbtn.setAttribute('aria-label', on ? snT('Pause autoplay') : snT('Play autoplay'));
 }
 pbtn.addEventListener('click', () => { const on = !playing(); autoOn = on; if(on){ userPlay = true; held = -1; } doneAt = 0; syncPlay(); });
 let pressT = 0;
@@ -460,6 +461,9 @@ function navKey(){
 const keyOf = a => a.k === 'ch' ? a.key : a.k === 'org' ? 'org' + a.b : a.k;
 sec._os = {get cur(){ return cur; }, get engaged(){ return engaged; }, get anim(){ return !!anim; }, get n(){ return A.length; }, get done(){ return doneAt; },
   get key(){ return keyOf(A[cur]); }, keys: () => A.map(keyOf), pos: i => pos(i), go: i => land(i, 'jump'), get rd(){ return rd; }, get story(){ return api; }, get fin(){ return finished(A[cur]); }, get held(){ return held === seq; }, get nav(){ return navKey(); }, get auto(){ return autoOn; }, set auto(v){ autoOn = !!v; doneAt = 0; syncPlay(); }, get playing(){ return playing(); }};
+// 电脑上一章的说明一次只展开一条：每条都展开成这一章最高那条的高度，一条收、一条开同速走，整块文案高度不变
+function descH(){ CH.forEach(c => c.copy.style.setProperty('--dh', Math.max(...c.li.map(li => li.querySelector('span')?.scrollHeight || 0)) + 'px')); }
+document.fonts?.ready.then(descH);
 addEventListener('resize', layout); layout();
 // 字体换好后手机文案的高度会变，再量一次
 document.fonts?.ready.then(layout);

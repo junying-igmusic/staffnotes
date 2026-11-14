@@ -98,6 +98,8 @@ const CSS=`
 .sns-pr13 .menu div.cur::before{content:"";position:absolute;left:13px;top:10px;width:9px;height:5px;border-left:1.8px solid ${A};border-bottom:1.8px solid ${A};transform:rotate(-45deg)}
 @keyframes sns-pr13-pop{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:none}}
 `;
+// 界面字接多语言：页面没加载 i18n-r13.js 时照原样返回英文；德语小数用逗号（App 按系统区域格式化）
+const tr=(s,v)=>window.snT?snT(s,v):s,dec=s=>window.SN_LANG==='de'?s.replace('.',','):s;
 const svg=d=>`<svg viewBox="0 0 24 24">${d}</svg>`;
 const I={
  metro:svg('<path d="M9.5 4h5l4 16h-13z"/><path d="M12 15l5-8"/>'),
@@ -122,9 +124,9 @@ SNSims['r13/practice-r13']=function(root){
   if(getComputedStyle(root).position==='static')root.style.position='relative';
   root.innerHTML=`<div class="st"><div class="card">
    <div class="tabs" role="tablist">
-    <button class="tab sel" data-t="1" role="tab" aria-label="Metronome">${I.metro}<span>Metronome</span></button>
-    <button class="tab" data-t="2" role="tab" aria-label="Tuner">${I.fork}<span>Tuner</span></button>
-    <button class="tab" data-t="3" role="tab" aria-label="Reference">${I.ear}<span>Reference</span></button>
+    <button class="tab sel" data-t="1" role="tab" aria-label="${tr('Metronome')}">${I.metro}<span>${tr('Metronome')}</span></button>
+    <button class="tab" data-t="2" role="tab" aria-label="${tr('Tuner')}">${I.fork}<span>${tr('Tuner')}</span></button>
+    <button class="tab" data-t="3" role="tab" aria-label="${tr('Reference')}">${I.ear}<span>${tr('Reference')}</span></button>
    </div>
    <div class="pane" data-p="1">
     <div class="pcap" style="left:20px;width:115.5px">4/4</div>
@@ -147,7 +149,7 @@ SNSims['r13/practice-r13']=function(root){
     <div class="stat" data-k="stat"></div>
     <div class="scale"><i class="tr"></i>${[-2,-1,0,1,2].map(i=>`<i class="tk${i?'':' c'}" style="left:${110.5+i*54.6}px"></i>`).join('')}<i class="ndl" data-k="ndl"></i></div>
     <div class="cents" data-k="cents"></div>
-    <div class="pbig"><i class="sq"></i>Stop</div>
+    <div class="pbig"><i class="sq"></i>${tr('Stop')}</div>
    </div>
    <div class="pane hid" data-p="3">
     <div class="pcap" data-k="rn" style="left:20px;width:115.5px"></div>
@@ -188,9 +190,9 @@ SNSims['r13/practice-r13']=function(root){
   // 调音器：A4 先偏低，指针来回收进 In tune 后停住
   let raf=0;
   const renderT=c=>{const rc=Math.round(c);
-    $('freq').textContent=(440*Math.pow(2,c/1200)).toFixed(1)+' Hz';
-    const ok=Math.abs(rc)<=5;$('stat').textContent=ok?'In tune':rc<0?'Flat':'Sharp';$('stat').classList.toggle('ok',ok);
-    $('cents').textContent=(rc>0?'+':rc<0?'−':'±')+Math.abs(rc)+' cents';
+    $('freq').textContent=dec((440*Math.pow(2,c/1200)).toFixed(1))+' Hz';
+    const ok=Math.abs(rc)<=5;$('stat').textContent=tr(ok?'In tune':rc<0?'Flat':'Sharp');$('stat').classList.toggle('ok',ok);
+    $('cents').textContent=(rc>0?'+':rc<0?'−':'±')+Math.abs(rc)+' '+tr('cents');
     $('ndl').style.transform=`translateX(${Math.max(-50,Math.min(50,c))*2.184}px)`};
   const tunerPlay=()=>{cancelAnimationFrame(raf);renderT(-27);const t0=performance.now()+250;
     const f=now=>{const t=Math.max(0,(now-t0)/1000);if(t>3.4){renderT(0);raf=0;return}
@@ -200,8 +202,8 @@ SNSims['r13/practice-r13']=function(root){
   // 标准音：从 G3 选到 A、4，按 Play tone，波纹表示正在响（网页上不出声）
   let rN=9,rO=4,toneOn=false,menu=null;
   const renderR=()=>{$('rn').innerHTML=NAMES[rN]+I.chev;$('ro').innerHTML=rO+I.chev;$('rp').innerHTML=`${NAMES[rN]}<sub>${rO}</sub>`;
-    $('rf').textContent=(440*Math.pow(2,((rO+1)*12+rN-69)/12)).toFixed(2)+' Hz';
-    const b=$('tone');b.classList.toggle('fill',toneOn);b.innerHTML=toneOn?'<i class="sq"></i>Stop tone':I.tplay+'Play tone';$('wave').classList.toggle('on',toneOn&&!RM)};
+    $('rf').textContent=dec((440*Math.pow(2,((rO+1)*12+rN-69)/12)).toFixed(2))+' Hz';
+    const b=$('tone');b.classList.toggle('fill',toneOn);b.innerHTML=toneOn?'<i class="sq"></i>'+tr('Stop tone'):I.tplay+tr('Play tone');$('wave').classList.toggle('on',toneOn&&!RM)};
   function closeMenu(){if(menu){menu.remove();menu=null;root.querySelectorAll('.pcap.open').forEach(c=>c.classList.remove('open'))}}
   const openMenu=(k,items,sel)=>{closeMenu();menu=document.createElement('div');menu.className='menu';menu.style.left=k==='rn'?'18px':'142px';$(k).classList.add('open');
     menu.innerHTML=items.map(v=>`<div class="${v===sel?'cur':''}">${v}</div>`).join('');panes[2].appendChild(menu);return menu};

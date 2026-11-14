@@ -10,10 +10,23 @@ if(SNSims.stats) return;
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const A='#3F529F',INK='#292D38',SEC='#646A75',MUT='#8A909B';
 
+// 多语言：句子查 i18n/turns-stats.json（snT），月份、星期、时长和数字照 SN_LANG 分开写；没加载 i18n-r13.js 的旧页面原样用英文
+const T=(s,v)=>window.snT?snT(s,v):(v?s.replace(/\{(\w+)\}/g,(m,k)=>k in v?v[k]:m):s);
+const LG=window.SN_LANG||'en', ZH=LG==='zh'||LG==='zh-hant';
+// h / m 写在日格、柱子和排行里，big 是大数字的单位，long 是读屏用的全称（照 App 统计的 %d 小时 %d 分钟、%d Stunden %d Minuten）
+const FMT={
+  en:{mon:'March',wd:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],wd1:['M','T','W','T','F','S','S'],big:['h','min','min'],hrs:'h'},
+  zh:{mon:'3 月',wd:['周一','周二','周三','周四','周五','周六','周日'],wd1:['一','二','三','四','五','六','日'],big:['小时','分','分钟'],hrs:'小时',h:'小时',m:'分',mo:'分钟',long:['小时','小时','分钟','分钟']},
+  'zh-hant':{mon:'3 月',wd:['週一','週二','週三','週四','週五','週六','週日'],wd1:['一','二','三','四','五','六','日'],big:['小時','分','分鐘'],hrs:'小時',h:'小時',m:'分',mo:'分鐘',long:['小時','小時','分鐘','分鐘']},
+  de:{mon:'März',wd:['Mo','Di','Mi','Do','Fr','Sa','So'],wd1:['Mo','Di','Mi','Do','Fr','Sa','So'],big:['Std.','Min.','Min.'],hrs:'Std.',h:'Std.',m:'Min.',mo:'Min.',long:['Stunde','Stunden','Minute','Minuten']}
+};
+const F=FMT[LG]||FMT.en;
 // 3 月 1–24 日每天开谱分钟数；周末多、几天空白
 const MIN=[95,85,0,110,75,150,0, 85,120,85,0,90,175,70, 100,80,135,0,55,160,0, 115,90,50];
-const TODAY=24, DAYS=31, MONTH='March', MAX=Math.max(...MIN);
-const WD=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const TODAY=24, DAYS=31, MONTH=F.mon, MAX=Math.max(...MIN);
+const WD=F.wd;
+// 日期：英文 Wed 24 March，中文 3 月 24 日周三，德语 Mi., 24. März
+const DT=(wd,d)=>ZH?`${MONTH} ${d} 日${wd}`:LG==='de'?`${wd}., ${d}. ${MONTH}`:`${wd} ${d} ${MONTH}`;
 const TOTAL=MIN.reduce((s,m)=>s+m,0);                       // 1925
 const LAST7=MIN.slice(TODAY-7);                               // 18–24 日
 const AVG7=Math.round(LAST7.reduce((s,m)=>s+m,0)/7);          // 67
@@ -28,9 +41,15 @@ const RANK={
   Periods:[['Classical','Mozart, Beethoven, Haydn',1125],['Romantic','Chopin',435],['Baroque','Bach',365]]
 };
 
-const hm=m=>m<60?`${m}m`:`${Math.floor(m/60)}h ${String(m%60).padStart(2,'0')}`;
-const bigHM=m=>m<60?`${m}<u>min</u>`:`${Math.floor(m/60)}<u>h</u>${String(m%60).padStart(2,'0')}<u>min</u>`;
-const longHM=m=>{const h=Math.floor(m/60),r=m%60;return [h&&`${h} hour${h>1?'s':''}`,r&&`${r} minute${r>1?'s':''}`].filter(Boolean).join(' ')||'no time';};
+// 日格和柱子上地方小，照 App 统计日历的紧凑写法（中文也用 h / m，德语分钟写 min）
+const hm=m=>m<60?`${m}${LG==='de'?'min':'m'}`:`${Math.floor(m/60)}h ${String(m%60).padStart(2,'0')}`;
+// 排行右边的时长：中文 1 小时 05 分，德语 1 Std. 05 Min.
+const hmM=m=>!F.h?hm(m):m<60?`${m} ${F.mo}`:`${Math.floor(m/60)} ${F.h} ${String(m%60).padStart(2,'0')} ${F.m}`;
+const U=F.big;
+const bigHM=m=>m<60?`${m}<u>${U[2]}</u>`:`${Math.floor(m/60)}<u>${U[0]}</u>${String(m%60).padStart(2,'0')}<u>${U[1]}</u>`;
+const longHM=m=>{const h=Math.floor(m/60),r=m%60;
+  if(F.long){ const w=F.long; return [h&&`${h} ${w[h>1?1:0]}`,r&&`${r} ${w[r>1?3:2]}`].filter(Boolean).join(' ')||`0 ${w[3]}`; }
+  return [h&&`${h} hour${h>1?'s':''}`,r&&`${r} minute${r>1?'s':''}`].filter(Boolean).join(' ')||'no time';};
 const ease=t=>1-Math.pow(1-t,3);
 
 const CSS=`
@@ -151,67 +170,67 @@ SNSims.stats=function(el){
   if(!document.getElementById('sn-stats-css')){ const s=document.createElement('style'); s.id='sn-stats-css'; s.textContent=CSS; document.head.appendChild(s); }
   el.innerHTML='';
   const g=document.createElement('div'); g.className='sn-st'; el.appendChild(g);
-  const fmtInt=n=>n.toLocaleString('en-US');
+  const fmtInt=n=>n.toLocaleString(LG==='de'?'de-DE':'en-US');
 
   // month calendar
-  let cells=WD.map(w=>`<div class="wd" aria-hidden="true">${w[0]}</div>`).join('');
+  let cells=F.wd1.map(w=>`<div class="wd" aria-hidden="true">${w}</div>`).join('');
   for(let d=1; d<=DAYS; d++){
     const m=MIN[d-1], wd=WD[(d-1)%7], k=d-1;
-    if(d>TODAY){ cells+=`<div class="d f" aria-label="${wd} ${d} ${MONTH}, not yet"><span class="n">${d}</span></div>`; continue; }
+    if(d>TODAY){ cells+=`<div class="d f" aria-label="${T('{date}, not yet',{date:DT(wd,d)})}"><span class="n">${d}</span></div>`; continue; }
     const a=m?(.14+.76*m/MAX).toFixed(2):0;
     const cls='d'+(m?' r':'')+(a>.62?' dk':'')+(d===TODAY?' td':'');
-    cells+=`<div class="${cls}" style="--a:${a};--dl:${(k*.032).toFixed(3)}s" title="${wd} ${d} ${MONTH} · ${m?hm(m):'nothing open'}" aria-label="${wd} ${d} ${MONTH}${d===TODAY?', today':''}: ${m?longHM(m):'no time'}"><span class="n" aria-hidden="true">${d}</span>${m?`<span class="m" aria-hidden="true">${hm(m)}</span>`:''}</div>`;
+    cells+=`<div class="${cls}" style="--a:${a};--dl:${(k*.032).toFixed(3)}s" title="${DT(wd,d)} · ${m?hm(m):T('nothing open')}" aria-label="${T(d===TODAY?'{date}, today: {time}':'{date}: {time}',{date:DT(wd,d),time:longHM(m)})}"><span class="n" aria-hidden="true">${d}</span>${m?`<span class="m" aria-hidden="true">${hm(m)}</span>`:''}</div>`;
   }
   const days=MIN.filter(Boolean).length;
-  const cal=card('cal',`${MONTH}: ${longHM(TOTAL)} with a score open, on ${days} days`,
-    `<div class="t"><b>${MONTH}</b><span>${days} days</span></div><div class="big" aria-hidden="true"></div><div class="cg">${cells}</div>`);
+  const cal=card('cal',T('{month}: {time} with a score open, on {n} days',{month:MONTH,time:longHM(TOTAL),n:days}),
+    `<div class="t"><b>${MONTH}</b><span>${T('{n} days',{n:days})}</span></div><div class="big" aria-hidden="true"></div><div class="cg">${cells}</div>`);
 
   // ranking
-  const rank=card('rank',`Where the time went in ${MONTH}`,
-    `<div class="t"><span>Where the time went</span><div class="seg" role="tablist" aria-label="Rank by">${Object.keys(RANK).map((k,i)=>`<button role="tab" aria-selected="${i===0}">${k}</button>`).join('')}</div></div><ol class="rows"></ol>`);
+  const rank=card('rank',T('Where the time went in {month}',{month:MONTH}),
+    `<div class="t"><span>${T('Where the time went')}</span><div class="seg" role="tablist" aria-label="${T('Rank by')}">${Object.keys(RANK).map((k,i)=>`<button role="tab" data-k="${k}" aria-selected="${i===0}">${T(k)}</button>`).join('')}</div></div><ol class="rows"></ol>`);
   const rows=rank.querySelector('.rows'), tabs=[...rank.querySelectorAll('.seg button')];
   let tab='Pieces';
   const fillRows=(key,animate)=>{
     const list=RANK[key], top=list[0][2];
-    rows.innerHTML=list.map(([n,c,m],i)=>`<li class="row" aria-label="${n}, ${c}: ${longHM(m)}"><span class="nm">${n}</span><span class="tm" aria-hidden="true">${hm(m)}</span><span class="cm">${c}</span><i class="b" style="--w:${(m/top*100).toFixed(1)}%;--dl:${(.18+i*.09).toFixed(2)}s" aria-hidden="true"></i></li>`).join('');
+    rows.innerHTML=list.map(([n,c,m],i)=>{ n=T(n); c=T(c); return `<li class="row" aria-label="${T('{name}, {sub}: {time}',{name:n,sub:c,time:longHM(m)})}"><span class="nm">${n}</span><span class="tm" aria-hidden="true">${hmM(m)}</span><span class="cm">${c}</span><i class="b" style="--w:${(m/top*100).toFixed(1)}%;--dl:${(.18+i*.09).toFixed(2)}s" aria-hidden="true"></i></li>`; }).join('');
     if(animate && !RM){ rank.classList.remove('go'); void rows.offsetWidth; rank.classList.add('go'); }
   };
   fillRows(tab,false);
   tabs.forEach(b=>b.addEventListener('click',()=>{
-    if(b.textContent===tab) return; tab=b.textContent;
+    if(b.dataset.k===tab) return; tab=b.dataset.k;
     tabs.forEach(x=>x.setAttribute('aria-selected',x===b));
     if(RM){ fillRows(tab,false); return; }
     rows.classList.add('out'); setTimeout(()=>{ fillRows(tab,true); rows.classList.remove('out'); },220);
   }));
   rank.querySelector('.seg').addEventListener('keydown',e=>{
-    const i=tabs.findIndex(x=>x.textContent===tab), j=e.key==='ArrowRight'?i+1:e.key==='ArrowLeft'?i-1:-9;
+    const i=tabs.findIndex(x=>x.dataset.k===tab), j=e.key==='ArrowRight'?i+1:e.key==='ArrowLeft'?i-1:-9;
     if(tabs[j]){ tabs[j].click(); tabs[j].focus(); e.preventDefault(); }
   });
 
   // last 7 days
   const wmax=Math.max(...LAST7);
   const cols=LAST7.map((m,i)=>`<div class="col">${m?`<span class="v" style="--dl:${(.5+i*.07).toFixed(2)}s">${hm(m)}</span><i class="bar" style="--p:${(m/wmax).toFixed(3)};--dl:${(.1+i*.07).toFixed(2)}s"></i>`:''}</div>`).join('');
-  const lbls=LAST7.map((m,i)=>{ const d=TODAY-6+i; return d===TODAY?'<span class="now">Today</span>':`<span>${WD[(d-1)%7]}</span>`; }).join('');
-  const week=card('week',`Last 7 days: ${longHM(AVG7)} a day on average. `+LAST7.map((m,i)=>`${WD[(TODAY-7+i)%7]} ${longHM(m)}`).join(', '),
-    `<div class="t"><span>Last 7 days</span></div><div class="big" aria-hidden="true"></div><div class="sub">a day, on average</div>
-     <div class="wk" aria-hidden="true">${cols}<div class="avg" style="--p:${(AVG7/wmax).toFixed(3)}"><span>avg</span></div></div><div class="wl" aria-hidden="true">${lbls}</div>`);
+  const lbls=LAST7.map((m,i)=>{ const d=TODAY-6+i; return d===TODAY?`<span class="now">${T('Today')}</span>`:`<span>${WD[(d-1)%7]}</span>`; }).join('');
+  const week=card('week',T('Last 7 days: {time} a day on average. ',{time:longHM(AVG7)})+LAST7.map((m,i)=>`${WD[(TODAY-7+i)%7]} ${longHM(m)}`).join(ZH?'，':', '),
+    `<div class="t"><span>${T('Last 7 days')}</span></div><div class="big" aria-hidden="true"></div><div class="sub">${T('a day, on average')}</div>
+     <div class="wk" aria-hidden="true">${cols}<div class="avg" style="--p:${(AVG7/wmax).toFixed(3)}"><span>${T('avg')}</span></div></div><div class="wl" aria-hidden="true">${lbls}</div>`);
 
   // weekly goal
-  const goal=card('goal',`This week: ${longHM(WEEK)} of a ${GOAL/60} hour goal you set`,
-    `<div class="t"><span>This week</span></div><div class="big" aria-hidden="true"></div><div class="sub">of your ${GOAL/60} h goal</div><div class="mtr" aria-hidden="true"><i style="--w:${(WEEK/GOAL*100).toFixed(1)}%"></i></div>`);
+  const goal=card('goal',T('This week: {time} of a {h} hour goal you set',{time:longHM(WEEK),h:GOAL/60}),
+    `<div class="t"><span>${T('This week')}</span></div><div class="big" aria-hidden="true"></div><div class="sub">${T('of your {h} h goal',{h:GOAL/60})}</div><div class="mtr" aria-hidden="true"><i style="--w:${(WEEK/GOAL*100).toFixed(1)}%"></i></div>`);
 
   // 12-month milestones
-  const marks=[10,50,100].map(h=>`<span class="mk${YEAR>=h?' on':''}" style="--x:${h}%;--dl:${(.25+1.2*h/YEAR*(YEAR>=h?1:0)).toFixed(2)}s"><b>${h} h</b></span>`).join('');
-  const miles=card('miles',`Past 12 months: ${YEAR} hours with a score open. 10 and 50 hours reached, 100 hours next`,
-    `<div class="t"><span>Past 12 months</span><span>${100-YEAR} h to 100</span></div><div class="big" aria-hidden="true"></div><div class="mtr" aria-hidden="true"><i style="--w:${YEAR}%"></i>${marks}</div>`);
+  const marks=[10,50,100].map(h=>`<span class="mk${YEAR>=h?' on':''}" style="--x:${h}%;--dl:${(.25+1.2*h/YEAR*(YEAR>=h?1:0)).toFixed(2)}s"><b>${h} ${F.hrs}</b></span>`).join('');
+  const miles=card('miles',T('Past 12 months: {n} hours with a score open. 10 and 50 hours reached, 100 hours next',{n:YEAR}),
+    `<div class="t"><span>${T('Past 12 months')}</span><span>${T('{n} h to 100',{n:100-YEAR})}</span></div><div class="big" aria-hidden="true"></div><div class="mtr" aria-hidden="true"><i style="--w:${YEAR}%"></i>${marks}</div>`);
 
   // metronome easter egg
-  const metro=card('metro',`Metronome: ${fmtInt(BEATS)} beats played. Something happens at 10,000`,
-    `<div class="t"><span>Metronome</span></div><div class="big" aria-hidden="true"></div><div class="sub">Something happens at 10,000.</div><div class="mtr thin" aria-hidden="true"><i style="--w:${(BEATS/100).toFixed(1)}%"></i></div>`);
+  const metro=card('metro',T('Metronome: {n} beats played. Something happens at 10,000',{n:fmtInt(BEATS)}),
+    `<div class="t"><span>${T('Metronome')}</span></div><div class="big" aria-hidden="true"></div><div class="sub">${T('Something happens at 10,000.')}</div><div class="mtr thin" aria-hidden="true"><i style="--w:${(BEATS/100).toFixed(1)}%"></i></div>`);
 
   // favourites
-  const star=card('star',`${STARRED} starred scores`,
-    `<div class="t"><span>Starred</span></div><div class="big" aria-hidden="true"></div><div class="sub">in your library</div>`);
+  const star=card('star',T('{n} starred scores',{n:STARRED}),
+    `<div class="t"><span>${T('Starred')}</span></div><div class="big" aria-hidden="true"></div><div class="sub">${T('in your library')}</div>`);
 
   [cal,rank,week,goal,miles,metro,star].forEach(c=>g.appendChild(c));
 
@@ -220,9 +239,9 @@ SNSims.stats=function(el){
     cal:[cal,TOTAL,bigHM,1300,150],
     week:[week,AVG7,bigHM,1000,150],
     goal:[goal,WEEK,bigHM,1200,250],
-    miles:[miles,YEAR,n=>`${n}<u>h</u>`,1300,250],
-    metro:[metro,BEATS,n=>`${fmtInt(n)}<u>beats</u>`,1500,200],
-    star:[star,STARRED,n=>`${n}<u>scores</u>`,700,200]
+    miles:[miles,YEAR,n=>`${n}<u>${F.hrs}</u>`,1300,250],
+    metro:[metro,BEATS,n=>`${fmtInt(n)}<u>${T('beats')}</u>`,1500,200],
+    star:[star,STARRED,n=>`${n}<u>${T('scores')}</u>`,700,200]
   };
   Object.values(nums).forEach(([c,,f])=>{ c.querySelector('.big').innerHTML=f(0); });
   const go=c=>{ c.classList.add('go'); const n=nums[c.classList[1]]; if(n){ const [k,...a]=n; count(k.querySelector('.big'),...a); } };
