@@ -1,8 +1,7 @@
-// r11 一张谱用的副本（applemusic.js 不动）：Apple Music 演示拆成三步，每步一个停靠点。
+// r11 一张谱用的副本（applemusic.js 不动）：Apple Music 演示拆成两步（r14 批注 89：原来的 Floating panel 和 Capsule 并成一步），每步一个停靠点。
 //   beat(n)：无动画摆到第 n 步的终态（0 = ♪ 还没点开）；one(n)：先摆到第 n-1 步终态再只播第 n 步；busy、beatNow、beatFrac 给翻页和进度条读。
-//   第 1 步 Recordings：点 ♪ 打开面板 → 列表往上滚 → 点一张录音开始放；
-//   第 2 步 Drag it anywhere：拖到右上角吸附 → 点列表键收成竖条 → 把竖条拖到右边中段；
-//   第 3 步 Capsule：点 ↖ 收进顶栏胶囊。
+//   第 1 步 Recordings：点 ♪ 打开面板 → 列表往上滚过好几位钢琴家的 K. 545（批注 90）→ 点一张录音开始放；
+//   第 2 步 Panel or capsule：拖到右上角吸附 → 点列表键收成竖条 → 点 ↖ 收进顶栏胶囊。
 // 以下是原 applemusic.js 的说明。
 // Apple Music 浮动面板复刻：叠在蜡笔画板同一张谱子上（834pt 宽的 iPad 舞台），只画 Music 自己的组件。
 // 照 App 源码 App/Reader/ReaderMusicPanelHost.swift、ReaderMusicPanelPlacement.swift、ReaderMusicPanelLayout.swift、
@@ -10,7 +9,7 @@
 // - 完整面板 380×520×0.85，列表收起后变竖条（宽 124×画笔面板缩放，高 238+封面）；
 // - 按住顶部条拖动，松手按中线分左右，离上/下边 80 以内吸角，其余贴边（竖条停在松手高度），拖动时显示左右两个吸附轮廓；
 // - 面板顶边离顶栏按钮底边 12；♪ 是 44 正圆；↖ 收进顶栏胶囊，胶囊只有完整、只封面两档，封面 18 秒转一圈；点胶囊展开。
-// 录音和演奏者都是编的，封面是灰色占位，不出声音。
+// 列表里每行都是同一首 K. 545，副标题是演奏者：都是真录过这首的钢琴家，不写专辑名和年份；封面是灰色占位，不出声音。
 (()=>{
 window.SNSims=window.SNSims||{};
 const W=834,L=.85,FW=380*L,FH=520*L,PS=.787,SW=Math.round(124*PS),CV=SW-24,SH=238+CV;
@@ -142,8 +141,11 @@ const I={
  chevR:svg('<path d="M9.5 6l6 6-6 6"/>'),chevL:svg('<path d="M14.5 6 8.5 12l6 6"/>'),
  note:svg('<path d="M9 17.5V6l10-2v11.5"/><circle cx="6.8" cy="17.5" r="2.3"/><circle cx="16.8" cy="15.5" r="2.3"/>')
 };
-const GRAYS=['#B9BCC2','#A6AAB2','#C7C9CD','#9A9EA6','#B0B3B9','#C0C2C6'];
-const VERS=[{p:'Clara Ruiz',y:2019},{p:'Ingrid Haller',y:1987},{p:'Jonas Lind',y:2008},{p:'Tomás Varga',y:1994},{p:'Mei Okada',y:2002},{p:'Henrik Aalto',y:1972}];
+const GRAYS=['#B9BCC2','#A6AAB2','#C7C9CD','#9A9EA6','#B0B3B9','#C0C2C6','#A9ADB4','#BCBFC4'];
+const VERS=[{p:'Mitsuko Uchida'},{p:'Maria João Pires'},{p:'András Schiff'},{p:'Daniel Barenboim'},{p:'Glenn Gould'},{p:'Ingrid Haebler'},{p:'Walter Gieseking'},{p:'Lili Kraus'}];
+const ROW='Piano Sonata No. 16, K. 545';
+// 第 1 步：列表往上滚 SCR（两行），点第 PICK 行（Daniel Barenboim）
+const SCR=124,PICK=3;
 const MOVS=[['I. Allegro',312],['II. Andante',384],['III. Rondo. Allegretto',121]];
 const WORK='Piano Sonata No. 16 in C Major, K. 545',COMP='Wolfgang Amadeus Mozart';
 const mmss=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
@@ -168,7 +170,7 @@ SNSims['r13/applemusic-r13']=function(root){
      </div>
      <div class="body">
       <div class="amp" data-k="ps"><div class="sc"><div data-k="scin" style="transition:transform .9s ${EZ}">
-       ${VERS.map((v,i)=>`<div class="vr" data-v="${i}"><span class="cv" style="background:${GRAYS[i]}">${I.note}</span><span class="tx"><b>${v.p}</b><i>${v.y} · 3 movements</i></span><span data-k="vw${i}"></span>${I.chevR.replace('<svg','<svg class="chev"')}</div>`).join('')}
+       ${VERS.map((v,i)=>`<div class="vr" data-v="${i}"><span class="cv" style="background:${GRAYS[i]}">${I.note}</span><span class="tx"><b>${ROW}</b><i>${v.p}</i></span><span data-k="vw${i}"></span>${I.chevR.replace('<svg','<svg class="chev"')}</div>`).join('')}
       </div></div></div>
       <div class="amp r" data-k="pm">
        <div class="bk" data-k="bk">${I.chevL}Recordings</div>
@@ -218,7 +220,7 @@ SNSims['r13/applemusic-r13']=function(root){
   let ver=0,mov=0,el=84,playing=true,rot=0,raf=0,lastT=0,tick=0;
   const renderTrack=()=>{const v=VERS[ver],m=MOVS[mov];
     ['ncv','hcv','rc','bcv'].forEach(x=>$(x).style.background=GRAYS[ver]);
-    $('nt2').textContent=m[0];$('na').textContent=`${v.p} · ${COMP}`;$('ct').textContent=m[0];$('ca').textContent=v.p;$('hsub').textContent=`${v.p} · ${v.y}`;
+    $('nt2').textContent=m[0];$('na').textContent=`${v.p} · ${COMP}`;$('ct').textContent=m[0];$('ca').textContent=v.p;$('hsub').textContent=v.p;
     $('ml').innerHTML=MOVS.map((x,i)=>`<div class="mr${i===mov?' cur':''}" data-m="${i}"><span class="n">${i===mov?wf:i+1}</span><b>${x[0].replace(/^[IV]+\. /,'')}</b><span>${mmss(x[1])}</span></div>`).join('');
     VERS.forEach((_,i)=>$('vw'+i).innerHTML=i===ver?wf:'');
     ['pv','bpv'].forEach(x=>$(x).classList.toggle('dis',mov===0));['nx','bnx'].forEach(x=>$(x).classList.toggle('dis',mov===MOVS.length-1));
@@ -306,45 +308,35 @@ SNSims['r13/applemusic-r13']=function(root){
   const demo=()=>{
     reset();touched=false;root.classList.add('anim');runFrames(true);
     if(reduced){present();return}
-    let t=500;
-    tap(t,M+TB/2,M+TB/2,()=>{present();say('list')});
-    t+=1500;at(t,()=>$('scin').style.transform='translateY(-40px)');
-    t+=900;at(t,()=>tapAt(M+120,area().y+(126+62+31-40)*L,()=>{play(0,1);setPage('m');say('list')}));
-    t+=1900;glide(t,1100,FW/2,14,W-M-FW/2+10,area().y+40);                       // 拖到右上角，松手吸附
-    t+=2300;at(t,()=>tapAt(geo.x+(380-28)*L,geo.y+22*L,()=>setList(true)));     // 列表键 → 竖条
-    t+=1600;glide(t,1000,SW/2,14,W-M-SW/2,area().y+(area().h-SH)*.45+14);        // 竖条贴右边中段
-    t+=2200;at(t,()=>tapAt(geo.x+SW/2,geo.y+28+22,()=>{press($('bcol'));collapse()})); // ↖ 收成胶囊
+    STEP[1].run();at(STEP[1].dur,()=>STEP[2].run());
   };
   const rest=()=>{reset();open=false;present();now(settle);root.classList.remove('anim');runFrames(false)};
 
-  /* ---------- r11：三步各自一个停靠点 ---------- */
+  /* ---------- r14：两步各自一个停靠点 ---------- */
   // 不带过渡直接摆好：整块加 .cut，改完强制排版一次再拿掉
   const cut=fn=>{root.classList.add('cut');fn();root.offsetWidth;root.classList.remove('cut')};
-  const stripEnd=()=>{const a=area();return{x:W-M-SW,y:a.y+(a.h-SH)*.45,w:SW,h:SH}};
-  // 第 n 步播完时的样子
+  const scrollList=(on,slow)=>{const e=$('scin');e.style.transition=slow?`transform 1.2s ${EZ}`:`transform .9s ${EZ}`;e.style.transform=on?`translateY(-${SCR}px)`:''};
+  // 第 n 步播完时的样子：1 面板开着、放着 Barenboim；2 拖到右上角、收成竖条、再收进顶栏胶囊
   const settleTo=n=>cut(()=>{
     reset();
-    if(n>=1){present();settle();$('scin').style.transform='translateY(-40px)';play(0,1);setPage('m')}
-    if(n>=2){listCollapsed=true;showShape();place=released(stripEnd());settle()}
-    if(n>=3){collapse()}
+    if(n>=1){present();settle();scrollList(true);play(0,PICK)}
+    if(n>=2){listCollapsed=true;showShape();place={side:'trailing',dock:'top',fy:0};settle();collapse()}
   });
   // 每步的动作（从这一步开始算的毫秒）和整步时长
   const STEP={
-    1:{dur:3900,run(){
+    1:{dur:4400,run(){
       tap(300,M+TB/2,M+TB/2,()=>{present();say('list')});
-      at(1800,()=>$('scin').style.transform='translateY(-40px)');
-      at(2700,()=>tapAt(M+120,area().y+(126+62+31-40)*L,()=>{play(0,1);setPage('m');say('list')}));}},
-    2:{dur:5800,run(){
-      glide(300,1100,FW/2,14,W-M-FW/2+10,area().y+40);                          // 拖到右上角，松手吸附
-      at(2600,()=>tapAt(geo.x+(380-28)*L,geo.y+22*L,()=>setList(true)));        // 列表键 → 竖条
-      glide(3900,1000,SW/2,14,W-M-SW/2,area().y+(area().h-SH)*.45+14);}},       // 竖条贴右边中段
-    3:{dur:1500,run(){
-      at(300,()=>tapAt(geo.x+SW/2,geo.y+28+22,()=>{press($('bcol'));collapse()}));}}  // ↖ 收成胶囊
+      at(1700,()=>scrollList(true,true));                                       // 慢慢滚过两行，露出更多钢琴家
+      at(3200,()=>tapAt(M+120,area().y+(126+62*PICK+31-SCR)*L,()=>{play(0,PICK);say('list')}));}},
+    2:{dur:5600,run(){
+      glide(300,900,FW/2,14,W-M-FW/2+10,area().y+40);                           // 拖到右上角，松手吸附
+      at(2100,()=>tapAt(geo.x+(380-28)*L,geo.y+22*L,()=>setList(true)));        // 列表键 → 竖条
+      at(3800,()=>tapAt(geo.x+SW/2,geo.y+28+22,()=>{press($('bcol'));collapse()}));}}  // ↖ 收进顶栏胶囊
   };
   let bn=0,bt0=0,bdur=0,bbusy=0;
-  const beat=n=>{n=Math.max(0,Math.min(3,n|0));clearTimeout(bbusy);bbusy=0;touched=false;settleTo(n);bn=n;bt0=performance.now();bdur=0;
+  const beat=n=>{n=Math.max(0,Math.min(2,n|0));clearTimeout(bbusy);bbusy=0;touched=false;settleTo(n);bn=n;bt0=performance.now();bdur=0;
     root.classList.add('anim');runFrames(true)};
-  const one=n=>{n=Math.max(1,Math.min(3,n|0));if(reduced){beat(n);return}
+  const one=n=>{n=Math.max(1,Math.min(2,n|0));if(reduced){beat(n);return}
     beat(n-1);bn=n;bt0=performance.now();bdur=STEP[n].dur;STEP[n].run();
     bbusy=setTimeout(()=>{bbusy=0},bdur)};
 

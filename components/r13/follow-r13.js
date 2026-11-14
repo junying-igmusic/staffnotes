@@ -47,8 +47,17 @@ const CSS = `
 .sns-fol.full .pg.a{opacity:0}
 .sns-fol .mn{position:absolute;height:${MH}px;min-width:${MH}px;box-sizing:border-box;padding:0 4px;border-radius:${MH/2}px;display:grid;place-items:center;white-space:nowrap;background:rgba(255,255,255,.8);box-shadow:0 1px 4px rgba(0,0,0,.1);font:500 ${MF.toFixed(2)}px/1 -apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;color:${ACCENT};transform-origin:0 50%;transform:scale(.7);opacity:0;transition:opacity .3s,transform .35s;transition-delay:var(--d)}
 .sns-fol.nums .mn{opacity:1;transform:none}
+/* 批注 95：拍 1 小节号一行行弹出时先是强调蓝底白字、放大一下，再褪回 App 的白底蓝字；--p 是弹出的先后 */
+.sns-fol.pop .mn{animation:folMn 1.1s var(--p) cubic-bezier(.3,.7,.3,1) both}
+@keyframes folMn{
+0%{opacity:0;transform:scale(.5);background:${ACCENT};color:#fff;box-shadow:0 0 0 0 rgba(63,82,159,.45)}
+18%{opacity:1;transform:scale(1.22);background:${ACCENT};color:#fff;box-shadow:0 0 0 7px rgba(63,82,159,.16)}
+36%{transform:none;background:${ACCENT};color:#fff;box-shadow:0 0 0 11px rgba(63,82,159,0)}
+58%{background:${ACCENT};color:#fff;box-shadow:0 0 0 0 rgba(63,82,159,0)}
+100%{opacity:1;transform:none;background:rgba(255,255,255,.8);color:${ACCENT};box-shadow:0 1px 4px rgba(0,0,0,.1)}}
 .sns-fol .box{position:absolute;border-radius:5px;background:rgba(63,82,159,.10);box-shadow:inset 0 0 0 2px rgba(63,82,159,.5);opacity:0;pointer-events:none}
 .sns-fol.now .pg,.sns-fol.now .mn,.sns-fol.roll .pg{transition:none!important}
+.sns-fol.now .mn{animation:none!important}
 .sns-fol.roll .f-card{overflow:visible}
 `;
 (function inject(){
@@ -64,7 +73,7 @@ NS['r13/follow-r13'] = function(root, opt){
   const bars = [], mns = {a:'', b:''};
   for (const k of ['a','b']) SYS[k].forEach(({t, b, y0, y1, xs}, r) => xs.slice(0, -1).forEach((x, i) => {
     bars.push({k, x, y:y0, w:xs[i+1] - x, h:y1 - y0});
-    mns[k] += `<span class="mn" style="left:${(x*K + 4*PS).toFixed(2)}px;top:${((t + b)/2*K - MH/2).toFixed(2)}px;--d:${r*110 + i*40}ms">${bars.length}</span>`;
+    mns[k] += `<span class="mn" style="left:${(x*K + 4*PS).toFixed(2)}px;top:${((t + b)/2*K - MH/2).toFixed(2)}px;--d:${r*110 + i*40}ms;--p:${r*190 + i*60}ms">${bars.length}</span>`;
   }));
   root.innerHTML = `<div class="f-stage"><div class="f-card">
     <div class="pg a">${mns.a}</div>
@@ -119,15 +128,15 @@ NS['r13/follow-r13'] = function(root, opt){
     else { unroll(); root.classList.toggle('full', !!e.full); opt.onPage?.(e.full ? 2 : 1); }
     cue(e.bar, soft ? 'hold' : 'set');
   }
-  const DUR = [0, 1700, 10*T + 300, 7*T + 1500];
+  const DUR = [0, 2650, 10*T + 300, 7*T + 1500];
   let tok = null, cur = 0, done = true, t0 = 0;
   async function run(n, t){
     const wait = ms => new Promise(r => setTimeout(r, ms)).then(() => { if (t.dead) throw CANCEL; });
-    if (n === 1){ await wait(250); root.classList.add('nums'); await wait(1450); }
+    if (n === 1){ await wait(250); root.classList.add('nums', 'pop'); await wait(2100); root.classList.remove('pop'); await wait(300); }
     else if (n === 2){ for (let i = 0; i <= 9; i++){ cue(i, i === 9 ? 'hold' : 'pass'); await wait(T); } await wait(300); }
     else if (n === 3){ for (let i = 10; i <= 16; i++){ cue(i, 'pass'); await wait(T); } await slide(true); await wait(220); cue(17, 'hold'); await wait(940); }
   }
-  function stop(){ if (tok){ tok.dead = true; tok = null; } }
+  function stop(){ if (tok){ tok.dead = true; tok = null; } root.classList.remove('pop'); }
   // soft：不切掉过渡，小节号、第 2 页按动画退回
   function snap(n, soft){
     stop();

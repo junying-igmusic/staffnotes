@@ -28,7 +28,9 @@
 .os .fx-copy{padding-left:0}
 .os .fx-copy .label{margin-bottom:18px}
 .os .fx-copy h2.sec-title{font-size:clamp(36px,3.4vw,58px);margin-bottom:34px}
-.os .fx-run{position:relative;padding-left:32px}
+/* 批注 76：节点线原来贴着钉住屏的左边缘，圆点左半边（-3.5 px）被裁掉；整条线右移 4 px，文案跟着让 4 px */
+.os .fx-run{position:relative;padding-left:36px}
+.os .fx-nodes{left:4px}
 .os .fx-beat h3{font-size:clamp(24px,1.8vw,30px);margin-bottom:12px}
 .os .fx-beat p{font-size:15px}
 /* 各章文案借了 .sk-g 的样子，淡入淡出完全跟翻页走，不要它自带的过渡；说明跟着当前那一站展开 */
@@ -73,6 +75,9 @@
   .os .tight h2.sec-title+.fx-run .fx-beat p{display:none}
   .os .sk-g h2.sec-title{font-size:34px}
   .os .sk-g>p{margin:12px 0 18px;font-size:15px}
+  /* 批注 79：手机上标题和下面的说明之间留够空，不贴着 */
+  .os .sk-g ul{margin-top:16px}
+  .os .tight1 ul,.os .tight ul{margin-top:18px}
   .os .tight>p,.os .tight .label,.os .tight1>p{display:none}
   .os .narrow li span,.os .narrow .fx-beat p{padding-right:52px}
   /* 一站一条说明，叠在同一个位置换 */

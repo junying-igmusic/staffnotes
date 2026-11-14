@@ -2,7 +2,7 @@
    最底下一层是 board-r13：谱页和四色笔迹，全程都在；画笔面板只在画笔章出现，也只有画笔章能在谱上画。
    上面各章的原组件副本各占一层、铺满整个框，只在自己那一章出现：图层 layers-r13、词典 dict-r13、练习工具 practice-r13、
    Apple Music applemusic-r13、翻页与跳转和小节显示 turns-r13（拍 1–3、拍 4–5）、跟谱 follow-r13。
-   站名：pen1–4、lay1–3、dict1–2、prac1–3、am1–3、turn1–3、bar1–2、fol1–3，共 23 站。
+   站名：pen1–5、lay1–2、dict1–2、prac1–3、am1–2、turn1–3、bar1–2、fol1–3，共 22 站（r14：画笔加 Undo，图层、Apple Music 各并成两站）。
    接口照 r12：keys；beat(key, soft) 直接摆到这一站的终态（null 是刚打开的干净谱页；soft 时面板按开合动画退回）；one(key) 先摆上一站终态再只播这一站；
    busy、beatNow（站的序号）、beatFrac（这一站播了多少）。四色笔迹画上去之后一直留着；图层章每站都停回 Lesson、四色都在。 */
 (function(){
@@ -10,11 +10,11 @@ const NS = window.SNSims = window.SNSims || {};
 if (NS['r13/reader-r13']) return;
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const BASE = (document.currentScript && document.currentScript.src) ? new URL('./', document.currentScript.src).href : 'components/r13/';
-const KEYS = ['pen1','pen2','pen3','pen4','lay1','lay2','lay3','dict1','dict2','prac1','prac2','prac3','am1','am2','am3','turn1','turn2','turn3','bar1','bar2','fol1','fol2','fol3'];
-// 画笔四站：Pens（蓝）、Apple Pencil only（红）、Lasso（绿）、Shapes（金）
-const DEMO = ['palette', 'pencil', 'lasso', 'shapes'];
-// 画笔四个演示大概多长（毫秒，量过），给进度条用
-const PEN_MS = [7500, 6000, 6300, 8100];
+const KEYS = ['pen1','pen2','pen3','pen4','pen5','lay1','lay2','dict1','dict2','prac1','prac2','prac3','am1','am2','turn1','turn2','turn3','bar1','bar2','fol1','fol2','fol3'];
+// 画笔五站：Pens（蓝）、Apple Pencil only（红）、Lasso（绿）、Shapes（金）、Undo（双指轻点两下撤销）
+const DEMO = ['palette', 'pencil', 'lasso', 'shapes', 'undo'];
+// 画笔五个演示大概多长（毫秒，量过），给进度条用
+const PEN_MS = [7500, 7400, 10200, 8300, 4400];
 // 每一章用哪一层、这一章第 n 站对应那一层的第几拍
 const CH = {pen: {c: 'board', o: 0}, lay: {c: 'layers', o: 0}, dict: {c: 'dict', o: 0}, prac: {c: 'practice', o: 0}, am: {c: 'am', o: 0},
   turn: {c: 'turns', o: 0}, bar: {c: 'turns', o: 3}, fol: {c: 'follow', o: 0}};

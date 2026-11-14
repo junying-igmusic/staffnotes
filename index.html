@@ -93,6 +93,12 @@ footer .brand .mk{fill:#F2F2F4}
 /* SHOWCASE */
 .show{position:relative;padding:40px 0 120px}
 .show h2,.sec-title{font-family:var(--serif);font-weight:400;font-size:clamp(44px,5.4vw,80px);line-height:1;letter-spacing:-.035em}
+/* 批注 87：大标题、小标题按宽度自动均衡换行，手机上不再剩一个词孤零零掉到下一行 */
+h1,h2,h3{text-wrap:balance}
+/* 原来用 <br> 手动断成两句，后一句太长时会被挤成「It knows the / piece.」；改成两段，每段各自均衡换行 */
+.ln{display:block}
+/* 手机上首页大标题缩到「Sheet music that」放得下一行，不再拆成「Sheet / music that」 */
+@media (max-width:440px){ .hero h1{font-size:13.2vw} }
 .show-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:80px}
 .show-head p{max-width:320px;color:var(--ink2);font-size:15px}
 #features .show-head{margin-bottom:0}#features .fx{margin-top:-10vh}#features{padding-bottom:0}#features .fx{margin-bottom:-12vh}
@@ -262,7 +268,8 @@ footer .brand .mk{fill:#F2F2F4}
 
 /* LIBRARY */
 .lib{padding:24px 0 40px}
-.lib .cols{display:grid;grid-template-columns:1fr 1.15fr;gap:60px;align-items:center}
+/* 左栏放宽到放得下「sorted and named.」一行，不再剩「named.」单独一行 */
+.lib .cols{display:grid;grid-template-columns:1.25fr 1fr;gap:60px;align-items:center}
 .lib .cols p{color:var(--ink2);max-width:400px;margin-top:22px;font-size:16px}
 .lib .cols .cap{margin-top:36px}
 .ed{background:var(--card);border-radius:32px;padding:34px 34px 20px}
@@ -404,7 +411,7 @@ footer .legal span{margin-left:auto}
   <div class="img" id="heroImg"></div>
   <div class="copy" id="heroCopy">
     <div class="brand rv" style="--i:1"><span class="bm"><svg class="mk"><use href="#sn-mark"/></svg></span>StaffNotes</div>
-    <h1 id="heroTitle">Sheet music that<br>follows you.</h1>
+    <h1 id="heroTitle"><span class="ln">Sheet music that</span> <span class="ln">follows you.</span></h1>
     <p class="sub rv" style="--i:8">Import any PDF. Mark it in layers. Play, and the page turns itself.</p>
   </div>
   <div class="cta rv" style="--i:12">
@@ -431,12 +438,12 @@ footer .legal span{margin-left:auto}
         <div class="os-sbox"><div class="fx-sim" data-sim="r13/story-r13" data-drive="scroll"></div></div>
         <div class="fx-prog"><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button></div>
         <div class="os-rbox"><div class="sim" data-sim="r13/reader-r13" data-drive="scroll"></div></div>
-        <div class="os-rprog"><div data-ch="pen"><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="lay"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="dict"><button><i></i></button><button><i></i></button></div><div data-ch="prac"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="am"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="turn"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="bar"><button><i></i></button><button><i></i></button></div><div data-ch="fol"><button><i></i></button><button><i></i></button><button><i></i></button></div></div>
+        <div class="os-rprog"><div data-ch="pen"><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="lay"><button><i></i></button><button><i></i></button></div><div data-ch="dict"><button><i></i></button><button><i></i></button></div><div data-ch="prac"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="am"><button><i></i></button><button><i></i></button></div><div data-ch="turn"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="bar"><button><i></i></button><button><i></i></button></div><div data-ch="fol"><button><i></i></button><button><i></i></button><button><i></i></button></div></div>
       </div>
       <div class="os-copy">
       <div class="fx-copy">
         <div class="label"><span>Import</span>Any PDF · single or batch · no typing</div>
-        <h2 class="sec-title">Drop in a PDF.<br>It knows the piece.</h2>
+        <h2 class="sec-title"><span class="ln">Drop in a PDF.</span> <span class="ln">It knows the piece.</span></h2>
         <div class="fx-run">
         <div class="fx-nodes"><i></i><i></i><i></i><i></i></div>
         <div class="fx-beats">
@@ -447,25 +454,25 @@ footer .legal span{margin-left:auto}
         </div>
       </div>
       </div>
-        <div class="os-chcopy sk-g on" data-ch="pen" data-side="L" data-beats="4">
+        <div class="os-chcopy sk-g on" data-ch="pen" data-side="L" data-beats="5">
           <div class="label"><span>Annotate</span>3 pens · 6 colors · 5 widths each</div>
           <h2 class="sec-title">Mark it like paper.</h2>
           <p>The pens, colors and widths from the app. Try them on this page with your mouse or finger.</p>
           <ul>
             <li tabindex="0" role="button">Pens<span>Monoline pen, crayon and highlighter.</span></li>
-            <li tabindex="0" role="button">Apple Pencil only<span>Only the Pencil writes. Fingers scroll and turn pages.</span></li>
-            <li tabindex="0" role="button">Lasso<span>Circle a mark and move it.</span></li>
+            <li tabindex="0" role="button">Apple Pencil only<span>Fingers turn the page. Only the Pencil writes.</span></li>
+            <li tabindex="0" role="button">Lasso<span>Circle a mark to cut, copy or move it. Tap with two fingers to paste.</span></li>
             <li tabindex="0" role="button">Shapes<span>Lines, arrows, circles and boxes, drawn straight.</span></li>
+            <li tabindex="0" role="button">Undo<span>Double-tap with two fingers to take back the last mark.</span></li>
           </ul>
         </div>
-        <div class="os-chcopy sk-g on" data-ch="lay" data-side="R" data-beats="3">
+        <div class="os-chcopy sk-g on" data-ch="lay" data-side="R" data-beats="2">
           <div class="label"><span>Layers</span>Groups · 6 colors each · every color is a layer</div>
           <h2 class="sec-title">Keep every version on one score.</h2>
-          <p>Teacher's marks, fingering and stage copy live in separate groups. Show, hide or lock any color.</p>
+          <p>Hide, lock or delete any color. Groups keep teacher's marks, fingering and stage copy apart.</p>
           <ul>
+            <li tabindex="0" role="button">Hide · Lock · Delete<span>Every color has its own eye, lock and trash.</span></li>
             <li tabindex="0" role="button">Groups<span>Lesson, Fingering, Stage. One tap swaps the whole page.</span></li>
-            <li tabindex="0" role="button">Hide layer<span>Tap the eye. The blue marks disappear until you tap again.</span></li>
-            <li tabindex="0" role="button">Lock layer<span>Lock one color, or the whole group.</span></li>
           </ul>
         </div>
         <div class="os-chcopy sk-g on" data-ch="dict" data-side="L" data-beats="2">
@@ -487,14 +494,13 @@ footer .legal span{margin-left:auto}
             <li tabindex="0" role="button">Reference<span>Any note, any octave. Hold it while you tune.</span></li>
           </ul>
         </div>
-        <div class="os-chcopy sk-g on" data-ch="am" data-side="L" data-beats="3">
-          <div class="label"><span>Apple Music</span>Recordings of this exact work · in movement order</div>
+        <div class="os-chcopy sk-g on" data-ch="am" data-side="L" data-beats="2">
+          <div class="label"><span>Apple Music</span>Recordings of this exact work · many pianists</div>
           <h2 class="sec-title">Hear the piece you're reading.</h2>
           <p>Pick a recording and it plays in a panel over the score.</p>
           <ul>
-            <li tabindex="0" role="button">Recordings<span>Albums of this work. Pick one and it plays.</span></li>
-            <li tabindex="0" role="button">Floating panel<span>Docks to any edge or corner. Hide the list for a slim bar.</span></li>
-            <li tabindex="0" role="button">Capsule<span>Tuck it into a capsule at the top and keep reading.</span></li>
+            <li tabindex="0" role="button">Recordings<span>The same work by many pianists. Pick one and it plays.</span></li>
+            <li tabindex="0" role="button">Panel or capsule<span>Drag it to any edge, fold it to a bar, or tuck it into the top bar.</span></li>
           </ul>
         </div>
         <div class="os-chcopy sk-g on" data-ch="turn" data-side="R" data-beats="3">
@@ -512,7 +518,7 @@ footer .legal span{margin-left:auto}
           <h2 class="sec-title">Go straight to bar 24.</h2>
           <p>StaffNotes numbers every bar, so you can count the way your teacher does.</p>
           <ul>
-            <li tabindex="0" role="button">Show measure numbers<span>The counter shows page and bar, out of all 74.</span></li>
+            <li tabindex="0" role="button">Show measure numbers<span>The counter shows page and bar, out of all 73.</span></li>
             <li tabindex="0" role="button">Jump to a bar<span>Tap Bar, type 24, and that bar lights up.</span></li>
           </ul>
         </div>
@@ -536,7 +542,7 @@ footer .legal span{margin-left:auto}
   <div class="cols">
     <div>
       <div class="label rv" style="margin-bottom:26px"><span>Online Library</span>Public-domain scores · grouped by edition</div>
-      <h2 class="sec-title rv">Free scores,<br>sorted and named.</h2>
+      <h2 class="sec-title rv"><span class="ln">Free scores,</span> <span class="ln">sorted and named.</span></h2>
       <p class="rv" style="--i:1">Search by work, composer or catalog number. Urtext, manuscripts, edited editions and arrangements come grouped, and the score you pick lands in your library already named.</p>
     </div>
     <div class="ed rv" style="--i:2">
@@ -562,7 +568,7 @@ footer .legal span{margin-left:auto}
   <div class="st wrap">
       <div class="st-top">
         <div class="label rv" style="margin-bottom:26px"><span>Practice statistics</span>By day · by piece · by composer</div>
-        <h2 class="sec-title rv">See what you practiced<br>this month.</h2>
+        <h2 class="sec-title rv"><span class="ln">See what you practiced</span> <span class="ln">this month.</span></h2>
         <p class="rv" style="--i:1">StaffNotes counts how long each score is open. Nothing to start or log, and it stays on your iPad.</p>
       </div>
       <div class="sim" data-sim="stats" aria-label="Sample statistics for one month"></div>
@@ -584,7 +590,7 @@ footer .legal span{margin-left:auto}
 <section class="pricing wrap" id="pricing" data-theme="light">
   <div class="head">
     <div class="label rv"><span>Pricing</span>Free · Pro</div>
-    <h2 class="sec-title rv">Start free.<br>Go Pro for page turning.</h2>
+    <h2 class="sec-title rv"><span class="ln">Start free.</span> <span class="ln">Go Pro for page turning.</span></h2>
   </div>
   <div class="plans">
     <div class="plan rv">

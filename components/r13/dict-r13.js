@@ -1,7 +1,7 @@
 /* r13 一张谱 · 词典章（Pro）：从 r11 的 dictionary-os 改来，只改位置、缩放、单张谱和剧情接线。
    谱子不在这里画：下面的 board-r13 已经画了 K. 545 第 1 页（和四色笔迹），这里是透明舞台 834×1194，只放 Allegro 的标记、长按圆环、点按圆点和 Dictionary 面板。
-   面板挂在谱页右上角（右边 810、顶 70），按 ps = max(1, .85/s) 放大，样式照 App 的 ReaderMusicDictionaryPanel。
-   拍 1：圆点按住 Allegro，圆环走满，词被标出，面板弹出 allegro 词条，旁边贴 Pro；
+   面板挂在谱页右上角（右边 810、顶 70），按 ps 放大（宽框上 .85/s，框越窄放大越少，手机上跟 Apple Music 一样只随框缩放），样式照 App 的 ReaderMusicDictionaryPanel。
+   拍 1：圆点按住 Allegro，圆环走满，词被标出，面板弹出 allegro 词条（r14：不再贴 Pro，Pro 只标在页面大标题旁）；
    拍 2：圆点点搜索框，Allegro 清空、光标闪；慢慢打 a、n、d，列表每个字母过滤一次；点 andante，词条打开，左上返回钮，下面是 Related entries。
    词条原文取自 App 内置词典（ReaderMusicFrozenRuntime.json，en）。用户可以点 Allegro、搜索框、清除钮、列表、返回钮、相关词；桌面上点了搜索框还能直接打字。
    接口：beats、beat(n, soft)、one(n)、busy、beatNow、beatFrac、visible(on)、destroy()。 */
@@ -97,10 +97,7 @@ const CSS = `
 .sns-r13d .rb{display:block;width:100%;border:0;background:none;text-align:left;color:${INK};padding:8px 0;font:400 16px/1.2 ${SERIF};cursor:pointer}
 .sns-r13d .nr{display:flex;align-items:center;gap:7px;padding:9px 11px;border-radius:12px;background:rgba(233,234,236,.7);color:${SEC};font-size:14px}
 .sns-r13d .nr svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
-.sns-r13d .pro{position:absolute;right:16px;top:-11px;height:22px;padding:0 9px;border-radius:11px;background:${A};color:#fff;font:600 12px/22px "Timeless Sans",-apple-system,sans-serif;letter-spacing:.02em;
-  box-shadow:0 3px 10px rgba(63,82,159,.35);transform:rotate(-6deg) scale(0);opacity:0;transition:transform .4s cubic-bezier(.3,1.7,.5,1),opacity .15s;pointer-events:none}
-.sns-r13d .pn.on+.pro{transform:rotate(-6deg) scale(1);opacity:1;transition-delay:.25s}
-.sns-r13d.now .pn,.sns-r13d.now .mark,.sns-r13d.now .pro,.sns-r13d.now .bk,.sns-r13d.now .rs,.sns-r13d.now .snd,.sns-r13d.now .ring{transition:none!important}
+.sns-r13d.now .pn,.sns-r13d.now .mark,.sns-r13d.now .bk,.sns-r13d.now .rs,.sns-r13d.now .snd,.sns-r13d.now .ring{transition:none!important}
 .sns-r13d.now .vw.in{animation:none}
 `;
 (function inject(){
@@ -128,7 +125,7 @@ NS['r13/dict-r13'] = function(root){
     <div class="pw"><div class="pn">
       <div class="hd"><button class="bk" type="button" aria-label="Search results" tabindex="-1">${ICON.back}</button><b>Dictionary</b></div>
       <div class="ct"><div class="sf">${ICON.search}<span class="q"></span><button class="cx" type="button" aria-label="Clear" tabindex="-1">${ICON.clear}</button></div><div class="rs"><div class="ri"></div></div></div>
-    </div><span class="pro">Pro</span></div>
+    </div></div>
     <div class="snd"></div></div>`;
   const $ = s => root.querySelector(s);
   const stage = $('.d-stage'), mk = $('.mark'), hit = $('.hit'), rg = $('.ring'), pw = $('.pw'), pn = $('.pn'), bk = $('.bk');
@@ -139,7 +136,7 @@ NS['r13/dict-r13'] = function(root){
 
   function layout(){
     const w = root.clientWidth; if (!w) return;
-    s = w/W; ps = Math.max(1, .85/s);
+    s = w/W; ps = Math.max(1, Math.min(.85/s, 1 + (s - .45)*2));
     stage.style.transform = `scale(${s})`;
     pw.style.transform = `scale(${ps})`;
     // 面板底边留在框里：标题 56 + 上 6 + 搜索框 44 + 间距 10 + 下 16

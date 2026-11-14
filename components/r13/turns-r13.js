@@ -5,8 +5,9 @@
    拍 1：手指按住底部页码胶囊横向拖，胶囊上方的卡片显示目标页真实缩略图、乐章名和页码，拖到第 6 页再拖回第 4 页，松手才翻过去；
    拍 2：轻点胶囊，数字面板从胶囊里长出来，按 2，Go 变蓝，按 Go，面板收回，到第 2 页；
    拍 3：点底栏「2. Andante »」，到第 5 页，Andante 开头那行字用强调蓝渐入、停一下、渐出；
-   拍 4（Pro，Bars, not pages）：胶囊加宽成等宽两半「Page 5 / 10 | Bar 1 / 74」，旁边当场贴 Pro；
-   拍 5（Pro，Jump to a bar）：点 Bar 那一半，面板切成小节输入，按 2、4、Go，到第 6 页，第 24 小节闪一下。
+   拍 4（Show measure numbers）：点「« 1. Allegro」回到第 1 页，胶囊加宽成等宽两半「Page 1 / 10 | Bar 1 / 73」；
+   拍 5（Jump to a bar）：点 Bar 那一半，面板切成小节输入，按 2、4、Go，到第 2 页，第 24 小节闪一下（进跟谱只往回翻一页）。
+   谱面上不贴 Pro，Pro 只在网页文案的大标题旁（小谭批注 92）。
    用户自己也能玩：拖胶囊翻页、点胶囊开数字面板、按数字和 Go、点乐章钮和翻页圆钮；播放中按下就停掉脚本，先摆到这一拍的终态。
    顶栏和底栏不跟谱页走，照 App 贴着框的上下沿（小谭批注 72）。
    跟谱章：fol(p) 只留顶栏和胶囊，阅读器把这一层盖在跟谱层上面，胶囊跟着跟谱翻到的页数。
@@ -36,8 +37,8 @@ const CS = 0.907;
 const TOPF = (24 + 4*1.12)/1.235, BOTF = 20/1.235;
 // 翻页过场：App 的 UIPageViewController（.scroll，横向，页间距 12），一页连页间距整页滑过去；舞台单位
 const SLIDE = (FW + 12/1.235)/R, SLIDE_MS = 340, REST_MS = 90;
-// 第 6 页第 24 小节（assets/turns/p6.jpg 1000×1414 上量的：小节线 x 396–662.5，高音谱表上线 648.5、低音谱表下线 773.5，上下各留 12）
-const B24 = {x:396, y:636.5, w:266.5, h:149};
+// Allegro 第 24 小节在第 2 页第三行开头（assets/turns/p2.jpg 1000×1414 上量的：小节线 x 41.5–379.5，高音谱表上线 583、低音谱表下线 680，上下各留 12）；跳到这里，进跟谱只往回翻一页
+const B24 = {x:41.5, y:571, w:338, h:121};
 
 const gl = b => `<svg viewBox="0 0 24 24" fill="none" stroke="${INK}" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="${b?'M12 6l-6 6 6 6M19 6l-6 6 6 6':'M5 6l6 6-6 6M12 6l6 6-6 6'}"/></svg>`;
 const chev = b => `<svg viewBox="0 0 24 24" fill="none" stroke="${INK}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="${b?'M14.5 6l-6 6 6 6':'M9.5 6l6 6-6 6'}"/></svg>`;
@@ -84,9 +85,6 @@ const CSS = `
 @keyframes trnGlass{35%{transform:scale(1.08);background:#fff;box-shadow:0 2px 9px rgba(41,45,56,.2),inset 0 0 0 .5px rgba(0,0,0,.06)}}
 .sns-turns .t-stage>.bar .off{opacity:0;pointer-events:none}
 .sns-turns.padon .tpill{opacity:0}
-.sns-turns .pro{position:absolute;top:${PY-17}px;height:12px;display:flex;align-items:center;gap:3px;padding:0 6px 0 5px;border-radius:6px;${glass};font-size:7px;color:${ACCENT};transform:translate(-50%,4px);opacity:0;pointer-events:none;transition:opacity .35s,transform .45s cubic-bezier(.3,.8,.2,1),left .45s cubic-bezier(.3,.8,.2,1);z-index:2}
-.sns-turns .pro::before{content:"";width:4px;height:4px;border-radius:50%;background:currentColor}
-.sns-turns.bars .pro{opacity:1;transform:translate(-50%,0);transition-delay:.35s,.35s,0s}
 /* 拖动预览：真实缩略图、乐章名、页码，固定在胶囊上方，不跟手指走，不加阴影 */
 .sns-turns .th{position:absolute;left:${W/2}px;bottom:${H-PY+6}px;width:${(92+6.6).toFixed(1)}px;padding:3.3px;box-sizing:border-box;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:2.75px;border-radius:4.4px;background:#fff;box-shadow:inset 0 0 0 .75px rgba(41,45,56,.16);font-size:6.6px;font-weight:500;line-height:1.25;opacity:0;pointer-events:none;transition:opacity .12s;z-index:3}
 .sns-turns .th.on{opacity:1}
@@ -117,15 +115,14 @@ const CSS = `
 .sns-turns .t-stage>.bar{transform:scale(${CS});transform-origin:${W/2}px ${PY+PH}px}
 .sns-turns .th,.sns-turns .pad{scale:calc(${CS}*var(--tps,1));transform-origin:50% 100%}
 .sns-turns .ttl{scale:${CS};transform-origin:50% 0}
-/* 顶栏、底栏（连胶囊上方的缩略图、数字面板、Pro）挪到贴框的上下沿：--ty、--by 由 layout() 按框高算，舞台单位 */
+/* 顶栏、底栏（连胶囊上方的缩略图、数字面板）挪到贴框的上下沿：--ty、--by 由 layout() 按框高算，舞台单位 */
 .sns-turns .ttl{translate:0 var(--ty,0px)}
-.sns-turns .t-stage>.bar,.sns-turns .th,.sns-turns .pad,.sns-turns .pro{translate:0 var(--by,0px)}
+.sns-turns .t-stage>.bar,.sns-turns .th,.sns-turns .pad{translate:0 var(--by,0px)}
 /* 翻页过场：页外垫一层白（App 翻页时页与页之间的底），卡片不裁，页的透明度不过渡 */
 .sns-turns>.bk{position:absolute;inset:0;background:#fff;visibility:hidden}
 .sns-turns.roll>.bk{visibility:visible}
 .sns-turns.roll .t-card{overflow:visible}
 .sns-turns.roll .t-card .pg{transition:none}
-.sns-turns .pro{height:17px;top:${PY+PH-PH*CS-25}px;padding:0 8px;border-radius:8.5px;font-size:9.5px;font-weight:600;background:${ACCENT};color:#fff;box-shadow:0 2px 8px -2px rgba(63,82,159,.45)}
 .sns-turns .tpill .h.br.hit{background:rgba(63,82,159,.14);border-radius:9px}
 .sns-turns .pad .chip.bm{background:rgba(63,82,159,.14);color:${ACCENT};font-weight:600}
 `;
@@ -153,7 +150,6 @@ NS['r13/turns-r13'] = function(root){
       <div class="cv nx">${chev(0)}</div>
       <div class="mv nx"><span></span>${gl(0)}</div>
     </div>
-    <div class="pro">Pro</div>
     <div class="th"><div class="im">${THUMBS.map(p=>`<div data-p="${p}" style="background-image:url(${base}t${p}.jpg)"></div>`).join('')}</div><span class="mt"></span><b></b></div>
     <div class="pad"><div class="row"><div class="fld"><span class="chip">Page</span><span class="ty"></span></div><div class="go">${goArrow}</div></div><div class="tcap">/ ${N}</div><div class="kp">${KEYS}</div></div>
     <div class="snd"></div>
@@ -161,7 +157,7 @@ NS['r13/turns-r13'] = function(root){
   const $ = s => root.querySelector(s);
   const stage = $('.t-stage'), tpill = $('.tpill'), line = $('.tpill>i'), touch = $('.snd');
   const pgs = [...root.querySelectorAll('.t-card .pg')], ttls = [...root.querySelectorAll('.ttl>span')];
-  const mvPr = $('.mv.tpr'), mvNx = $('.mv.nx'), cvPv = $('.cv.pv'), cvNx = $('.cv.nx'), pro = $('.pro');
+  const mvPr = $('.mv.tpr'), mvNx = $('.mv.nx'), cvPv = $('.cv.pv'), cvNx = $('.cv.nx');
   const th = $('.th'), thIm = [...root.querySelectorAll('.th .im>div')], tfl = $('.tfl'), bfl = $('.bfl'), ty = $('.pad .ty'), goB = $('.pad .go');
   const pnPg = $('.h.pg .pn'), pnBr = $('.h.br .pn'), brH = $('.h.br'), chip = $('.pad .chip'), tcap = $('.pad .tcap'), pad = $('.pad'), bk = $('.bk');
 
@@ -193,7 +189,6 @@ NS['r13/turns-r13'] = function(root){
     Object.assign(mvNx.style, {left:nx+'px', maxWidth:(eR - nx)+'px'});
     mvPr.classList.toggle('off', prev < 0 || st.pad); mvNx.classList.toggle('off', next < 0 || st.pad);
     mvPr._to = prev >= 0 ? MSTART[prev] : 0; mvNx._to = next >= 0 ? MSTART[next] : 0;
-    pro.style.left = (W/2 + pw/4*CS) + 'px';
     // 拖动预览
     th.classList.toggle('on', !!st.thumb);
     if (st.thumb){
@@ -229,7 +224,7 @@ NS['r13/turns-r13'] = function(root){
 
   /* ---------- scripted beats ---------- */
   const CANCEL = {};
-  const DUR = [0, 7050, 5050, 4650, 2300, 6400];
+  const DUR = [0, 4900, 5050, 4650, 3850, 6400];
   let tok = null, cur = 0, t0 = 0, done = false, tp = null, rolling = null;
   const center = el => { const sr = stage.getBoundingClientRect(), r = el.getBoundingClientRect(), k = sr.width/W || 1; return [(r.left+r.width/2-sr.left)/k, (r.top+r.height/2-sr.top)/k]; };
   function place(){ if (!tp) return; touch.style.left = tp[0] + 'px'; touch.style.top = tp[1] + 'px'; touch.style.transform = touch._down ? 'scale(.75)' : ''; }
@@ -251,25 +246,26 @@ NS['r13/turns-r13'] = function(root){
     const hitKey = d => { const k = $(`.pad .k[data-k="${d}"]`); k.classList.add('hit'); setTimeout(()=>k.classList.remove('hit'), 160); st.typed += d; render(); };
     // 拖动中：页码、进度线、缩略图跟手指，主谱不动
     const scrubTo = (x0, x1, ms) => tween(ms, p=>{
-      const x = x0 + (x1-x0)*ease(p); tp = [vis(x), VY + by]; place();
+      const x = x0 + (x1-x0)*(1-Math.cos(Math.PI*p))/2; tp = [vis(x), VY + by]; place();
       const f = Math.min(1, Math.max(0, (x - (W/2-PW1/2+INSET)) / (PW1-2*INSET)));
       const pg = Math.round(f*(N-1)) + 1;
       st.frac = f; st.disp = pg; st.thumb = pg; render();
     });
     if (n===1){
-      await wait(450);
-      await moveTo([vis(xFor(1)), VY + by], 520);
+      // 批注 91：整站从 7 秒压到 5 秒；拖动用正弦缓动（中段不比平均快太多），每张缩略图仍停够看清
+      await wait(300);
+      await moveTo([vis(xFor(1)), VY + by], 420);
       down(true); line.classList.remove('ease');
       st.frac = 0; st.disp = 1; st.thumb = 1; render();
-      await wait(550);
-      await scrubTo(xFor(1), xFor(6), 1900);
-      await wait(650);
-      await scrubTo(xFor(6), xFor(4), 800);
-      await wait(800);
+      await wait(300);
+      await scrubTo(xFor(1), xFor(6), 1300);
+      await wait(450);
+      await scrubTo(xFor(6), xFor(4), 600);
+      await wait(450);
       down(false); line.classList.add('ease');
       st.page = 4; st.disp = 4; st.frac = null; st.thumb = 0; render();
       await wait(250); await lift();
-      await wait(800);
+      await wait(500);
     } else if (n===2){
       await wait(350);
       await tapOn(tpill, ()=>{ st.pad = true; render(); }, 560);
@@ -288,10 +284,16 @@ NS['r13/turns-r13'] = function(root){
       await wait(250); await lift();
       await wait(3000);
     } else if (n===4){
-      // 胶囊加宽成「Page | Bar」两半，Pro 当场贴上
-      await wait(400);
+      // 先点「« 1. Allegro」回到第 1 页（第 24 小节在 Allegro 第 2 页），胶囊再加宽成「Page | Bar」两半
+      await wait(350);
+      await tapOn(mvPr, ()=>{
+        mvPr.classList.remove('press'); void mvPr.offsetWidth; mvPr.classList.add('press');
+        setTimeout(()=>{ if (t.dead) return; st.page = 1; st.disp = 1; render(); }, 180);
+      }, 620);
+      await wait(250); await lift();
+      await wait(450);
       st.bars = true; render();
-      await wait(1900);
+      await wait(1700);
     } else if (n===5){
       await wait(300);
       await tapOn(brH, ()=>{ brH.classList.add('hit'); setTimeout(()=>brH.classList.remove('hit'), 220); st.pmode = 'bar'; st.pad = true; render(); }, 560);
@@ -300,7 +302,7 @@ NS['r13/turns-r13'] = function(root){
       await tapOn($('.pad .k[data-k="4"]'), ()=>hitKey('4'), 420);
       await wait(300);
       await tapOn(goB, ()=>{
-        st.pad = false; st.typed = ''; st.page = 6; st.disp = 6; st.bar = 24; render();
+        st.pad = false; st.typed = ''; st.page = 2; st.disp = 2; st.bar = 24; render();
         setTimeout(()=>{ if (t.dead) return; bfl.classList.remove('go'); void bfl.offsetWidth; bfl.classList.add('go'); }, 180);
       }, 460);
       await wait(250); await lift();
@@ -313,15 +315,15 @@ NS['r13/turns-r13'] = function(root){
     if (n>=1){ s.page = s.disp = 4; }
     if (n>=2){ s.page = s.disp = 2; }
     if (n>=3){ s.page = s.disp = 5; }
-    if (n>=4){ s.bars = true; }
-    if (n>=5){ s.page = s.disp = 6; s.bar = 24; s.pmode = 'bar'; }
+    if (n>=4){ s.page = s.disp = 1; s.bars = true; }
+    if (n>=5){ s.page = s.disp = 2; s.bar = 24; s.pmode = 'bar'; }
     return s;
   }
   function stop(){ if (tok){ tok.dead = true; tok = null; } if (rolling){ const r = rolling; rolling = null; r.res(false); unroll(r); } touch.style.opacity = 0; touch._down = false; tp = null; }
   // soft：不切掉过渡，面板、胶囊按动画退回
   function snap(n, soft){
     stop(); st = stateAt(n);
-    tfl.classList.remove('go'); bfl.classList.remove('go'); mvNx.classList.remove('press'); line.classList.add('ease');
+    tfl.classList.remove('go'); bfl.classList.remove('go'); mvNx.classList.remove('press'); mvPr.classList.remove('press'); line.classList.add('ease');
     if (soft){ render(); return; }
     root.classList.add('now'); render();
     void root.offsetWidth; requestAnimationFrame(()=>root.classList.remove('now'));
@@ -378,7 +380,8 @@ NS['r13/turns-r13'] = function(root){
         if (b !== to) await wait(REST_MS);
       }
       if (end) st = end;
-      render(); rolling = null; unroll(r); if (tok === t) tok = null;
+      // 批注 94：先在 .roll（页不过渡）下把刚翻走的那页藏好再撤 .roll；同一帧里一起撤，那页会摆回原位再按 .22s 淡出，往回翻到透明的第 1 页时就是闪一下
+      render(); void root.offsetWidth; rolling = null; unroll(r); if (tok === t) tok = null;
       r.res(true);
       if (r.next) go(r.next, true, r.only);
     })().catch(e => { if (e !== CANCEL) throw e; });
@@ -433,7 +436,7 @@ NS['r13/turns-r13'] = function(root){
       const cand = PAGES.filter(p => mvOf(p) === m && BAR[p][0] <= b);
       const p = cand.length ? cand[cand.length - 1] : st.page;
       st.page = st.disp = p; st.bar = b; st.frac = null; render();
-      if (p === 6 && b === 24){ bfl.classList.remove('go'); void bfl.offsetWidth; bfl.classList.add('go'); }
+      if (p === 2 && b === 24){ bfl.classList.remove('go'); void bfl.offsetWidth; bfl.classList.add('go'); }
       return;
     }
     turnTo(near(Math.min(N, v)));

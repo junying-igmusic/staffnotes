@@ -1,6 +1,7 @@
 /* 一张谱 r13 的图层副本（layers.js、r10/r12 的副本都不改）：铺在竖屏 iPad 框（834×1194）上，谱页和 Lesson 组的笔迹是下面 board 画的四种颜色，
    这里只画面板、Fingering / Stage 两组的墨迹和点按圆点。Lesson 组的眼睛、切组都回调给阅读器（opts.onEye、opts.onGroup），由它去隐藏 board 上的笔迹。
-   三拍：1 面板弹出 → 点 Fingering → 点 Stage → 点回 Lesson；2 点 Blue 的眼睛藏起指法弧线，停一会儿再打开；3 锁 Gold 那一层，再锁整组。每拍都停在 Lesson、四色都在。 */
+   r14 两拍：1 面板弹出 → 点 Blue 的眼睛藏起连线 → 锁 Green（它的垃圾桶跟着变灰）→ 点 Gold 的垃圾桶，照 App 先弹「Delete “Gold Layer”?」，点 Delete，那一行收起、谱上的 Gold 消失；
+   2 点 Fingering → 点 Stage → 点回 Lesson。藏、锁、删停在第 1 拍的终态，第 2 拍切回 Lesson 时还是那样；离开这一章由阅读器把颜色全摆回来。 */
 (function(){
 const NS = window.SNSims = window.SNSims || {};
 if (NS['r13/layers-r13']) return;
@@ -21,8 +22,11 @@ const ICON = {
   eyeOff: S(`<path d="${EYE}" fill="currentColor" fill-opacity=".25"/><circle cx="12" cy="12" r="3.1" fill="currentColor"/><path d="M3.6 3.6 20.4 20.4" stroke="#fff" stroke-width="4"/><path d="M3.6 3.6 20.4 20.4" stroke-width="1.7"/>`),
   unlock: S('<rect x="5" y="10.4" width="14" height="10.1" rx="2.6"/><path d="M8.2 10.4V8.1a3.8 3.8 0 0 1 7.6 0v2.3"/><path d="M3.6 3.6 20.4 20.4"/>'),
   lock: S('<rect x="5" y="10.4" width="14" height="10.1" rx="2.6" fill="currentColor" fill-opacity=".25"/><path d="M8.2 10.4V8.1a3.8 3.8 0 0 1 7.6 0v2.3"/><path d="M12 14.2v2.6" stroke-width="1.9"/>'),
-  trash: S('<path d="M4.5 6.5h15"/><path d="M9.5 6.5V4.2h5v2.3"/><path d="m6.3 6.5.9 13.3h9.6l.9-13.3"/><path d="M10.2 10.5v5.8M13.8 10.5v5.8"/>')
+  trash: S('<path d="M4.5 6.5h15"/><path d="M9.5 6.5V4.2h5v2.3"/><path d="m6.3 6.5.9 13.3h9.6l.9-13.3"/><path d="M10.2 10.5v5.8M13.8 10.5v5.8"/>'),
+  trashOn: S('<path d="M4.5 6.5h15"/><path d="M9.5 6.5V4.2h5v2.3"/><path d="m6.3 6.5.9 13.3h9.6l.9-13.3" fill="currentColor" fill-opacity=".25"/><path d="M10.2 10.5v5.8M13.8 10.5v5.8"/>')
 };
+// App 的删除确认（Resources/LayerPanel.xcstrings：layer.deleteTitle / layer.deleteMessage）
+const DEL_MSG = 'Deletes this colour layer’s annotations on every page in the current note group. This cannot be undone. The PDF and layers in other groups are kept.';
 const tip = c => `<svg class="tip" viewBox="0 0 16 18"><path d="M8 1.2 13 8v2.4H3V8Z" fill="${c}"/><rect x="3.4" y="11" width="9.2" height="5.8" rx="1.2" fill="#292D38"/></svg>`;
 
 /* ---------- ink, in page pixels of k545-p1.jpg (1300 × 1839) ---------- */
@@ -133,7 +137,19 @@ const CSS = `
 .sns-layers svg{display:block;width:100%;height:100%}
 .sns-layers .rows{transition:opacity .16s}
 .sns-layers .rows.fade{opacity:0}
-.sns-layers .ly{display:flex;align-items:center;height:46px;padding:0 12px 0 18px;gap:10px;font-size:15px;font-weight:500}
+.sns-layers .ly{display:flex;align-items:center;height:46px;padding:0 12px 0 18px;gap:10px;font-size:15px;font-weight:500;overflow:hidden;transition:height .3s ease,opacity .2s}
+.sns-layers .ly.gone{height:0;opacity:0}
+.sns-layers .ly .tr.off{opacity:.3;cursor:default}
+.sns-layers .l-dim{position:absolute;left:0;top:0;width:100%;height:100%;background:rgba(20,22,28,.16);opacity:0;transition:opacity .22s ease;pointer-events:none}
+.sns-layers .l-dim.on{opacity:1;pointer-events:auto}
+.sns-layers .l-alert{position:absolute;left:50%;top:50%;width:300px;box-sizing:border-box;padding:22px 20px 18px;border-radius:32px;background:rgba(255,255,255,.98);box-shadow:0 1px 2px rgba(41,45,56,.08),0 20px 60px rgba(41,45,56,.22);text-align:center;
+  transform:translate(-50%,-50%) scale(calc(var(--ps,1)*1.1));opacity:0;pointer-events:none;transition:opacity .2s ease,transform .3s cubic-bezier(.2,.8,.2,1)}
+.sns-layers .l-alert.on{transform:translate(-50%,-50%) scale(var(--ps,1));opacity:1;pointer-events:auto}
+.sns-layers .l-alert h4{margin:0 0 6px;font-size:17px;line-height:22px;font-weight:600}
+.sns-layers .l-alert p{margin:0 0 18px;font-size:13.5px;line-height:18px;color:rgba(41,45,56,.72)}
+.sns-layers .l-alert .bt{display:flex;gap:10px}
+.sns-layers .l-alert .bt span{flex:1;height:46px;border-radius:23px;background:rgba(118,118,128,.12);display:grid;place-items:center;font-size:16px;font-weight:500;cursor:pointer}
+.sns-layers .l-alert .bt .del{color:#C9433F;font-weight:600}
 .sns-layers .ly .nm{flex:1;height:100%;display:flex;align-items:center;box-shadow:inset 0 -.5px 0 rgba(41,45,56,.14)}
 .sns-layers .ly .ic{width:29.6px;height:22px;display:grid;place-items:center;cursor:pointer}
 .sns-layers .ly .ic svg{width:22px;height:22px}
@@ -160,15 +176,20 @@ NS['r13/layers-r13'] = function(root, opts){
   const card = document.createElement('div'); card.className = 'l-card';
   card.innerHTML = `<svg class="ink" viewBox="0 0 1300 1839" aria-hidden="true">${inkSVG()}</svg>`;
   const pan = document.createElement('div'); pan.className = 'l-pan';
+  const dim = document.createElement('div'); dim.className = 'l-dim';
+  const alertEl = document.createElement('div'); alertEl.className = 'l-alert';
+  alertEl.innerHTML = `<h4></h4><p>${DEL_MSG}</p><div class="bt"><span class="cn">Cancel</span><span class="del">Delete</span></div>`;
   const touch = document.createElement('div'); touch.className = 'snd';
   Object.assign(touch.style, {opacity:0, transition:'opacity .25s, transform .12s'});
-  stage.append(card, pan, touch);
+  stage.append(card, pan, dim, alertEl, touch);
   const svg = card.querySelector('svg.ink');
   root.classList.add('ready');
 
   /* state */
-  const fresh = () => ({g:0, open:false, hidden:[{},{},{}], locked:[{},{},{}], glocked:[false,false,false]});
-  let st = fresh();
+  const fresh = () => ({g:0, open:false, hidden:[{},{},{}], locked:[{},{},{}], deleted:[{},{},{}], glocked:[false,false,false]});
+  let st = fresh(), pend = null;   // pend：等确认删除的那一层 [组, 颜色]
+  const live = g => usedColours(g).filter(c=>!st.deleted[g][c]);
+  const gone = (g, c) => !!(st.hidden[g][c] || st.deleted[g][c]);
 
   /* panel */
   pan.innerHTML = `<div class="seg">${GROUPS.map((n,i)=>`<span data-g="${i}"><i></i><b>${n}</b></span>`).join('')}</div>
@@ -176,10 +197,11 @@ NS['r13/layers-r13'] = function(root, opts){
   const segs = [...pan.querySelectorAll('.seg span')], rowsEl = pan.querySelector('.rows');
   function renderRows(){
     const g = st.g;
-    rowsEl.innerHTML = usedColours(g).map(c=>{
-      const off = !!st.hidden[g][c], lk = !!st.locked[g][c];
+    rowsEl.innerHTML = live(g).map(c=>{
+      const off = !!st.hidden[g][c], lk = !!st.locked[g][c], ask = !!pend && pend[0]===g && pend[1]===c;
+      // App：锁上的层不能删，垃圾桶变灰
       return `<div class="ly" data-c="${c}">${tip(INKS[c])}<div class="nm">${NAMES[c]} Layer</div>`+
-        `<i class="ic eye ${off?'act':''}">${off?ICON.eyeOff:ICON.eye}</i><i class="ic lk ${lk?'act':''}">${lk?ICON.lock:ICON.unlock}</i><i class="ic tr">${ICON.trash}</i></div>`;
+        `<i class="ic eye ${off?'act':''}">${off?ICON.eyeOff:ICON.eye}</i><i class="ic lk ${lk?'act':''}">${lk?ICON.lock:ICON.unlock}</i><i class="ic tr ${lk?'off':''}">${ask?ICON.trashOn:ICON.trash}</i></div>`;
     }).join('');
   }
   function render(){
@@ -188,29 +210,39 @@ NS['r13/layers-r13'] = function(root, opts){
     segs.forEach((s,i)=>{ s.classList.toggle('on', i===g); s.querySelector('i').innerHTML = i===g ? ICON.stackOn : ICON.stack; });
     pan.querySelector('.gt .nm').textContent = GROUPS[g];
     const gl = pan.querySelector('.glock .ic'); gl.classList.toggle('act', st.glocked[g]); gl.innerHTML = st.glocked[g] ? ICON.lock : ICON.unlock;
-    const allOff = usedColours(g).every(c=>st.hidden[g][c]);
+    const allOff = live(g).every(c=>st.hidden[g][c]);
     const ge = pan.querySelector('.geye .ic'); ge.classList.toggle('act', allOff); ge.innerHTML = allOff ? ICON.eyeOff : ICON.eye;
     renderRows();
     svg.querySelectorAll('.grp').forEach(e=>e.classList.toggle('on', +e.dataset.g===g));
-    svg.querySelectorAll('.grp').forEach(e=>{ const gg = +e.dataset.g; e.querySelectorAll('.lay').forEach(l=>l.classList.toggle('off', !!st.hidden[gg][+l.dataset.c])); });
+    svg.querySelectorAll('.grp').forEach(e=>{ const gg = +e.dataset.g; e.querySelectorAll('.lay').forEach(l=>l.classList.toggle('off', gone(gg, +l.dataset.c))); });
   }
-  // 把当前状态告诉阅读器：在哪一组、Lesson 组哪几层藏着
-  function report(soft){ onGroup(st.g, soft); usedColours(0).forEach(c=>onEye(c, !!st.hidden[0][c], soft)); }
+  // 把当前状态告诉阅读器：在哪一组、Lesson 组哪几层藏着或删了
+  function report(soft){ onGroup(st.g, soft); usedColours(0).forEach(c=>onEye(c, gone(0, c), soft)); }
+  // 删一层：照 App 先弹确认；点 Delete 那一行收起，谱上那种颜色消失
+  function ask(g, c){ pend = [g, c]; alertEl.querySelector('h4').textContent = `Delete “${NAMES[c]} Layer”?`; dim.classList.add('on'); alertEl.classList.add('on'); renderRows(); }
+  function closeAsk(){ pend = null; dim.classList.remove('on'); alertEl.classList.remove('on'); }
+  function del(g, c){
+    closeAsk(); st.deleted[g][c] = true;
+    if (g === 0) onEye(c, true, true); else svg.querySelectorAll(`.grp[data-g="${g}"] .lay[data-c="${c}"]`).forEach(l=>l.classList.add('off'));
+    const row = rowsEl.querySelector(`.ly[data-c="${c}"]`);
+    if (row){ row.querySelector('.tr').innerHTML = ICON.trash; row.classList.add('gone'); setTimeout(()=>{ if (st.deleted[g][c] && row.isConnected) render(); }, 320); }
+  }
 
-  /* layout：舞台 834×1194 按框宽缩放；面板挂右上，App 的 1 pt 在屏幕上至少 .85 px */
+  /* layout：舞台 834×1194 按框宽缩放；面板挂右上。宽框（桌面）上 App 的 1 pt 在屏幕上至少 .85 px；
+     r14：框越窄面板放大得越少，手机上（框宽 .45 以下）跟 Apple Music 一样只随框缩放，不盖住谱 */
   let s = 1;
   function layout(){
     const w = root.clientWidth; if (!w) return;
     s = w/W;
     stage.style.transform = `scale(${s})`;
-    pan.style.setProperty('--ps', Math.max(1, .85/s));
+    stage.style.setProperty('--ps', Math.max(1, Math.min(.85/s, 1 + (s - .45)*2)));
   }
   const ro = new ResizeObserver(layout); ro.observe(root);
   layout(); render();
 
   /* ---------- scripted beats ---------- */
   const CANCEL = {};
-  const DUR = [0, 7600, 4200, 3800];
+  const DUR = [0, 9200, 6200];
   let tok = null, cur = 0, t0 = 0, done = false, tp = null;
   const center = el => { const sr = stage.getBoundingClientRect(), r = el.getBoundingClientRect(), k = sr.width/W || 1; return [(r.left+r.width/2-sr.left)/k, (r.top+r.height/2-sr.top)/k]; };
   function place(){ if (!tp) return; touch.style.left = tp[0]+'px'; touch.style.top = tp[1]+'px'; touch.style.transform = touch._down ? 'scale(.75)' : ''; }
@@ -232,11 +264,23 @@ NS['r13/layers-r13'] = function(root, opts){
     const moveTo = (el, ms) => { const q = center(el); const a = tp || [q[0]-60, q[1]+170]; if (!tp){ tp = a; place(); } touch.style.opacity = 1; return tween(ms||480, p=>{ const e = ease(p); tp = [a[0]+(q[0]-a[0])*e, a[1]+(q[1]-a[1])*e]; place(); }); };
     const press = async ()=>{ touch._down = true; place(); rip(); await wait(130); touch._down = false; place(); };
     const tapOn = async (el, fn, ms) => { await moveTo(el, ms); await press(); fn(); };
-    const eye = c => rowsEl.querySelector(`.ly[data-c="${c}"] .eye`);
+    const btn = (c, k) => rowsEl.querySelector(`.ly[data-c="${c}"] ${k}`);
     if (n===1){
       await wait(150);
       st.open = true; render();
-      await wait(1500);
+      await wait(1100);
+      await tapOn(btn(2, '.eye'), ()=>setEye(0, 2, true), 560);
+      await wait(1150);
+      await tapOn(btn(1, '.lk'), ()=>{ st.locked[0][1] = true; render(); }, 480);
+      await wait(950);
+      await tapOn(btn(3, '.tr'), ()=>ask(0, 3), 460);
+      await wait(1900);
+      await tapOn(alertEl.querySelector('.del'), ()=>del(0, 3), 520);
+      await wait(1100);
+      touch.style.opacity = 0;
+      await wait(300);
+    } else if (n===2){
+      await wait(250);
       await tapOn(segs[1], ()=>pickGroup(1, true, t), 520);
       await wait(1450);
       await tapOn(segs[2], ()=>pickGroup(2, true, t), 460);
@@ -245,45 +289,28 @@ NS['r13/layers-r13'] = function(root, opts){
       await wait(900);
       touch.style.opacity = 0;
       await wait(300);
-    } else if (n===2){
-      await wait(200);
-      await tapOn(eye(2), ()=>setEye(0, 2, true), 560);
-      await wait(1700);
-      await tapOn(eye(2), ()=>setEye(0, 2, false), 200);
-      await wait(900);
-      touch.style.opacity = 0;
-      await wait(300);
-    } else if (n===3){
-      await wait(200);
-      await tapOn(rowsEl.querySelector('.ly[data-c="3"] .lk'), ()=>{ st.locked[0][3] = true; render(); }, 560);
-      await wait(950);
-      await tapOn(pan.querySelector('.glock'), ()=>{ st.glocked[0] = true; render(); }, 520);
-      await wait(900);
-      touch.style.opacity = 0;
-      await wait(300);
     }
   }
-  // 每一拍的终态：都停在 Lesson，四层都在
+  // 每一拍的终态：面板开着、停在 Lesson；Blue 藏着、Green 锁着、Gold 删了
   function stateAt(n){
     const s = fresh();
-    if (n>=1) s.open = true;
-    if (n>=3){ s.locked[0][3] = true; s.glocked[0] = true; }
+    if (n>=1){ s.open = true; s.hidden[0][2] = true; s.locked[0][1] = true; s.deleted[0][3] = true; }
     return s;
   }
   function stop(){ if (tok){ tok.dead = true; tok = null; done = true; } touch.style.opacity = 0; touch._down = false; tp = null; touch.style.transform = ''; rowsEl.classList.remove('fade'); }
   function snap(n, soft){
-    stop(); st = stateAt(n);
+    stop(); closeAsk(); st = stateAt(n);
     if (!soft || RM){ root.classList.add('now'); void root.offsetWidth; }
     render(); report(soft && !RM);
     if (!soft || RM){ void root.offsetWidth; requestAnimationFrame(()=>root.classList.remove('now')); }
   }
   function go(n, animate, only, soft){
-    n = Math.max(0, Math.min(3, n|0));
+    n = Math.max(0, Math.min(2, n|0));
     if (!animate || RM || n===0){ snap(n, soft); cur = n; done = true; t0 = performance.now(); return; }
     snap(n-1);
     const t = tok = {dead:false};
     (async ()=>{
-      for (let k=n; k<=(only ? n : 3); k++){
+      for (let k=n; k<=(only ? n : 2); k++){
         cur = k; done = false; t0 = performance.now();
         try { await run(k, t); } catch(e){ if (e===CANCEL) return; throw e; }
         if (t.dead) return;
@@ -292,8 +319,14 @@ NS['r13/layers-r13'] = function(root, opts){
     })();
   }
 
-  /* ---------- 用户自己点：切组、眼睛、锁；一按下就停掉正在播的脚本 ---------- */
+  /* ---------- 用户自己点：切组、眼睛、锁、删；一按下就停掉正在播的脚本 ---------- */
   pan.addEventListener('pointerdown', ()=>{ if (tok) stop(); });
+  alertEl.addEventListener('pointerdown', ()=>{ if (tok) stop(); });
+  alertEl.addEventListener('click', e=>{
+    if (!pend) return;
+    if (e.target.closest('.del')) del(...pend);
+    else if (e.target.closest('.cn')){ closeAsk(); renderRows(); }
+  });
   pan.addEventListener('click', e=>{
     if (!st.open) return;
     const sg = e.target.closest('.seg span');
@@ -303,21 +336,22 @@ NS['r13/layers-r13'] = function(root, opts){
       const c = +row.dataset.c;
       if (e.target.closest('.eye')) setEye(g, c, !st.hidden[g][c]);
       else if (e.target.closest('.lk')){ st.locked[g][c] = !st.locked[g][c]; render(); }
+      else if (e.target.closest('.tr') && !st.locked[g][c]) ask(g, c);
       return;
     }
     if (e.target.closest('.glock')){ st.glocked[g] = !st.glocked[g]; render(); return; }
     if (e.target.closest('.geye')){
-      const h = !usedColours(g).every(c=>st.hidden[g][c]);
-      usedColours(g).forEach(c=>{ st.hidden[g][c] = h; if (g === 0) onEye(c, h, true); });
+      const h = !live(g).every(c=>st.hidden[g][c]);
+      live(g).forEach(c=>{ st.hidden[g][c] = h; if (g === 0) onEye(c, h, true); });
       render();
     }
   });
 
   return {
-    beats: 3,
+    beats: 2,
     get beatNow(){ return cur; }, get busy(){ return !!tok; },
     get beatFrac(){ if (done || !tok) return cur ? 1 : 0; return Math.min(1, (performance.now()-t0)/DUR[cur]); },
-    play(){ go(RM ? 3 : 1, true); },
+    play(){ go(RM ? 2 : 1, true); },
     go(n){ go(n, true); },
     one(n){ go(n, true, true); },
     beat(n, soft){ go(n, false, false, soft); },

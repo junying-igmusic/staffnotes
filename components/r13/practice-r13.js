@@ -1,5 +1,5 @@
 // 一张谱 r13 的练习卡片副本（practice.js 原文件不改）：App 里同一块 280×400pt 面板，原尺寸挂在竖屏 iPad 框（834×1194）谱面的右上角，
-// 按 ps = max(1, .85/s) 放大；谱页是下面 board 画的，这里背景透明。
+// r14：放大 1.1 倍（308×440），和 Apple Music 面板一样只随框缩放，桌面、手机上都占谱框约 37%；谱页是下面 board 画的，这里背景透明。
 // 三拍：1 卡片在 Metronome 分段弹出，圆点点开始、点六下加号，拍点随拍闪；2 圆点点 Tuner，指针落到 0；3 圆点点 Reference，从 G3 选到 A4，点 Play tone。
 // beat(n, soft) 直接摆第 n 拍终态（0 是卡片收起）；one(n) 先摆第 n−1 拍终态再播第 n 拍；用户一按卡片就停掉脚本。
 // 全部演示不出声：没有任何发声代码，也不开麦克风。
@@ -164,9 +164,9 @@ SNSims['r13/practice-r13']=function(root){
   const touch=root.querySelector('.snd');
   Object.assign(touch.style,{opacity:0,transition:'opacity .25s, transform .12s'});
 
-  // 舞台 834×1194 按框宽缩放；卡片原尺寸挂右上，App 的 1 pt 在屏幕上至少 .85 px
+  // 舞台 834×1194 按框宽缩放；卡片挂右上，固定放大 1.1 倍，大小跟 Apple Music 面板（323×442）相当
   let s=1;
-  const fit=()=>{const w=root.clientWidth;if(!w)return;s=w/W;st.style.transform=`scale(${s})`;card.style.setProperty('--ps',Math.max(1,.85/s))};
+  const fit=()=>{const w=root.clientWidth;if(!w)return;s=w/W;st.style.transform=`scale(${s})`;card.style.setProperty('--ps',1.1)};
   fit();const ro=new ResizeObserver(fit);ro.observe(root);
 
   let on=true,cur=0,pick=null,pane=1;

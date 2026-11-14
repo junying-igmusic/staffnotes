@@ -81,7 +81,9 @@ function layout(){
     G = {vh, sx, sy, sw, sh, full, k, fw, fh, fy, fx, B};
   } else {
     // 手机：导航条下面是舞台，竖放阅读器整页放下、水平居中，下面留至少 200 px 给文案；Organize 的 story 是 640 宽的窄版，在阅读器那块里上下居中
-    const T = 12, fw = Math.min(W, (vh - 64 - T - 26 - 200)*RD.W/RD.H), fh = fw*RD.H/RD.W, fx0 = (W - fw)/2, k = fw/RD.W;
+    // 批注 79：阅读器原来离舞台顶 12 px，紧贴着菜单条；现在离菜单条底边 16 px
+    const nb = navEl ? parseFloat(getComputedStyle(navEl).top) + navEl.offsetHeight : 72;
+    const T = Math.max(12, Math.round(nb + 16 - 64)), fw = Math.min(W, (vh - 64 - T - 26 - 200)*RD.W/RD.H), fh = fw*RD.H/RD.W, fx0 = (W - fw)/2, k = fw/RD.W;
     const sw = W, u = W/VN, sh = SH*u, sy = T + (fh - sh)/2, SH2 = T + fh + 30;
     stage.style.setProperty('--os-sh', SH2 + 'px');
     Object.assign(sbox.style, {left: '0px', top: sy + 'px', width: sw + 'px'});

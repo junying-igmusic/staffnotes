@@ -22,6 +22,7 @@ const CW = 134.8, CH = 190, GAP = 18, X0 = 17, R1 = 76, R2 = 346, R3 = R1 + CH +
 const colX = c => X0 + c*(CW+GAP);
 // 文档原始尺寸 170×246；拍 1 放大居中，拍 2 缩成导入卡片里的缩略图，拍 3 缩进两个文件夹
 const DW = 170, DH = 246;
+// 批注 80：拍 1 落下的 PDF 原来只放大 1.3 倍，太小；现在桌面 1.9 倍，手机窄版 2.2 倍（--ds）
 // 导入卡片
 // App 里 Import Score 是 720pt 宽的 sheet，这里按 KW/720 ≈ .89 缩：边距 40→36，缩略图 159→141，行高 44→39
 const KX = 70, KY = 10, KW = 640, KH = 560, TS = 141/170, TX = 36, TY = 72;
@@ -31,6 +32,8 @@ const SW = 136, SH = 192;
 const VX = (W-410)/2, ZS = SW/410, T5 = 2.9;
 // 手机：只看 ${VN} 宽的一段
 const VN = 640;
+// 手机拍 3：第 2–5 列在 VN 宽的窗口里居中
+const PN = (colX(1) + colX(4) + CW)/2 - VN/2;
 // 拍 2 字段展开：TF 时点开，FS 是卡片列表往上滚的距离（十行字段 39 高，从 Choose individual fields 那一行露到最后一行）
 const TF = 4.1, FS = 394, FR = 39;
 // 字段展开要紧凑：TF+.12 起列表 FU 秒滚上去（字段跟着很快一行行亮起），停 FH 秒，FD 秒滚回顶；滚回来 Save to Library 才出现，TV 时圆点按它
@@ -39,9 +42,12 @@ const into = (c, rowY, s=.3) => `translate(${colX(c)+CW/2-DW*s/2}px,${rowY+CH*.4
 const G = n => `.sns-story.g${n}`;
 
 const CSS = `
-.sns-story{position:relative;width:100%;aspect-ratio:${W}/${H};--k:1;overflow:hidden;overflow:clip visible}
-.sns-story.narrow{aspect-ratio:${VN}/${H}}
-.sns-story.narrow .hd{left:${W-VN+4}px}
+/* 批注 81：只裁左右、上下放开。原来靠 overflow:clip visible，不认它的浏览器（Safari）退回 hidden，把导入卡片落在底下的阴影齐刷刷切掉，成了一道没有渐变的黑边；改用 clip-path 上下各留 400 px */
+.sns-story{position:relative;width:100%;aspect-ratio:${W}/${H};--k:1;--ds:1.9;clip-path:inset(-400px 0 -400px 0)}
+.sns-story.narrow{aspect-ratio:${VN}/${H};--ds:2.2}
+/* 批注 77：手机竖屏一行只放得下 4 个文件夹，拍 1–3 收起第 1 列（Bach、Baroque），其余 4 列居中，标题对齐它们；拍 4 镜头左移时 Bach 再淡入 */
+.sns-story.narrow .hd{left:${colX(1)+2}px}
+.sns-story.narrow:not(.g4) .it.c0{opacity:0;transition-delay:0s}
 .sns-story.narrow[data-s="4"] .hd,.sns-story.narrow[data-s="5"] .hd{left:${X0+2}px}
 .sns-story *{box-sizing:border-box;margin:0;padding:0}
 .sns-story .st{position:absolute;left:0;top:0;width:${W}px;height:${H}px;transform-origin:0 0;transition:transform calc(.9s*var(--k)) cubic-bezier(.2,.7,.2,1);font-family:"Timeless Sans",-apple-system,system-ui,sans-serif;color:#292D38;letter-spacing:-.01em;-webkit-font-smoothing:antialiased}
@@ -50,13 +56,13 @@ const CSS = `
 /* 文档：两份叠在一起，拍 3 才分开 */
 .sns-story .doc{position:absolute;left:0;top:0;width:${DW}px;height:${DH}px;transform-origin:0 0;z-index:5;
   transition:transform calc(.9s*var(--k)) cubic-bezier(.2,.7,.2,1),opacity calc(.5s*var(--k)) ease;opacity:0;
-  transform:translate(${W/2-DW*1.3/2}px,${-60}px) scale(1.3) rotate(-7deg)}
+  transform:translate(calc(${W/2}px - ${DW/2}px*var(--ds)),-60px) scale(var(--ds)) rotate(-7deg)}
 .sns-story .doc .pg{position:absolute;inset:0;border-radius:6px;background:#fff url(${A}k545-p1.jpg) center top/cover;box-shadow:0 1px 3px rgba(0,0,0,.08),0 18px 40px -14px rgba(23,27,36,.28);overflow:hidden}
 .sns-story .doc.b .pg{box-shadow:none}
 .sns-story .scan{position:absolute;left:-10%;right:-10%;top:0;height:34%;background:linear-gradient(to bottom,rgba(63,82,159,0),rgba(63,82,159,.16) 85%,rgba(63,82,159,.55) 100%);opacity:0;transform:translateY(-100%)}
-.sns-story .fn{position:absolute;left:50%;top:100%;margin-top:14px;transform:translateX(-50%);white-space:nowrap;font-size:11px;color:#646A75;padding:3px 9px;border-radius:9px;background:rgba(41,45,56,.06);transition:opacity calc(.3s*var(--k))}
+.sns-story .fn{position:absolute;left:50%;top:100%;margin-top:calc(18px/var(--ds));transform:translateX(-50%) scale(calc(1.3/var(--ds)));transform-origin:50% 0;white-space:nowrap;font-size:11px;color:#646A75;padding:3px 9px;border-radius:9px;background:rgba(41,45,56,.06);transition:opacity calc(.3s*var(--k))}
 
-.sns-story[data-s="1"] .doc{opacity:1;transform:translate(${W/2-DW*1.3/2}px,${H/2-DH*1.3/2-18}px) scale(1.3) rotate(-1.5deg);transition-duration:calc(1.05s*var(--k)),calc(.35s*var(--k))}
+.sns-story[data-s="1"] .doc{opacity:1;transform:translate(calc(${W/2}px - ${DW/2}px*var(--ds)),calc(${H/2-18}px - ${DH/2}px*var(--ds))) scale(var(--ds)) rotate(-1.5deg);transition-duration:calc(1.05s*var(--k)),calc(.35s*var(--k))}
 .sns-story[data-s="2"] .doc{opacity:1;transform:translate(${KX+TX}px,${KY+TY}px) scale(${TS});transition-delay:calc(.08s*var(--k))}
 .sns-story[data-s="2"] .doc .pg{box-shadow:0 1px 3px rgba(0,0,0,.08),0 6px 16px -8px rgba(23,27,36,.2)}
 ${G(2)} .fn{opacity:0}
@@ -70,6 +76,8 @@ ${G(3)} .doc.b{transform:${into(1,R2)};transition-delay:calc(.42s*var(--k)),calc
 .sns-story .card{position:absolute;left:${KX}px;top:${KY}px;width:${KW}px;height:${KH}px;border-radius:24px;background:#fff;box-shadow:0 1px 3px rgba(170,178,197,.25),0 24px 60px -24px rgba(41,45,56,.28);
   opacity:0;transform:translateY(24px) scale(.97);transition:opacity calc(.5s*var(--k)) ease,transform calc(.7s*var(--k)) cubic-bezier(.2,.7,.2,1)}
 .sns-story[data-s="2"] .card{opacity:1;transform:none}
+/* 批注 81：手机窄版卡片和窗口一样宽，原来的阴影往两边扩出去被截成硬边；窄版的阴影只往下落，不出左右边 */
+.sns-story.narrow .card{box-shadow:0 1px 3px rgba(170,178,197,.25),0 30px 44px -38px rgba(41,45,56,.34)}
 ${G(3)} .card{opacity:0;transform:scale(.94);transition-delay:calc(.15s*var(--k))}
 .sns-story .sb{-webkit-text-stroke:.35px currentColor}
 .sns-story .card .h{position:absolute;left:0;right:0;top:19px;text-align:center;font-size:15px;line-height:20px}
@@ -129,7 +137,7 @@ ${G(3)} .card{opacity:0;transform:scale(.94);transition-delay:calc(.15s*var(--k)
 .sns-story .tp.t1d{z-index:6}
 .sns-story[data-s="1"] .tp.t1d{animation:snsDragT calc(1.05s*var(--k)) cubic-bezier(.2,.7,.2,1) both,snsDragP calc(1.5s*var(--k)) linear both}
 .sns-story[data-s="1"] .tp.t1d::after{animation:snd-rip calc(.5s*var(--k)) calc(.02s*var(--k)) ease-out both}
-@keyframes snsDragT{0%{translate:0 ${100-(H/2-18)}px}100%{translate:0 0}}
+@keyframes snsDragT{0%{translate:0 calc(${DH/2}px*var(--ds) - ${60+H/2-18}px)}100%{translate:0 0}}
 @keyframes snsDragP{0%{opacity:0;scale:1}6%{opacity:1;scale:.75}70%{opacity:1;scale:.75}80%{opacity:1;scale:1}100%{opacity:0;scale:1}}
 @keyframes snsTap{50%{transform:scale(.93)}100%{transform:none}}
 @keyframes snsTp{0%{opacity:0;scale:1}22%{opacity:1;scale:1}38%{opacity:1;scale:.75}60%{opacity:1;scale:.75}74%{opacity:1;scale:1}100%{opacity:0;scale:1}}
@@ -229,7 +237,7 @@ function folder(o, i){
     ? `<div class="av" style="background-image:url(${A}cmp-${o.cmp}.jpg)"></div><div class="t"><span class="f">${o.first}</span><span class="z">${o.last}</span></div>`
     : `${o.png ? `<div class="ic" style="-webkit-mask-image:url(${A}fld-${o.png}.png);mask-image:url(${A}fld-${o.png}.png)"></div>` : folderSvg}<div class="t"><small>${o.years}</small>${o.label}</div>`;
   const n = o.hit ? `<span class="a">${o.n}</span><span class="b">${o.n+1}</span>` : `<span class="a">${o.n}</span>`;
-  return `<div class="it ${o.cmp?'cmp':'per'}${o.hit?' hit':''}" style="left:${colX(i%5)}px;top:${o.y}px;--i:${o.i}"><div class="bp"></div>${pv}<div class="cv"><div class="dots">···</div><div class="n">${n}</div>${body}</div></div>`;
+  return `<div class="it c${i%5} ${o.cmp?'cmp':'per'}${o.hit?' hit':''}" style="left:${colX(i%5)}px;top:${o.y}px;--i:${o.i}"><div class="bp"></div>${pv}<div class="cv"><div class="dots">···</div><div class="n">${n}</div>${body}</div></div>`;
 }
 
 SNSims['r13/story-r13'] = function(root){
@@ -311,7 +319,7 @@ SNSims['r13/story-r13'] = function(root){
   let cur = 0, zpan = 0, dotPx = 26;
   const fit=()=>{
     const narrow = root.clientWidth < 560; root.classList.toggle('narrow', narrow);
-    const s = root.clientWidth/(narrow ? VN : W), pan = narrow ? (cur===3 ? W-VN : cur===4 ? zpan*(W-VN)/2 : (W-VN)/2) : 0;
+    const s = root.clientWidth/(narrow ? VN : W), pan = narrow ? (cur===3 ? PN : cur===4 ? zpan*(W-VN)/2 : (W-VN)/2) : 0;
     st.style.transform=`translateX(${-pan*s}px) scale(${s})`;
     if(s) root.style.setProperty('--dotu', (dotPx/s).toFixed(2)+'px');
   };

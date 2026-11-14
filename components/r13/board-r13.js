@@ -164,8 +164,8 @@ ${P} .k-cmp .sym .k-sf{transform:scale(1.6)}
 
 ${P} .k-pop{position:absolute;box-sizing:border-box;border-radius:32px;padding:12px 14px;background:rgba(252,252,250,.78);-webkit-backdrop-filter:blur(22px) saturate(1.7);backdrop-filter:blur(22px) saturate(1.7);box-shadow:0 14px 44px rgba(41,45,56,.16),0 1px 3px rgba(41,45,56,.06),inset 0 0 0 .6px rgba(255,255,255,.9);transform-origin:var(--ox,50%) var(--oy,100%);transition:opacity .18s,transform .26s cubic-bezier(.2,.9,.3,1.1)}
 ${P} .k-pop.off{opacity:0;transform:scale(.86);pointer-events:none}
-${P} .k-pop .arrow{position:absolute;width:22px;height:11px;overflow:hidden}
-${P} .k-pop .arrow::before{content:"";position:absolute;left:3px;top:-8px;width:16px;height:16px;transform:rotate(45deg);border-radius:3px;background:rgba(252,252,250,.92)}
+${P} .k-pop .arrow{position:absolute;width:22px;height:12px;overflow:hidden}
+${P} .k-pop .arrow::before{content:"";position:absolute;left:3px;top:4px;width:16px;height:16px;transform:rotate(45deg);border-radius:3px;background:rgba(250,250,248,.96)}
 ${P} .k-widths{display:flex;gap:4px;height:44px}
 ${P} .k-widths.er{gap:${116/3}px;justify-content:center}
 ${P} .k-w{all:unset;width:44px;height:44px;display:grid;place-items:center;cursor:pointer;position:relative}
@@ -216,6 +216,19 @@ ${P} .k-touch.pen::before{bottom:3px;height:26px;transform-origin:50% 100%;clip-
 ${P} .k-touch.pen::after{bottom:29px;height:150px;border-radius:7px 7px 1px 1px;transform-origin:50% calc(100% + 26px);background:linear-gradient(90deg,#fff,#f3f3f5 55%,#dcdde2)}
 ${P} .k-tip{position:absolute;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:rgba(41,45,56,.55);box-shadow:0 0 0 3px rgba(255,255,255,.55);pointer-events:none}
 ${P} .k-sel{position:absolute;border:1.5px dashed rgba(63,82,159,.85);border-radius:8px;background:rgba(63,82,159,.05);pointer-events:none;box-sizing:border-box}
+${P} .k-seb,${P} .k-note{position:absolute;box-sizing:border-box;height:44px;border-radius:22px;background:rgba(252,252,250,.8);-webkit-backdrop-filter:blur(22px) saturate(1.7);backdrop-filter:blur(22px) saturate(1.7);box-shadow:0 8px 28px rgba(41,45,56,.14),0 1px 3px rgba(41,45,56,.06),inset 0 0 0 .6px rgba(255,255,255,.9);display:flex;align-items:center;pointer-events:none;z-index:25;transition:opacity .2s,transform .26s cubic-bezier(.2,.9,.3,1.1)}
+${P} .k-seb{width:214px;padding:0 2px;transform-origin:50% 0}
+${P} .k-seb i{flex:none;width:42px;height:44px;display:grid;place-items:center;color:#292D38;position:relative;transition:opacity .2s}
+${P} .k-seb i::before{content:"";position:absolute;left:3px;top:4px;width:36px;height:36px;border-radius:18px;background:rgba(118,118,128,.16);opacity:0;transition:opacity .15s}
+${P} .k-seb i.hit::before{opacity:1}
+${P} .k-seb i.off{opacity:.3}
+${P} .k-seb i.del{color:#B33E47}
+${P} .k-seb svg{position:relative;display:block;overflow:visible}
+${P} .k-seb .dot::after{content:"";width:17px;height:17px;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 1px #fff}
+${P} .k-note{left:50%;padding:0 16px;gap:9px;font-size:15px;font-weight:500;letter-spacing:-.01em;white-space:nowrap;color:#292D38;transform:translateX(-50%);transform-origin:50% 0}
+${P} .k-note svg{flex:none;display:block}
+${P} .k-seb.off{opacity:0;transform:scale(.94)}
+${P} .k-note.off{opacity:0;transform:translate(-50%,-10px) scale(.92)}
 `;
 // r13：统一圆点按下时的涟漪（样式在 onescore-r13.css 的 .snd）
 K.rip = el => { el.classList.remove('rip'); void el.offsetWidth; el.classList.add('rip'); };
@@ -583,11 +596,32 @@ SNSims['r13/board-r13'] = function(root, opts){
   Object.assign(page.style,{left:pr.x+'px',top:pr.y+'px',width:pr.w+'px'});
   page.onload = ()=>root.classList.add('ready');
   stage.appendChild(page);
+  // r14 批注 82：Apple Pencil only 那站手指翻到第 2 页再翻回来，第 2 页平时藏在右边
+  const page2 = K.h('img','k-page'); page2.alt = ''; page2.draggable = false; page2.src = K.asset('k545-p2.jpg');
+  Object.assign(page2.style,{left:pr.x+'px',top:pr.y+'px',width:pr.w+'px',visibility:'hidden'});
+  stage.appendChild(page2);
   const ink = K.h('canvas','k-ink'), live = K.h('canvas','k-live'), scratch = document.createElement('canvas');
   const fadeC = K.h('canvas','k-ink');   // r13：图层章点眼睛时，那一种颜色在这里淡出淡入
   fadeC.style.opacity = 0;
   stage.append(ink, fadeC, live);
   const touch = K.h('div','k-touch snd'); Object.assign(touch.style,{opacity:0,transition:'opacity .25s, transform .12s',zIndex:30}); stage.appendChild(touch);
+  // r14 批注 83、84：双指手势的第二个圆点；套索选中后的编辑条（照 App SelectionEditorBar：色点、剪切、复制、粘贴、删除）；顶部状态胶囊
+  const touch2 = K.h('div','k-touch snd'); Object.assign(touch2.style,{opacity:0,transition:'opacity .25s, transform .12s',zIndex:30}); stage.appendChild(touch2);
+  const CLIP_D = '<path d="M15.5 6V3.5C15.5 1.843 14.157.5 12.5.5h-9C1.843.5.5 1.843.5 3.5V17c0 1.657 1.343 3 3 3H8"/><path d="M12 .5l-.171.342C11.321 1.858 10.282 2.5 9.146 2.5H6.854C5.718 2.5 4.679 1.858 4.171.842L4 .5"/><rect x="6" y="6" width="14" height="14" rx="2.5"/>';
+  const SEB_ICON = {
+    cut: '<svg viewBox="2 3 20 18" width="16.4" height="14.76" fill="none" stroke="currentColor" stroke-width="1.88" stroke-linecap="round" stroke-linejoin="round" style="transform:translateX(.35px)"><circle cx="5.5" cy="6.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><path d="M22 6 8.65 15.98M22 17.97 8.65 7.98"/></svg>',
+    copy: '<svg viewBox="1.25 1.2 21.55 21.55" width="18" height="18" fill="currentColor" fill-rule="evenodd" stroke="currentColor" stroke-width=".44" stroke-linejoin="round"><path d="M11.4 22.75H7.6c-4.39 0-6.35-1.96-6.35-6.35v-3.8c0-4.39 1.96-6.35 6.35-6.35h3c.41 0 .75.34.75.75s-.34.75-.75.75h-3c-3.58 0-4.85 1.27-4.85 4.85v3.8c0 3.58 1.27 4.85 4.85 4.85h3.8c3.58 0 4.85-1.27 4.85-4.85v-3c0-.41.34-.75.75-.75s.75.34.75.75v3c0 4.39-1.96 6.35-6.35 6.35Z"/><path d="M17 14.15h-3.2c-2.81 0-3.95-1.14-3.95-3.95V7c0-.3.18-.58.46-.69.28-.12.6-.05.82.16l6.4 6.4c.21.21.28.54.16.82-.11.28-.39.46-.69.46Zm-5.65-5.34v1.39c0 1.99.46 2.45 2.45 2.45h1.39l-3.84-3.84Z"/><path d="M15.6 2.75h-4c-.41 0-.75-.34-.75-.75s.34-.75.75-.75h4c.41 0 .75.34.75.75s-.34.75-.75.75Z"/><path d="M7 5.75c-.41 0-.75-.34-.75-.75 0-2.07 1.68-3.75 3.75-3.75h2.62c.41 0 .75.34.75.75s-.34.75-.75.75H10c-1.24 0-2.25 1.01-2.25 2.25 0 .41-.34.75-.75.75Z"/><path d="M19.19 17.75c-.41 0-.75-.34-.75-.75s.34-.75.75-.75c1.14 0 2.06-.93 2.06-2.06V8c0-.41.34-.75.75-.75s.75.34.75.75v6.19c0 1.96-1.6 3.56-3.56 3.56Z"/><path d="M22 8.75h-3c-2.66 0-3.75-1.09-3.75-3.75V2c0-.3.18-.58.46-.69.28-.12.6-.05.82.16l6 6c.21.21.28.54.16.82-.11.28-.39.46-.69.46Zm-5.25-4.94V5c0 1.83.42 2.25 2.25 2.25h1.19l-3.44-3.44Z"/></svg>',
+    paste: `<svg viewBox=".5 .5 19.5 19.5" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.88" stroke-linecap="round" stroke-linejoin="round" style="transform:translate(-.2px,-.15px)">${CLIP_D}</svg>`,
+    del: '<svg viewBox="3.75 3.45 16.5 17.1" width="15.4" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6.5h15"/><path d="M9.5 6.5V4.2h5v2.3"/><path d="m6.3 6.5.9 13.3h9.6l.9-13.3"/><path d="M10.2 10.5v5.8M13.8 10.5v5.8"/></svg>'
+  };
+  const seb = K.h('div','k-seb off',`<i class="dot"></i><i class="cut">${SEB_ICON.cut}</i><i class="copy">${SEB_ICON.copy}</i><i class="paste off">${SEB_ICON.paste}</i><i class="del">${SEB_ICON.del}</i>`);
+  stage.appendChild(seb);
+  const PILL = {
+    clip: [`<svg viewBox=".5 .5 19.5 19.5" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.05" stroke-linecap="round" stroke-linejoin="round">${CLIP_D}</svg>`, 'Content on clipboard · Tap a location with two fingers to paste'],
+    undo: ['<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>', 'Undone']
+  };
+  const note = K.h('div','k-note off'); note.style.top = '16px'; stage.appendChild(note);
+  const pill = name => { if (name){ note.innerHTML = `${PILL[name][0]}<span>${PILL[name][1]}</span>`; note.classList.remove('off'); } else note.classList.add('off'); };
 
   /* ---------- state ---------- */
   const st = {tool:'crayon', color:2, wi:Object.assign({},K.DEF_W), op:Object.assign({},K.DEF_OP), whole:false, hidden:{}, layersOpen:false, pencilOnly:false, lastInk:'crayon', shapeKind:'rectangle'};
@@ -689,6 +723,7 @@ SNSims['r13/board-r13'] = function(root, opts){
       gc.setLineDash([6,4]); gc.lineWidth=1.5; gc.strokeStyle='rgba(63,82,159,.9)'; gc.fillStyle='rgba(63,82,159,.05)';
       gc.beginPath(); gc.roundRect ? gc.roundRect(b.x-6,b.y-6,b.w+12,b.h+12,8) : gc.rect(b.x-6,b.y-6,b.w+12,b.h+12); gc.fill(); gc.stroke(); gc.setLineDash([]);
       sel.box = {x:b.x-6,y:b.y-6,w:b.w+12,h:b.h+12};
+      placeSeb();
     }
   }
 
@@ -905,7 +940,16 @@ SNSims['r13/board-r13'] = function(root, opts){
   let demoTok = null, tp = null;
   const PG = (x,y)=>[pr.x+x*pr.w/1300, pr.y+y*pr.w/1300];          // page pixels -> stage points
   const PK = pr.w/1300;
-  const scrollPage = y => { const t = y ? `translateY(${y}px)` : ''; page.style.transform = ink.style.transform = live.style.transform = t; };
+  // r14 批注 82：整页横滑（照 turns / follow：一页宽加 12 pt 的缝，340 ms），x 是第 1 页往左挪了多少（负数），第 2 页跟着从右边进来
+  const SLIDE = W + 12/1.235, SLIDE_MS = 340;
+  const slidePage = x => { const t = x ? `translateX(${x}px)` : ''; page.style.transform = ink.style.transform = live.style.transform = t;
+    page2.style.visibility = x ? 'visible' : 'hidden'; page2.style.transform = `translateX(${SLIDE+x}px)`; };
+  // 编辑条照 App SelectionEditorAnchor：在选中框正下方 14 pt，水平居中
+  let sebOn = false;
+  const placeSeb = ()=>{ if (!sebOn || !sel || !sel.box) return; const b = sel.box; seb.style.left = (b.x+b.w/2-107)+'px'; seb.style.top = (b.y+b.h+14)+'px'; };
+  const showSeb = on => { sebOn = !!on; if (on){ seb.querySelector('.dot').style.setProperty('--c', K.INKS[st.color]); seb.querySelector('.paste').classList.add('off'); placeSeb(); } seb.classList.toggle('off', !on); };
+  const ctr = pts => { const b = K.bbox([{pts, w:0}]); return [b.x+b.w/2, b.y+b.h/2]; };
+  const PASTE = ()=>PG(190,1068);   // 两指轻点的地方：第 4 行第 11 小节上方
   const DIGIT = {
     1:'M3 2 L5.5 0 L5.5 10',
     2:'M1 3 C1 -0.5 9 -0.5 9 3 C9 6 1 8 1 10 L9.5 10',
@@ -915,22 +959,26 @@ SNSims['r13/board-r13'] = function(root, opts){
   };
   const digit = (d, x, y)=>K.sample(DIGIT[d], PG(x,y)[0], PG(x,y)[1], 3.3*PK);
   // r13：四个演示各用一种颜色，画完的样子（瞬间摆好用，和下面演示里画的一致）
-  const COLOR = {palette:2, pencil:0, lasso:1, shapes:3};   // Blue、Red、Green、Gold
+  const COLOR = {palette:2, pencil:0, lasso:1, shapes:3, undo:3};   // Blue、Red、Green、Gold；r14 撤销站那一笔用金色，撤掉后不留
   const SLUR = ()=>{ const a = PG(236,268), b = PG(760,268); return Array.from({length:30},(_,i)=>{ const t=i/29; return [a[0]+(b[0]-a[0])*t, a[1]-Math.sin(t*Math.PI)*40*PK]; }); };
   const PENCIL = [[1,506,520],[3,563,516],[5,682,506]];
   const SHAPES = [['ellipse',[1012,250],[1140,328]],['rectangle',[438,1062],[596,1176]]];
+  const SLIP = ()=>Array.from({length:26},(_,i)=>{ const t = i/25; return PG(560+430*t, 1530-70*t-Math.sin(t*Math.PI)*36+Math.sin(t*Math.PI*3)*6); });   // r14 撤销站：第 5 行谱上划错的一笔
   const FIN = {
     palette: ()=>[{tool:'crayon', pts:SLUR()}],
     pencil: ()=>PENCIL.map(([d,x,y])=>({tool:'crayon', pts:digit(d,x,y)})),
-    lasso: ()=>[{tool:'crayon', pts:digit(4,866,766), dx:44*PK, dy:-4*PK}],
-    shapes: ()=>SHAPES.map(([kind,a,b])=>({tool:'shape', kind, pts:[PG(...a),PG(...b)]}))
+    // r14：拖过去的 4，加上两指粘贴落在 PASTE 的那份（中心对准两指中点）
+    lasso: ()=>{ const pts = digit(4,866,766), c = ctr(pts), q = PASTE(); return [{tool:'crayon', pts, dx:44*PK, dy:-4*PK}, {tool:'crayon', pts, dx:q[0]-c[0], dy:q[1]-c[1]}]; },
+    shapes: ()=>SHAPES.map(([kind,a,b])=>({tool:'shape', kind, pts:[PG(...a),PG(...b)]})),
+    undo: ()=>[]
   };
   function put(names){
     stopDemo(); closePops(); sel = null; lassoPts = null;
     strokes = strokes.filter(s=>!names.includes(s.demo));
     for (const n of names) for (const f of FIN[n]()) strokes.push(Object.assign({id:sid++, color:COLOR[n], w:K.WIDTHS.crayon[1]*WF, op:1, demo:n}, f));
     st.wi.crayon = 1; st.tool = 'crayon'; st.lastInk = 'crayon';
-    if (names.length) st.color = COLOR[names[names.length-1]];
+    const cn = names.filter(n=>n in COLOR).pop();   // r14：DEMO 里有 COLOR 没登记的站名时，别把颜色设成 undefined（笔图标会去拉 PaletteCrayonundefined.svg）
+    if (cn) st.color = COLOR[cn];
     if (names.includes('pencil')) st.pencilOnly = true;
     redraw(); pal.update();
   }
@@ -938,9 +986,10 @@ SNSims['r13/board-r13'] = function(root, opts){
   // r13：Apple Pencil only 那段，圆点换成原版那支 Pencil（.snd 的样式带 !important，先摘掉；写完换回圆点）
   function penTip(on){ touch.classList.toggle('pen', on); touch.classList.toggle('snd', !on); }
   function stopDemo(){
+    showSeb(false); pill(null); touch2.style.opacity = 0; touch2.style.transform = ''; slidePage(0);
     if (!demoTok) return;
     demoTok.dead = true; demoTok = null;
-    touch.style.opacity = 0; touch.style.transform = ''; penTip(false); scrollPage(0);
+    touch.style.opacity = 0; touch.style.transform = ''; penTip(false);
     if (curStroke && curStroke.demo) curStroke = null;
     lassoPts = null; drawLive();
   }
@@ -960,6 +1009,13 @@ SNSims['r13/board-r13'] = function(root, opts){
     const press = async ()=>{ down(); await wait(120); up(); };
     const center = el => { const sr = stage.getBoundingClientRect(), r = el.getBoundingClientRect(); return [(r.left+r.width/2-sr.left)/k, (r.top+r.height/2-sr.top)/k]; };
     const tapPal = async sel => { const b = pal.exp.querySelector(sel); await moveTo(center(b)); await press(); tap(b); await wait(220); };
+    // r14：圆点换成 Pencil（或换回来），先淡出再换，落在 q
+    const toPen = async (on, q)=>{ touch.style.opacity = 0; await wait(250); penTip(on); if (q){ tp = q; placeTouch(); } };
+    // r14：两根手指（两个圆点）以 q 为中点，从下面一点落进来；轻点一下 = 两个一起缩一下、起涟漪
+    const two = (q, dy)=>{ tp = [q[0]-30, q[1]+7+dy]; placeTouch(); touch2.style.left = (q[0]+30)+'px'; touch2.style.top = (q[1]-7+dy)+'px'; };
+    const twoIn = async q=>{ two(q, 36); touch.style.opacity = touch2.style.opacity = 1; await tween(420, p=>two(q, 36*(1-ease(p)))); };
+    const tapTwo = async ()=>{ K.rip(touch); K.rip(touch2); touch.style.transform = touch2.style.transform = 'scale(.75)'; await wait(110); touch.style.transform = touch2.style.transform = ''; };
+    const twoOut = ()=>{ touch.style.opacity = touch2.style.opacity = 0; };
     const ink = async (pts, tool, ms)=>{
       const w = K.WIDTHS[tool][st.wi[tool]]*WF;
       const s = {id:sid++, tool, color:st.color, w, op:st.op[tool], pts:[pts[0]], demo:name};
@@ -987,20 +1043,32 @@ SNSims['r13/board-r13'] = function(root, opts){
           if (wb){ await moveTo(center(wb), 420); await press(); wb.click(); await wait(600); }
         }
       } else if (name==='pencil'){
-        // 只认 Apple Pencil：More 里打开开关；手指只滚动谱子、不留墨，Pencil 才写
+        // r14 批注 82：只认 Apple Pencil：手指在谱上横滑，整页翻到第 2 页、再翻回来，不留墨；然后 Pencil 出来写字
         await tapPal(`.k-dot[data-i="${COLOR.pencil}"]`);   // r13：先点红色
         st.pencilOnly = true;
-        const f0 = PG(700,1300), D = 260*PK;
-        await moveTo(f0, 560); down();
-        await tween(700, p=>{ const e = ease(p); tp = [f0[0], f0[1]-D*e]; placeTouch(); scrollPage(-D*e); });
+        const y = PG(0,880)[1], R = pr.x+pr.w*.82, L = pr.x+pr.w*.18, DR = 240;
+        const out = p => 1-Math.pow(1-p,3);
+        // 手指按住往左一甩，页跟着手走；松手后整页滑过去（照 turns / follow 的 340 ms）
+        await moveTo([R,y], 560); down();
+        await tween(420, p=>{ const e = p*p; tp = [R-DR*e, y-6*e]; placeTouch(); slidePage(-DR*e); });
         up(); touch.style.opacity = 0;
-        await tween(560, p=>scrollPage(-D*Math.pow(1-p,3)));
-        await wait(380);
+        await tween(SLIDE_MS, p=>slidePage(-DR-(SLIDE-DR)*out(p)));
+        await wait(750);
+        // 第 2 页上，手指从左边往右拖，翻回第 1 页
+        tp = [L,y]; placeTouch(); touch.style.opacity = 1;
+        await wait(300); down();
+        await tween(420, p=>{ const e = p*p; tp = [L+DR*e, y-6*e]; placeTouch(); slidePage(-SLIDE+DR*e); });
+        up(); touch.style.opacity = 0;
+        await tween(SLIDE_MS, p=>slidePage(-(SLIDE-DR)*(1-out(p))));
+        slidePage(0);
+        await wait(420);
         tp = PG(820,420); placeTouch(); penTip(true);
         for (const [d,x,y] of PENCIL) await ink(digit(d,x,y), 'crayon', 340);   // bar 6: g′ b′ g″
         await wait(500);
       } else if (name==='lasso'){
+        // r14 批注 83：Pencil 写个 4，套索圈住、拖一下；选中框下面出 App 的编辑条，点 Copy，顶部提示双指粘贴；两根手指在别处轻点，复制的 4 落在那里
         await tapPal(`.k-dot[data-i="${COLOR.lasso}"]`);   // r13：先点绿色
+        await toPen(true, PG(980,700));                   // 已经开了只认 Pencil，写和圈都用 Pencil
         await ink(digit(4, 866, 766), 'crayon', 420);
         await tapPal('.k-act.lasso');
         const c = PG(883,782), rx = 46*PK, ry = 40*PK;
@@ -1012,19 +1080,45 @@ SNSims['r13/board-r13'] = function(root, opts){
         const poly = loop; lassoPts = null;
         const ids = new Set(visibleStrokes().filter(s=>s.tool!=='eraser' && s.pts.some(q=>K.inPoly([q[0]+(s.dx||0),q[1]+(s.dy||0)],poly))).map(s=>s.id));
         sel = ids.size ? {ids} : null; drawLive();
-        await wait(350);
         if (sel){
+          showSeb(true);
+          await wait(500);
           await moveTo(c, 380); down();
           const base = strokes; undoS.push(base); redoS = [];
           strokes = strokes.map(s=>sel.ids.has(s.id)?Object.assign({},s):s);
           const D = [44*PK, -4*PK];
           const moved = strokes.filter(s=>sel.ids.has(s.id)).map(s=>[s, s.dx||0, s.dy||0]);
           await tween(700, p=>{ const e = ease(p); moved.forEach(([s,x,y])=>{ s.dx = x+D[0]*e; s.dy = y+D[1]*e; }); tp = [c[0]+D[0]*e, c[1]+D[1]*e]; placeTouch(); redraw(); });
-          up(); await wait(800);
+          up(); await wait(450);
+          // 编辑条上点 Copy：粘贴键亮起来，顶部出状态胶囊
+          const cp = seb.querySelector('.copy');
+          await moveTo(center(cp), 460); cp.classList.add('hit'); await press(); await wait(100); cp.classList.remove('hit');
+          seb.querySelector('.paste').classList.remove('off'); pill('clip');
+          const orig = strokes.filter(s=>sel.ids.has(s.id));
+          touch.style.opacity = 0;
+          await wait(1100);
+          penTip(false);
+          // 两根手指在别处轻点一下：复制的笔迹以两指中点为中心落下，选中换成新的那份，编辑条跟过去
+          const m = PASTE();
+          await twoIn(m);
+          await wait(100);
+          await tapTwo();
+          const c0 = ctr(orig.flatMap(s=>s.pts.map(q=>[q[0]+(s.dx||0), q[1]+(s.dy||0)])));
+          const copies = orig.map(s=>Object.assign({}, s, {id:sid++, dx:(s.dx||0)+m[0]-c0[0], dy:(s.dy||0)+m[1]-c0[1]}));
+          seb.style.transition = 'none'; seb.classList.add('off'); void seb.offsetWidth; seb.style.transition = '';
+          pill(null);
+          sel = {ids:new Set(copies.map(s=>s.id))};
+          commit(strokes.concat(copies));
+          await wait(220);
+          twoOut(); seb.classList.remove('off');
+          await wait(1200);
         }
-        sel = null; st.tool = st.lastInk; pal.update(); drawLive();
+        sel = null; showSeb(false); st.tool = st.lastInk; pal.update(); drawLive();
       } else if (name==='shapes'){
         await tapPal(`.k-dot[data-i="${COLOR.shapes}"]`);   // r13：先点金色
+        // r14：前面已经开了只认 Pencil，形状和 Lasso、Undo 一样用 Pencil 画
+        const sb = center(pal.exp.querySelector('.k-act.shape'));
+        await toPen(true, [sb[0]+70, sb[1]-150]);
         await tapPal('.k-act.shape');
         const shapes = SHAPES.map(([kind,a,b])=>[kind, PG(...a), PG(...b)]);
         for (const [kind, a, b] of shapes){
@@ -1038,6 +1132,21 @@ SNSims['r13/board-r13'] = function(root, opts){
           await wait(350);
         }
         st.tool = st.lastInk; pal.update();
+      } else if (name==='undo'){
+        // r14 批注 84：Pencil 随手划了一笔（金色，和形状同一层），两根手指在谱上轻点两下，这一笔撤掉，顶部出 Undone（照 App ReaderHistoryInteraction：2 或 3 指双击撤销）
+        st.color = COLOR.undo; st.tool = 'crayon'; st.lastInk = 'crayon'; pal.update();
+        tp = PG(660,1420); placeTouch(); penTip(true);
+        await ink(SLIP(), 'crayon', 460);
+        await wait(500);
+        touch.style.opacity = 0; await wait(250); penTip(false);
+        await twoIn(PG(820,1290));
+        await wait(120);
+        await tapTwo(); await wait(90); await tapTwo();
+        undo(); pill('undo');
+        await wait(350);
+        twoOut();
+        await wait(1300);
+        pill(null);
       }
       touch.style.opacity = 0;
       await wait(250);
