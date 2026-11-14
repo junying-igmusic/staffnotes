@@ -21,7 +21,7 @@ const io = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3)/2;
 
 /* 可调的数：大过场（hero → Overview → Organize、换章）多长；换拍多长；Organize 第 4 拍 → 画笔第 1 拍那整段过场多长；滚轮停多久才算下一下；
    演示播完停多久自动进下一站；手机上手指滑多远算一下（毫秒、像素） */
-const BIG = 1000, BEAT = 500, LONG = 1600, QUIET = 250, HOLD_MS = 1000, SWIPE = 24;
+const BIG = 1000, BEAT = 500, LONG = 1600, QUIET = 250, HOLD_MS = 0, SWIPE = 24;
 // Organize 第 3 拍 → 画笔第 1 拍：先 FOLD 毫秒播 Mozart 文件夹打开（story 第 4 拍），接着 LONG 毫秒点 K. 545、放大、挪进阅读器；往回走最后 UNFOLD 毫秒文件夹合上
 const FOLD = 1350, UNFOLD = 700;
 // story 舞台 780×580，放大后谱页 x=185、宽 410、满高；手机只看中间 640 宽，谱页在 115
