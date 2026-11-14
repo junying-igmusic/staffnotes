@@ -326,7 +326,7 @@ SNSims['r13/story-r13'] = function(root){
   const ro=new ResizeObserver(fit); ro.observe(root); fit();
 
   // 自动连播：每拍按 DUR 播完自动进下一拍，拍 5 播完停在终态
-  const DUR = [0, 1800, Math.round((TV+.8)*1000), 2800, 2600, Math.round((T5+1.3)*1000)];
+  const DUR = [0, 1800, Math.round((TV+.3)*1000), 2800, 2600, Math.round((T5+1.3)*1000)];
   let timer = 0, auto = false, t0 = 0, dur = 0;
   const show = () => { root.dataset.s = String(cur); for(let i=1;i<=LAST;i++) root.classList.toggle('g'+i, cur>=i); fit(); };
   // 不带动画直接落到拍 n 的终态

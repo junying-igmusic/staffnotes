@@ -47,6 +47,8 @@ const CSS = `
 .sns-fol.full .pg.a{opacity:0}
 .sns-fol .mn{position:absolute;height:${MH}px;min-width:${MH}px;box-sizing:border-box;padding:0 4px;border-radius:${MH/2}px;display:grid;place-items:center;white-space:nowrap;background:rgba(255,255,255,.8);box-shadow:0 1px 4px rgba(0,0,0,.1);font:500 ${MF.toFixed(2)}px/1 -apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;color:${ACCENT};transform-origin:0 50%;transform:scale(.7);opacity:0;transition:opacity .3s,transform .35s;transition-delay:var(--d)}
 .sns-fol.nums .mn{opacity:1;transform:none}
+/* 手机（框窄）：小节号整体再放大 --ms，靠左、竖直居中不变（scale 和上面的 transform、弹出动画叠着算） */
+.sns-fol .mn{scale:var(--ms,1)}
 /* 批注 95：拍 1 小节号一行行弹出时先是强调蓝底白字、放大一下，再褪回 App 的白底蓝字；--p 是弹出的先后 */
 .sns-fol.pop .mn{animation:folMn 1.1s var(--p) cubic-bezier(.3,.7,.3,1) both}
 @keyframes folMn{
@@ -83,6 +85,7 @@ NS['r13/follow-r13'] = function(root, opt){
   // 谱页上沿和 board 算法一致：框高换成框单位后，谱页在框里竖直居中（834×1194 时正好 41）
   const card = root.querySelector('.f-card');
   function layout(){ const w = root.clientWidth; if (!w) return; stage.style.transform = `scale(${w/W})`;
+    root.style.setProperty('--ms', w/W < .5 ? 1.4 : 1);
     const fh = root.clientHeight ? Math.round(W*root.clientHeight/w) : H; card.style.top = Math.max(16, (fh - CH)/2) + 'px'; }
   const ro = new ResizeObserver(layout); ro.observe(root); layout();
 

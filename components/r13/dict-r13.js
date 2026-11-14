@@ -227,7 +227,7 @@ NS['r13/dict-r13'] = function(root){
       await wait(HOLD + 40);
       rg.classList.remove('on', 'run'); mk.classList.remove('pre'); mk.classList.add('on');
       Object.assign(st, {q: 'Allegro', sel: null, focus: false}); render(true); pn.classList.add('on');
-      await wait(250); await lift(); await wait(1500);
+      await wait(250); await lift(); await wait(200);
     } else if (n === 2){
       await wait(300); await moveTo(at(sf, .38), 600);
       press(); await wait(140);
@@ -239,7 +239,7 @@ NS['r13/dict-r13'] = function(root){
       await moveTo(row ? at(row, .22, .5) : at(sf, .5, 2), 620);
       press(); await wait(140);
       Object.assign(st, {sel: 'andante', focus: false}); render(true);
-      await wait(120); await lift(); await wait(1500);
+      await wait(120); await lift(); await wait(200);
     }
   }
   function snap(n, soft){

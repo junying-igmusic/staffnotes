@@ -21,7 +21,7 @@ const io = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3)/2;
 
 /* 可调的数：大过场（hero → Overview → Organize、换章）多长；换拍多长；Organize 第 4 拍 → 画笔第 1 拍那整段过场多长；滚轮停多久才算下一下；
    演示播完停多久自动进下一站；手机上手指滑多远算一下（毫秒、像素） */
-const BIG = 1000, BEAT = 500, LONG = 1600, QUIET = 250, HOLD_MS = 1500, SWIPE = 24;
+const BIG = 1000, BEAT = 500, LONG = 1600, QUIET = 250, HOLD_MS = 1000, SWIPE = 24;
 // Organize 第 3 拍 → 画笔第 1 拍：先 FOLD 毫秒播 Mozart 文件夹打开（story 第 4 拍），接着 LONG 毫秒点 K. 545、放大、挪进阅读器；往回走最后 UNFOLD 毫秒文件夹合上
 const FOLD = 1350, UNFOLD = 700;
 // story 舞台 780×580，放大后谱页 x=185、宽 410、满高；手机只看中间 640 宽，谱页在 115
@@ -57,6 +57,8 @@ function layout(){
     [sim, copyEl, fxCopy, sbox, prog, rbox, rprog, ...CH.map(c => c.copy)].forEach(e => e.removeAttribute('style'));
     lastZ = -1;
   }
+  // 钉住的这一屏按看得见的高度来定：iPhone Safari 的 100vh 比工具栏露出时的可视高度高，最后一站会被顶上去
+  pin.style.height = vh + 'px';
   track.style.height = (LEN + 1)*vh + 'px';
   // 菜单里的 Read、Practice、Play 各有一个记号，落在各自第一站（没有脚本时链接也能滑到这里）
   marks.forEach(([m, key]) => { const c = CH.find(c => c.key === key); if(c) Object.assign(m.style, {top: (c.s + X + AH/2)*vh + 'px', height: '1px'}); });
@@ -324,10 +326,10 @@ function finished(a){
   if(a.k === 'org') return api.beatNow === a.b && !api.busy;
   return !!rd && rd.beatNow === a.ri && !rd.busy;
 }
-// 自动连播：播完停 HOLD_MS 再走下一步；hero 和最后一站不动；后台、离开这一段时不走；手势还没停（连惯性）也不计，停了再从头计
+// 自动连播：播完停 HOLD_MS 再走下一步；hero、Overview 和最后一站不动；后台、离开这一段时不走；手势还没停（连惯性）也不计，停了再从头计
 let autoOn = !RMq, held = -1, userPlay = false;
 function autoTick(now){
-  if((RMq && !userPlay) || !autoOn || !engaged || anim || held === seq || document.hidden || cur >= last() || A[cur].k === 'hero' || now - lastWheel < QUIET || tch || !finished(A[cur])){ doneAt = 0; return; }
+  if((RMq && !userPlay) || !autoOn || !engaged || anim || held === seq || document.hidden || cur >= last() || A[cur].k === 'hero' || A[cur].k === 'ov' || now - lastWheel < QUIET || tch || !finished(A[cur])){ doneAt = 0; return; }
   if(!doneAt) doneAt = now; else if(now - doneAt >= HOLD_MS) step(1);
 }
 document.addEventListener('visibilitychange', () => { doneAt = 0; });
@@ -478,7 +480,7 @@ document.fonts?.ready.then(layout);
     if(!engaged) rSet(keyAt(y));
     desk() ? tickDesk(y) : tickPhone(y); syncCopy(y);
     if(fin && anim === fin){ anim = null; arrive(cur, fin.how); }
-    autoTick(now); showPlay(engaged && A[cur].k !== 'hero');
+    autoTick(now); showPlay(engaged && A[cur].k !== 'hero' && A[cur].k !== 'ov');
   }
   requestAnimationFrame(loop);
 })(performance.now());

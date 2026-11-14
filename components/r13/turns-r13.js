@@ -61,7 +61,7 @@ const CSS = `
 .sns-turns .bfl{left:${pc(B24.x,1000)};top:${pc(B24.y,1414)};width:${pc(B24.w,1000)};height:${pc(B24.h,1414)};background:rgba(63,82,159,.12)}
 .sns-turns .tfl.go,.sns-turns .bfl.go{animation:trnFl 2.3s .25s ease both}
 @keyframes trnFl{0%{opacity:0}18%{opacity:1}62%{opacity:1}100%{opacity:0}}
-.sns-turns .ttl{position:absolute;left:50%;top:8px;height:22px;transform:translateX(-50%);display:grid;place-items:center;padding:0 11px;border-radius:11px;${glass};white-space:nowrap;text-align:center;z-index:2;pointer-events:none}
+.sns-turns .ttl{position:absolute;left:50%;top:8px;height:22px;display:grid;place-items:center;padding:0 11px;border-radius:11px;${glass};white-space:nowrap;text-align:center;z-index:2;pointer-events:none}
 .sns-turns .ttl>span{grid-area:1/1;font-size:7.2px;line-height:1.12;opacity:0;transition:opacity .2s}
 .sns-turns .ttl>span.on{opacity:1}
 .sns-turns .ttl small{display:block;font-size:5.9px;color:#8C919B}
@@ -86,14 +86,14 @@ const CSS = `
 .sns-turns .t-stage>.bar .off{opacity:0;pointer-events:none}
 .sns-turns.padon .tpill{opacity:0}
 /* 拖动预览：真实缩略图、乐章名、页码，固定在胶囊上方，不跟手指走，不加阴影 */
-.sns-turns .th{position:absolute;left:${W/2}px;bottom:${H-PY+6}px;width:${(92+6.6).toFixed(1)}px;padding:3.3px;box-sizing:border-box;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:2.75px;border-radius:4.4px;background:#fff;box-shadow:inset 0 0 0 .75px rgba(41,45,56,.16);font-size:6.6px;font-weight:500;line-height:1.25;opacity:0;pointer-events:none;transition:opacity .12s;z-index:3}
+.sns-turns .th{position:absolute;left:${W/2}px;bottom:calc(${H-PY-PH+6}px + ${(PH*CS).toFixed(2)}px*var(--bs,1));width:${(92+6.6).toFixed(1)}px;padding:3.3px;box-sizing:border-box;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:2.75px;border-radius:4.4px;background:#fff;box-shadow:inset 0 0 0 .75px rgba(41,45,56,.16);font-size:6.6px;font-weight:500;line-height:1.25;opacity:0;pointer-events:none;transition:opacity .12s;z-index:3}
 .sns-turns .th.on{opacity:1}
 .sns-turns .th .im{position:relative;width:92px;height:123px}
 .sns-turns .th .im>div{position:absolute;inset:0;background:center/contain no-repeat;opacity:0}
 .sns-turns .th .im>div.on{opacity:1}
 .sns-turns .th b{font-weight:500;font-variant-numeric:tabular-nums}
 /* 页码输入：从胶囊里长出来（App 的 PageJumpPad，按 App 尺寸的一半画）；--tps 是阅读器框小时额外放大，保证字看得清 */
-.sns-turns .pad{position:absolute;left:${W/2-78.5}px;top:${PY+PH-143}px;width:157px;height:143px;transform-origin:50% 100%;transform:scale(calc(${(PW1/157).toFixed(3)}/var(--tps,1)),calc(${(PH/143).toFixed(3)}/var(--tps,1)));opacity:0;pointer-events:none;transition:transform .38s cubic-bezier(.2,.8,.2,1),opacity .16s;z-index:4}
+.sns-turns .pad{position:absolute;left:${W/2-78.5}px;top:${PY+PH-143}px;width:157px;height:143px;transform-origin:50% 100%;transform:scale(calc(${(PW1/157).toFixed(3)}*var(--bs,1)/var(--tps,1)),calc(${(PH/143).toFixed(3)}*var(--bs,1)/var(--tps,1)));opacity:0;pointer-events:none;transition:transform .38s cubic-bezier(.2,.8,.2,1),opacity .16s;z-index:4}
 .sns-turns.padon .pad{transform:none;opacity:1;pointer-events:auto}
 .sns-turns .pad .row{display:flex;gap:4.5px;height:22px}
 .sns-turns .pad .fld{flex:1;display:flex;align-items:center;padding-left:3.5px;border-radius:11px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.07),0 3px 10px -4px rgba(41,45,56,.16),inset 0 0 0 .5px rgba(0,0,0,.07)}
@@ -112,11 +112,15 @@ const CSS = `
 /* 点按提示：样子全在 dot-r13.css（.snd），这里只管显隐和按下 */
 .sns-turns .snd{left:0;top:0;opacity:0;transition:opacity .25s,transform .12s}
 .sns-turns.now *{transition:none!important;animation:none!important}
-.sns-turns .t-stage>.bar{transform:scale(${CS});transform-origin:${W/2}px ${PY+PH}px}
+.sns-turns .t-stage>.bar{transform:scale(calc(${CS}*var(--bs,1)));transform-origin:${W/2}px ${PY+PH}px}
 .sns-turns .th,.sns-turns .pad{scale:calc(${CS}*var(--tps,1));transform-origin:50% 100%}
-.sns-turns .ttl{scale:${CS};transform-origin:50% 0}
+.sns-turns .ttl{scale:calc(${CS}*var(--tts,1));transform-origin:50% 0}
+/* 手机（框窄）：底栏放大 --bs、顶栏放大 --tts，字才看得清；底栏放大后放不下翻页圆钮，收掉（演示不点它们），跳曲钮挨着胶囊、内边距收一点 */
+.sns-turns.nar .t-stage>.bar .cv{opacity:0;pointer-events:none}
+.sns-turns.nar .mv{padding:0 7px}
 /* 顶栏、底栏（连胶囊上方的缩略图、数字面板）挪到贴框的上下沿：--ty、--by 由 layout() 按框高算，舞台单位 */
-.sns-turns .ttl{translate:0 var(--ty,0px)}
+/* 居中用 translate 的 -50%（不跟着 scale 放大），顶栏放大多少都还在正中 */
+.sns-turns .ttl{translate:-50% var(--ty,0px)}
 .sns-turns .t-stage>.bar,.sns-turns .th,.sns-turns .pad{translate:0 var(--by,0px)}
 /* 翻页过场：页外垫一层白（App 翻页时页与页之间的底），卡片不裁，页的透明度不过渡 */
 .sns-turns>.bk{position:absolute;inset:0;background:#fff;visibility:hidden}
@@ -168,7 +172,8 @@ NS['r13/turns-r13'] = function(root){
   function render(){
     // pv：跟谱章借这一层的顶栏和胶囊时，胶囊数到跟谱翻到的页，谱页本身停在透明的第 1 页
     const p = st.pv || st.page, m = mvOf(p), pw = st.bars ? PW2 : PW1, L = W/2 - pw/2, R2 = W/2 + pw/2;
-    const eL = PX + 4, eR = W - PX - 4;
+    // 手机上底栏放大了：跳曲钮能用到框边（App 的底栏本来就横跨整个屏幕），留 8 框单位换成底栏放大前的坐标
+    const hw = nar ? (FW/2/R - 8)/(CS*bs) : W/2 - PX - 4, eL = W/2 - hw, eR = W/2 + hw, gap = nar ? 4 : 5 + 22 + 4;
     root.classList.toggle('bars', st.bars); root.classList.toggle('padon', st.pad);
     pgs.forEach(el=>el.classList.toggle('on', +el.dataset.p === st.page));
     ttls.forEach(el=>el.classList.toggle('on', +el.dataset.m === m));
@@ -184,7 +189,7 @@ NS['r13/turns-r13'] = function(root){
     const prev = p > MSTART[m] ? m : m - 1, next = m + 1 < MOV.length ? m + 1 : -1;
     mvPr.querySelector('span').textContent = prev >= 0 ? MOV[prev] : '';
     mvNx.querySelector('span').textContent = next >= 0 ? MOV[next] : '';
-    const tpr = W - (L - 5 - 22 - 4), nx = R2 + 5 + 22 + 4;
+    const tpr = W - (L - gap), nx = R2 + gap;
     Object.assign(mvPr.style, {right:tpr+'px', maxWidth:(W - tpr - eL)+'px'});
     Object.assign(mvNx.style, {left:nx+'px', maxWidth:(eR - nx)+'px'});
     mvPr.classList.toggle('off', prev < 0 || st.pad); mvNx.classList.toggle('off', next < 0 || st.pad);
@@ -204,7 +209,7 @@ NS['r13/turns-r13'] = function(root){
   }
 
   // 整块对到阅读器谱页；点按提示按阅读器给的 --dotu（框单位）换成本舞台单位，屏幕上和别的组件一样大
-  let sc = 1, by = 0;
+  let sc = 1, by = 0, bs = 1, nar = false;
   function layout(){
     const w = root.clientWidth; if (!w) return;
     // 谱页上沿和 board 算法一致：框高换成框单位后，谱页在框里竖直居中（834×1194 时正好 41）
@@ -215,6 +220,10 @@ NS['r13/turns-r13'] = function(root){
     root.style.setProperty('--ty', ((TOPF - oy)/R - 8).toFixed(2) + 'px');
     root.style.setProperty('--by', by.toFixed(2) + 'px');
     root.style.setProperty('--tps', Math.max(1, .85/s).toFixed(3));
+    // 手机上框不到 .5（390 宽的手机约 .41）：底栏 1.4 倍、顶栏 1.6 倍
+    nar = s < .5; bs = nar ? 1.4 : 1;
+    root.classList.toggle('nar', nar);
+    root.style.setProperty('--bs', bs); root.style.setProperty('--tts', nar ? 1.6 : 1);
     const du = parseFloat(getComputedStyle(root).getPropertyValue('--dotu')) || Math.max(18, 30*s)/s;
     touch.style.setProperty('--dotu', (du/R).toFixed(2) + 'px');
     render();
@@ -230,9 +239,9 @@ NS['r13/turns-r13'] = function(root){
   function place(){ if (!tp) return; touch.style.left = tp[0] + 'px'; touch.style.top = tp[1] + 'px'; touch.style.transform = touch._down ? 'scale(.75)' : ''; }
   const rip = () => { touch.classList.remove('rip'); void touch.offsetWidth; touch.classList.add('rip'); };
   const down = on => { touch._down = on; if (on) rip(); place(); };
-  // 胶囊上横向位置 ↔ 页（照 ReaderPageScrubPosition：去掉两头 inset 后按比例取整）；底栏整体按 CS 缩在中下点，手指要落在缩过的胶囊上
+  // 胶囊上横向位置 ↔ 页（照 ReaderPageScrubPosition：去掉两头 inset 后按比例取整）；底栏整体按 CS×bs 缩在中下点，手指要落在缩过的胶囊上
   const xFor = pg => W/2 - PW1/2 + INSET + (pg-1)/(N-1)*(PW1-2*INSET);
-  const vis = x => W/2 + (x - W/2)*CS, VY = PY + PH - PH/2*CS;
+  const vis = x => W/2 + (x - W/2)*CS*bs, vy = () => PY + PH - PH/2*CS*bs;
   async function run(n, t){
     const chk = ()=>{ if (t.dead) throw CANCEL; };
     const wait = ms => new Promise(r=>setTimeout(r, ms)).then(chk);
@@ -246,7 +255,7 @@ NS['r13/turns-r13'] = function(root){
     const hitKey = d => { const k = $(`.pad .k[data-k="${d}"]`); k.classList.add('hit'); setTimeout(()=>k.classList.remove('hit'), 160); st.typed += d; render(); };
     // 拖动中：页码、进度线、缩略图跟手指，主谱不动
     const scrubTo = (x0, x1, ms) => tween(ms, p=>{
-      const x = x0 + (x1-x0)*(1-Math.cos(Math.PI*p))/2; tp = [vis(x), VY + by]; place();
+      const x = x0 + (x1-x0)*(1-Math.cos(Math.PI*p))/2; tp = [vis(x), vy() + by]; place();
       const f = Math.min(1, Math.max(0, (x - (W/2-PW1/2+INSET)) / (PW1-2*INSET)));
       const pg = Math.round(f*(N-1)) + 1;
       st.frac = f; st.disp = pg; st.thumb = pg; render();
@@ -254,7 +263,7 @@ NS['r13/turns-r13'] = function(root){
     if (n===1){
       // 批注 91：整站从 7 秒压到 5 秒；拖动用正弦缓动（中段不比平均快太多），每张缩略图仍停够看清
       await wait(300);
-      await moveTo([vis(xFor(1)), VY + by], 420);
+      await moveTo([vis(xFor(1)), vy() + by], 420);
       down(true); line.classList.remove('ease');
       st.frac = 0; st.disp = 1; st.thumb = 1; render();
       await wait(300);
@@ -265,7 +274,7 @@ NS['r13/turns-r13'] = function(root){
       down(false); line.classList.add('ease');
       st.page = 4; st.disp = 4; st.frac = null; st.thumb = 0; render();
       await wait(250); await lift();
-      await wait(500);
+      await wait(100);
     } else if (n===2){
       await wait(350);
       await tapOn(tpill, ()=>{ st.pad = true; render(); }, 560);
@@ -274,15 +283,16 @@ NS['r13/turns-r13'] = function(root){
       await wait(600);
       await tapOn(goB, ()=>{ st.pad = false; st.typed = ''; st.page = 2; st.disp = 2; render(); }, 460);
       await wait(250); await lift();
-      await wait(900);
+      await wait(250);
     } else if (n===3){
       await wait(350);
       await tapOn(mvNx, ()=>{
         mvNx.classList.remove('press'); void mvNx.offsetWidth; mvNx.classList.add('press');
         setTimeout(()=>{ if (t.dead) return; st.page = 5; st.disp = 5; render(); tfl.classList.remove('go'); void tfl.offsetWidth; tfl.classList.add('go'); }, 180);
       }, 620);
+      // 收尾只等到 Andante 那行的闪光（点后 180 + .25s 延迟 + 2.3s）刚好走完，之后的停顿交给自动连播的 1 秒
       await wait(250); await lift();
-      await wait(3000);
+      await wait(2100);
     } else if (n===4){
       // 先点「« 1. Allegro」回到第 1 页（第 24 小节在 Allegro 第 2 页），胶囊再加宽成「Page | Bar」两半
       await wait(350);
@@ -293,7 +303,7 @@ NS['r13/turns-r13'] = function(root){
       await wait(250); await lift();
       await wait(450);
       st.bars = true; render();
-      await wait(1700);
+      await wait(500);
     } else if (n===5){
       await wait(300);
       await tapOn(brH, ()=>{ brH.classList.add('hit'); setTimeout(()=>brH.classList.remove('hit'), 220); st.pmode = 'bar'; st.pad = true; render(); }, 560);
@@ -479,7 +489,7 @@ NS['r13/turns-r13'] = function(root){
     if (!drag || e.pointerId !== drag.id) return;
     const [x] = toStage(e); fingerAt(e, true); touch.style.transform = 'scale(.75)';
     // 底栏缩在中下点：把屏幕上的 x 换回胶囊自己的坐标
-    const ux = W/2 + (x - W/2)/CS, ux0 = W/2 + (drag.x0 - W/2)/CS;
+    const ux = W/2 + (x - W/2)/(CS*bs), ux0 = W/2 + (drag.x0 - W/2)/(CS*bs);
     if (!drag.moved && Math.abs(ux - ux0) < 3) return;
     drag.moved = true; line.classList.remove('ease');
     const L = W/2 - drag.pw/2 + INSET, f = Math.min(1, Math.max(0, (ux - L)/(drag.pw - 2*INSET)));

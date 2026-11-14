@@ -82,8 +82,9 @@
   .os .narrow li span,.os .narrow .fx-beat p{padding-right:52px}
   /* 一站一条说明，叠在同一个位置换 */
   .os .sk-g ul{display:grid}
-  .os .sk-g li{grid-area:1/1;border-top:0;padding:0;opacity:0;transform:translateY(8px);transition:opacity .4s ease,transform .5s var(--ease),color .3s}
-  .os .sk-g li.on,.os .sk-g ul:not(:has(.on)) li:first-child{opacity:1;transform:none}
+  /* 不叠影：旧的一条 .15s 淡掉，新的等它走完再淡入 */
+  .os .sk-g li{grid-area:1/1;border-top:0;padding:0;opacity:0;transform:translateY(8px);transition:opacity .15s ease,transform 0s .15s,color .3s}
+  .os .sk-g li.on,.os .sk-g ul:not(:has(.on)) li:first-child{opacity:1;transform:none;transition:opacity .35s ease .15s,transform .5s var(--ease) .15s,color .3s}
   .os .sk-g li span,.os .sk-g li.on span{max-height:none;opacity:1;transform:none;margin-top:4px}
 }
 
