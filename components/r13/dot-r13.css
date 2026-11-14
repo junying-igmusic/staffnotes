@@ -1,0 +1,9 @@
+/* r13 一张谱：全站唯一的点按提示。半透明圆点，按下缩小并起一圈涟漪；各组件只管它的位置、显隐和按下（scale）。
+   尺寸 --dotu 由阅读器按组件的缩放算好（屏幕上约 30 px，最小 18 px），所以各组件里看起来一样大 */
+.snd{position:absolute!important;width:var(--dotu,30px)!important;height:var(--dotu,30px)!important;margin:calc(var(--dotu,30px)/-2) 0 0 calc(var(--dotu,30px)/-2)!important;
+  border-radius:50%!important;background:rgba(41,45,56,.16)!important;box-shadow:0 0 0 calc(var(--dotu,30px)*.05) rgba(255,255,255,.85),0 2px 8px rgba(41,45,56,.18)!important;
+  border:0!important;pointer-events:none!important;z-index:60;box-sizing:border-box}
+.snd::before{content:none!important}
+.snd.rip::after{content:"";position:absolute;inset:0;border-radius:50%;border:calc(var(--dotu,30px)*.06) solid rgba(41,45,56,.28);animation:snd-rip .5s ease-out both;pointer-events:none}
+@keyframes snd-rip{0%{opacity:1;transform:scale(.6)}100%{opacity:0;transform:scale(2.1)}}
+@media (prefers-reduced-motion:reduce){.snd.rip::after{animation:none;opacity:0}}

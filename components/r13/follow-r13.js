@@ -1,0 +1,167 @@
+/* 一张谱 r13 用的 follow 副本（components/follow.js、r12 副本都不改）：叠在阅读器的竖屏谱页上（24, 41, 786×1112，框单位 834 宽）。
+   第 1 页透明，直接用下面 board 的 K. 545 第 1 页（components/assets/k545-p1.jpg，1300×1839）；第 2 页是 k545-p2.jpg，白底，从右边滑进来盖住第 1 页。
+   照 App 的 ReaderFollowOverlay：
+   拍 1：每个小节都标上小节号（每行第一小节也标，谱上印了号的照样标），白底胶囊左边离小节线 4×pageScale，竖直以这一小节的谱表（小节线上下端）中线居中，压在蓝框上面；
+   拍 2：边弹边跟，柔和的蓝框一小节一小节落下（1–10 小节），每小节停 T；
+   拍 3：接着到第 17 小节，第 2 页照 App 整页横滑推进来（两页中间留 12 pt，第 1 页透明，滑的是阅读器的 board 层），框落在第 18 小节。
+   顶栏和页码胶囊借翻页层的（阅读器把它盖在这一层上面），翻到第 2 页时 opt.onPage(2) 让胶囊数到 2 / 10。
+   小节线、五线谱上下线、每行墨迹上下沿都在 k545 两页上量过（work/r13/tools/turnsfol/mnfit.mjs、fit2.mjs）。
+   接口：beat(n, soft) 直接摆拍 n 终态（soft 时按动画退回）；one(n) 只播拍 n；play() 从拍 1 连播；reset() 回到起点。 */
+(function(){
+const NS = window.SNSims = window.SNSims || {};
+if (NS['r13/follow-r13']) return;
+const W = 834, H = 1194, CX = 24, CY = 41, CW = 786, CH = 786*1839/1300;
+// T：蓝框在每小节停多久（小谭批注 74：原来 480 太快，放慢到约 1.8 倍）
+const IW = 1300, IH = 1839, T = 860, ACCENT = '#3F529F';
+// 整页横滑：一页框宽加 12 pt 的缝，340 ms（和 turns-r13 一样）
+const SLIDE = W + 12/1.235, SLIDE_MS = 340;
+const src = document.currentScript && document.currentScript.src;
+const P2 = src ? new URL('../assets/k545-p2.jpg', src).href : 'components/assets/k545-p2.jpg';
+// 每行谱：上线 t、下线 b（k545 px，也就是小节线上下端）、这一行墨迹（加线音符、tr、印的小节号）上下沿外扩 6 px 的 y0/y1（蓝框用）、小节线 xs
+const SYS = {
+  a: [{t:293.5, b:433.5, y0:247, y1:459, xs:[134,464.5,723.5,979.5,1238.5]},
+      {t:560.5, b:704.5, y0:525, y1:740, xs:[75,501,873.5,1238.5]},
+      {t:834, b:983, y0:799, y1:1009, xs:[74,497.5,866.5,1237]},
+      {t:1119, b:1274, y0:1074, y1:1290, xs:[74.5,437,590.5,930.5,1238.5]},
+      {t:1408, b:1560.5, y0:1353, y1:1576.5, xs:[74.5,497.5,866.5,1239.5]}],
+  b: [{t:180.5, b:338, y0:112, y1:354, xs:[55.5,478.5,859.5,1222]},
+      {t:465.5, b:623, y0:408, y1:647, xs:[54.5,550,846,1221.5]},
+      {t:757.5, b:884, y0:707, y1:906, xs:[54.5,493.5,880.5,1220.5]},
+      {t:1006.5, b:1144.5, y0:966, y1:1167, xs:[53.5,520.5,772.5,1219.5]},
+      {t:1281, b:1407.5, y0:1238, y1:1436, xs:[53,432.5,812.5,1219.5]},
+      {t:1536, b:1685, y0:1495, y1:1706, xs:[51.5,451.5,804.5,1219.5]}]
+};
+// 小节号胶囊照 App ReaderFollowOverlay（框单位 = iPad pt）：pageScale = 谱页宽 786 / A4 宽 595.28 pt（k545 图 1300×1839 正好 A4 比例）≈ 1.32；
+// 字 max(11, min(18, 12×pageScale)) medium，高 max(16, 字行高 + 2)（SF 行高 ≈ 1.193 字号），宽 max(高, 字宽 + 8)，圆角 = 高/2；
+// 左边 = 小节框 minX + 4×pageScale，竖直以小节框中线居中。App 的小节号和蓝框用同一个小节框（DemoBarLayout.rect：这一小节的谱表那一条），这里取小节线上下端 t–b
+const PS = CW/595.28, MF = Math.max(11, Math.min(18, 12*PS)), MH = Math.max(16, Math.ceil(MF*1.1934) + 2), K = CW/IW;
+const pc = (v, d) => (v/d*100).toFixed(3) + '%';
+const CSS = `
+.sns-fol{position:relative;overflow:hidden;-webkit-user-select:none;user-select:none}
+.sns-fol .f-stage{position:absolute;left:0;top:0;width:${W}px;height:${H}px;transform-origin:0 0}
+.sns-fol .f-card{position:absolute;left:${CX}px;top:${CY}px;width:${CW}px;height:${CH.toFixed(2)}px;overflow:hidden}
+.sns-fol .pg{position:absolute;inset:0}
+.sns-fol .pg.b{background:#fff url(${P2}) center top/100% auto no-repeat;transform:translateX(100%);transition:transform .55s cubic-bezier(.25,.8,.25,1)}
+.sns-fol.full .pg.b{transform:none}
+.sns-fol .pg.a{transition:opacity 0s .55s}
+.sns-fol.full .pg.a{opacity:0}
+.sns-fol .mn{position:absolute;height:${MH}px;min-width:${MH}px;box-sizing:border-box;padding:0 4px;border-radius:${MH/2}px;display:grid;place-items:center;white-space:nowrap;background:rgba(255,255,255,.8);box-shadow:0 1px 4px rgba(0,0,0,.1);font:500 ${MF.toFixed(2)}px/1 -apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;color:${ACCENT};transform-origin:0 50%;transform:scale(.7);opacity:0;transition:opacity .3s,transform .35s;transition-delay:var(--d)}
+.sns-fol.nums .mn{opacity:1;transform:none}
+.sns-fol .box{position:absolute;border-radius:5px;background:rgba(63,82,159,.10);box-shadow:inset 0 0 0 2px rgba(63,82,159,.5);opacity:0;pointer-events:none}
+.sns-fol.now .pg,.sns-fol.now .mn,.sns-fol.roll .pg{transition:none!important}
+.sns-fol.roll .f-card{overflow:visible}
+`;
+(function inject(){
+  if (document.getElementById('sns-r13-follow-css')) return;
+  const s = document.createElement('style'); s.id = 'sns-r13-follow-css'; s.textContent = CSS;
+  (document.head || document.documentElement).appendChild(s);
+})();
+const RM = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches), CANCEL = {};
+
+NS['r13/follow-r13'] = function(root, opt){
+  opt = opt || {}; const base = opt.base || (() => {});
+  root.classList.add('sns-fol');
+  const bars = [], mns = {a:'', b:''};
+  for (const k of ['a','b']) SYS[k].forEach(({t, b, y0, y1, xs}, r) => xs.slice(0, -1).forEach((x, i) => {
+    bars.push({k, x, y:y0, w:xs[i+1] - x, h:y1 - y0});
+    mns[k] += `<span class="mn" style="left:${(x*K + 4*PS).toFixed(2)}px;top:${((t + b)/2*K - MH/2).toFixed(2)}px;--d:${r*110 + i*40}ms">${bars.length}</span>`;
+  }));
+  root.innerHTML = `<div class="f-stage"><div class="f-card">
+    <div class="pg a">${mns.a}</div>
+    <div class="pg b" role="img" aria-label="Mozart, Piano Sonata K. 545, second page">${mns.b}</div>
+    <div class="box"></div></div></div>`;
+  const stage = root.querySelector('.f-stage'), box = root.querySelector('.box'), pgs = {a:root.querySelector('.pg.a'), b:root.querySelector('.pg.b')};
+  // 谱页上沿和 board 算法一致：框高换成框单位后，谱页在框里竖直居中（834×1194 时正好 41）
+  const card = root.querySelector('.f-card');
+  function layout(){ const w = root.clientWidth; if (!w) return; stage.style.transform = `scale(${w/W})`;
+    const fh = root.clientHeight ? Math.round(W*root.clientHeight/w) : H; card.style.top = Math.max(16, (fh - CH)/2) + 'px'; }
+  const ro = new ResizeObserver(layout); ro.observe(root); layout();
+
+  let anim = null;
+  // mode：pass 一小节一拍 0→1→1→0；hold 渐亮后停住；set 直接亮着（摆终态）
+  function cue(i, mode){
+    anim?.cancel(); anim = null;
+    if (i < 0){ box.style.opacity = 0; return; }
+    // 蓝框放进小节所在那一页、排在小节号前面：小节号压在框上面，和 App 一样
+    const b = bars[i]; if (box.parentNode !== pgs[b.k]) pgs[b.k].prepend(box);
+    Object.assign(box.style, {left:pc(b.x, IW), top:pc(b.y, IH), width:pc(b.w, IW), height:pc(b.h, IH), opacity: mode === 'set' ? 1 : 0});
+    if (mode === 'set') return;
+    anim = box.animate(mode === 'hold' ? [{opacity:0},{opacity:1}] : [{opacity:0},{opacity:1, offset:1/3},{opacity:1, offset:2/3},{opacity:0}], {duration: mode === 'hold' ? 220 : T, fill:'forwards'});
+  }
+  const END = [{nums:0, bar:-1, full:0}, {nums:1, bar:-1, full:0}, {nums:1, bar:9, full:0}, {nums:1, bar:17, full:1}];
+  // 第 1 页 ↔ 第 2 页：fwd 往前（第 2 页从右边推进来），否则往回；滑完把页和 board 摆回原位，用 .full 定住
+  let rl = null;
+  const ease = q => q < .5 ? 2*q*q : 1 - Math.pow(-2*q + 2, 2)/2;
+  function unroll(){
+    const was = rl || root.classList.contains('roll'); if (rl){ rl.dead = true; rl = null; }
+    root.classList.remove('roll'); pgs.a.style.transform = pgs.b.style.transform = '';
+    if (was) base(0);
+  }
+  function slide(fwd){
+    unroll(); const r = rl = {dead:false};
+    root.classList.add('roll'); root.classList.remove('full');
+    const s = root.clientWidth/W;
+    const put = e => { pgs.a.style.transform = `translateX(${-e*SLIDE}px)`; pgs.b.style.transform = `translateX(${(1 - e)*SLIDE}px)`; base(-e*SLIDE*s); };
+    put(fwd ? 0 : 1);
+    return new Promise(res => { const a = performance.now();
+      (function f(now){
+        if (r.dead) return res(false);
+        const q = Math.min(1, (now - a)/SLIDE_MS); put(fwd ? ease(q) : 1 - ease(q));
+        if (q < 1) return requestAnimationFrame(f);
+        rl = null; root.classList.add('now'); root.classList.toggle('full', fwd); unroll();
+        void root.offsetWidth; requestAnimationFrame(() => root.classList.remove('now'));
+        opt.onPage?.(fwd ? 2 : 1); res(true);
+      })(a); });
+  }
+  function show(e, soft){
+    root.classList.toggle('nums', !!e.nums);
+    if (soft && !RM && !e.full && (rl || root.classList.contains('full'))) slide(false);
+    else { unroll(); root.classList.toggle('full', !!e.full); opt.onPage?.(e.full ? 2 : 1); }
+    cue(e.bar, soft ? 'hold' : 'set');
+  }
+  const DUR = [0, 1700, 10*T + 300, 7*T + 1500];
+  let tok = null, cur = 0, done = true, t0 = 0;
+  async function run(n, t){
+    const wait = ms => new Promise(r => setTimeout(r, ms)).then(() => { if (t.dead) throw CANCEL; });
+    if (n === 1){ await wait(250); root.classList.add('nums'); await wait(1450); }
+    else if (n === 2){ for (let i = 0; i <= 9; i++){ cue(i, i === 9 ? 'hold' : 'pass'); await wait(T); } await wait(300); }
+    else if (n === 3){ for (let i = 10; i <= 16; i++){ cue(i, 'pass'); await wait(T); } await slide(true); await wait(220); cue(17, 'hold'); await wait(940); }
+  }
+  function stop(){ if (tok){ tok.dead = true; tok = null; } }
+  // soft：不切掉过渡，小节号、第 2 页按动画退回
+  function snap(n, soft){
+    stop();
+    if (soft){ show(END[n], true); return; }
+    root.classList.add('now'); show(END[n]); void root.offsetWidth; requestAnimationFrame(() => root.classList.remove('now'));
+  }
+  function go(n, animate, only, soft){
+    n = Math.max(0, Math.min(3, n|0));
+    if (!animate || RM || n === 0){ snap(n, soft); cur = n; done = true; return; }
+    snap(n - 1);
+    const t = tok = {dead:false};
+    (async () => {
+      for (let k = n; k <= (only ? n : 3); k++){
+        cur = k; done = false; t0 = performance.now();
+        try { await run(k, t); } catch(e){ if (e === CANCEL) return; throw e; }
+        if (t.dead) return;
+      }
+      done = true; if (tok === t) tok = null;
+    })();
+  }
+  // 播放中按下：停掉脚本，摆到这一拍的终态
+  const onDown = () => { if (tok){ snap(cur); done = true; } };
+  root.addEventListener('pointerdown', onDown);
+  return {
+    beats: 3,
+    get beatNow(){ return cur; }, get busy(){ return !!tok; },
+    get beatFrac(){ if (done || !tok) return cur ? 1 : 0; return Math.min(1, (performance.now() - t0)/DUR[cur]); },
+    play(){ go(RM ? 3 : 1, true); },
+    go(n){ go(n, true); },
+    one(n){ go(n, true, true); },
+    beat(n, soft){ go(n, false, false, soft); },
+    reset(){ go(0, false); },
+    visible(on){ if (!on && tok){ snap(cur); done = true; } },
+    destroy(){ stop(); unroll(); anim?.cancel(); ro.disconnect(); root.removeEventListener('pointerdown', onDown); root.innerHTML = ''; }
+  };
+};
+})();

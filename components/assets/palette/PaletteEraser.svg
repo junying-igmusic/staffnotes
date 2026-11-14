@@ -1,0 +1,51 @@
+<!-- Drawesome studio artwork. Copyright (c) 2026 Benji Taylor. MIT license; see ThirdPartyLicenses/Drawesome-LICENSE.txt and Drawesome-SOURCE.md. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="30" height="88" viewBox="0 0 30 88" fill="none">
+  <defs>
+    <linearGradient id="eraser-light-b-R0" x1="0" x2="30" y1="0" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0.167" stop-color="#dcd8d2" />
+      <stop offset="0.21" stop-color="#f6f4f1" />
+      <stop offset="0.33" stop-color="#ffffff" />
+      <stop offset="0.44" stop-color="#fdfcfb" />
+      <stop offset="0.58" stop-color="#f8f6f3" />
+      <stop offset="0.71" stop-color="#eceae5" />
+      <stop offset="0.765" stop-color="#dcd8d1" />
+      <stop offset="0.805" stop-color="#e6e2dc" />
+      <stop offset="0.833" stop-color="#dcd8d2" />
+    </linearGradient>
+    <linearGradient id="eraser-light-t-R0" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity="0.16" />
+      <stop offset="0.07" stop-color="#000" stop-opacity="0.02" />
+      <stop offset="0.2" stop-color="#fff" stop-opacity="0.18" />
+      <stop offset="0.33" stop-color="#fff" stop-opacity="0.05" />
+      <stop offset="0.52" stop-color="#000" stop-opacity="0" />
+      <stop offset="0.72" stop-color="#000" stop-opacity="0.08" />
+      <stop offset="0.87" stop-color="#000" stop-opacity="0.15" />
+      <stop offset="0.95" stop-color="#fff" stop-opacity="0.05" />
+      <stop offset="1" stop-color="#000" stop-opacity="0.14" />
+    </linearGradient>
+    <linearGradient id="eraser-light-m-R0" x1="0" x2="30" y1="0" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0.167" stop-color="#7d7a74" />
+      <stop offset="0.24" stop-color="#cbc7c0" />
+      <stop offset="0.33" stop-color="#fdfdfc" />
+      <stop offset="0.42" stop-color="#e2dfd9" />
+      <stop offset="0.58" stop-color="#b8b4ad" />
+      <stop offset="0.71" stop-color="#8d8a84" />
+      <stop offset="0.765" stop-color="#6e6b66" />
+      <stop offset="0.805" stop-color="#a5a29b" />
+      <stop offset="0.833" stop-color="#7d7a74" />
+    </linearGradient>
+    <linearGradient id="eraser-light-r-R0" x1="0" x2="30" y1="0" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#d08b7c" />
+      <stop offset="0.18" stop-color="#f3b8a8" />
+      <stop offset="0.46" stop-color="#f8ccbe" />
+      <stop offset="0.78" stop-color="#e5a091" />
+      <stop offset="1" stop-color="#c9806f" />
+    </linearGradient>
+  </defs>
+  <path d="M5 36.5a1.5 1.5 0 0 1 1.5-1.5h17a1.5 1.5 0 0 1 1.5 1.5V88H5Z" fill="url(#eraser-light-b-R0)" />
+  <path d="M6.8 9a4.8 4.8 0 0 1 4.8-4.8h6.8a4.8 4.8 0 0 1 4.8 4.8V34H6.8Z" fill="url(#eraser-light-r-R0)" />
+  <path d="M6.8 9a4.8 4.8 0 0 1 4.8-4.8h6.8a4.8 4.8 0 0 1 4.8 4.8V34H6.8Z" fill="url(#eraser-light-t-R0)" />
+  <path d="M5 29h20v8.4H5Z" fill="url(#eraser-light-m-R0)" />
+  <path d="M5 29h20v8.4H5Z" fill="url(#eraser-light-t-R0)" />
+  <path d="M5 29h20v0.9H5Z" fill="#000000" fill-opacity="0.14" />
+</svg>

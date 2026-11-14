@@ -1,0 +1,97 @@
+/* r13 一张谱（one-score-r13.html 专用）：Organize → K. 545 放大，一路落进竖放的整页阅读器（.os-rbox，components/r13/reader-r13.js）→ 同一个阅读器从画笔讲到跟谱，每章换边。
+   各元素的位置由 components/r13/onescore-r13.js 按窗口算好写进 style，这里只管层级、外观和手机版的排布；最后是 7 项菜单和单独成块的统计。 */
+.os{padding:40px 0 0}
+.os .show-head{margin-bottom:0}
+.os-track{position:relative}
+.os-mark{position:absolute;left:0;width:1px;pointer-events:none}
+.os-pin{position:sticky;top:0;height:100vh;overflow:hidden;overflow:clip}   /* 放大过的 Organize 舞台在手机上会伸出屏外，撑宽整页；钉住的这一屏只在屏内显示 */
+.os-stage{position:absolute;inset:0;pointer-events:none}
+.os-sbox{position:absolute;z-index:3}
+.os-sbox .fx-sim{width:100%;transform-origin:0 0}
+.os .fx-prog{position:absolute;z-index:3;width:min(280px,24vw);margin-left:calc(min(280px,24vw)/-2);pointer-events:auto}
+/* 阅读器：白纸、圆角，和 App 打开 PDF 一样；过场末尾才淡入 */
+.os-rbox{position:absolute;left:0;top:0;z-index:2;overflow:hidden;background:#fff;opacity:0;visibility:hidden;pointer-events:auto;
+  box-shadow:0 0 0 1px rgba(41,45,56,.06),0 1px 2px rgba(41,45,56,.06),0 24px 60px -24px rgba(41,45,56,.3)}
+.os-rbox .sim{width:100%;height:100%;aspect-ratio:auto!important;border-radius:0;background:#fff;overflow:hidden}
+/* 各章进度条：阅读器正下方居中，一章一组，只显示正在台上那一章的 */
+.os-rprog{position:absolute;z-index:3;width:min(240px,20vw);transform:translateX(-50%);opacity:0;transition:opacity .45s ease .1s;pointer-events:none}
+.os-rprog.live{opacity:1;pointer-events:auto}
+.os-rprog>div{display:none;gap:6px}
+.os-rprog>div.on{display:flex}
+.os-rprog button{flex:1;height:20px;padding:0;border:0;background:none;cursor:pointer;display:grid;align-items:center}
+.os-rprog i{display:block;height:3px;border-radius:2px;background:var(--line);overflow:hidden}
+.os-rprog i::after{content:"";display:block;height:100%;width:calc(var(--p,0)*100%);background:var(--blue);border-radius:inherit}
+.os-rprog button:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:4px}
+.os-copy{position:absolute;inset:0;pointer-events:none}
+.os .fx-copy{position:absolute;left:0;top:50%;transform:translateY(-50%);pointer-events:auto}
+/* Organize 左栏和各章一样：小标签、大标题，下面是四拍的节点线和文案 */
+.os .fx-copy{padding-left:0}
+.os .fx-copy .label{margin-bottom:18px}
+.os .fx-copy h2.sec-title{font-size:clamp(36px,3.4vw,58px);margin-bottom:34px}
+.os .fx-run{position:relative;padding-left:32px}
+.os .fx-beat h3{font-size:clamp(24px,1.8vw,30px);margin-bottom:12px}
+.os .fx-beat p{font-size:15px}
+/* 各章文案借了 .sk-g 的样子，淡入淡出完全跟翻页走，不要它自带的过渡；说明跟着当前那一站展开 */
+.os-chcopy{position:absolute;top:50%;opacity:0;pointer-events:none!important}
+.os-chcopy.live{pointer-events:auto!important}
+.os .os-chcopy.sk-g{transition:none}
+.os .os-chcopy h2.sec-title{font-size:clamp(36px,3.4vw,58px)}
+.os .sk-g li span{opacity:0;transform:translateY(6px);transition:max-height .45s var(--ease),opacity .35s ease,transform .45s var(--ease)}
+.os .sk-g li.on span,.os .sk-g li:hover span{opacity:1;transform:none}
+.pro-tag{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:999px;background:var(--blue);color:#fff;font-size:11px;font-weight:600;line-height:18px;vertical-align:2px;letter-spacing:.02em}
+/* 统计单独一块，在在线曲库后面、Pro 横条前面 */
+#stats{padding:150px 0 120px}
+#stats .st{margin-top:0;margin-bottom:0}
+/* 标题照在线曲库排：小标签、大标题、一段说明 */
+#stats .st-top{margin-bottom:56px}
+#stats .st-top p{color:var(--ink2);max-width:400px;margin-top:22px;font-size:16px}
+@media (max-width:900px){
+  #stats{padding:110px 0 80px}
+  #stats .st-top{margin-bottom:36px}
+  /* Menu 展开：7 项竖排，挂在菜单条下面 */
+  .nav.open .links{display:flex;position:absolute;top:52px;left:50%;transform:translateX(-50%);flex-direction:column;align-items:stretch;height:auto;padding:8px;border-radius:18px;background:rgba(246,246,244,.96);box-shadow:0 12px 40px -12px rgba(41,45,56,.25)}
+  .nav.open.dark .links{background:rgba(28,30,36,.96)}
+  .nav.open .links a{line-height:44px;padding:0 28px;text-align:center}
+  .nav.open .links .slider{display:none}
+}
+/* 手机：整段钉住，上面是阅读器和进度条，下面是文案，一次滑动走一站，文案原地换 */
+@media (max-width:900px){
+  .os{padding:100px 0 40px}
+  .os .show-head{margin-bottom:28px}
+  .os-stage{top:64px;bottom:auto;height:var(--os-sh,460px)}
+  .os .fx-prog{width:160px;margin-left:-80px}
+  .os-rprog{width:160px}
+  .os-copy{inset:auto 0 auto 0}
+  .os .fx-copy,.os-chcopy{position:absolute;left:0;right:0;top:0;width:auto!important;max-width:none;padding:0;transform:none}
+  .os .fx-beats{display:grid}
+  .os .fx-beat{grid-area:1/1;opacity:0;transform:translateY(14px);filter:blur(6px)}
+  .os .fx-beat.on{opacity:1;transform:none;filter:none}
+  .os .fx-beat h3{font-size:22px;margin-bottom:8px}
+  .os .fx-copy .label{margin-bottom:10px}
+  .os .fx-copy h2.sec-title{font-size:34px;margin-bottom:16px}
+  .os .fx-run{padding-left:0}
+  .os .tight h2.sec-title+.fx-run .fx-beat p{display:none}
+  .os .sk-g h2.sec-title{font-size:34px}
+  .os .sk-g>p{margin:12px 0 18px;font-size:15px}
+  .os .tight>p,.os .tight .label,.os .tight1>p{display:none}
+  .os .narrow li span,.os .narrow .fx-beat p{padding-right:52px}
+  /* 一站一条说明，叠在同一个位置换 */
+  .os .sk-g ul{display:grid}
+  .os .sk-g li{grid-area:1/1;border-top:0;padding:0;opacity:0;transform:translateY(8px);transition:opacity .4s ease,transform .5s var(--ease),color .3s}
+  .os .sk-g li.on,.os .sk-g ul:not(:has(.on)) li:first-child{opacity:1;transform:none}
+  .os .sk-g li span,.os .sk-g li.on span{max-height:none;opacity:1;transform:none;margin-top:4px}
+}
+
+/* 右下角播放 / 暂停：和左下角批注条左右对称（离边 20 px、一样高 41 px）；只在一张谱钉住时出现，那时回到顶部的按钮让到它上面 */
+.os-play{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:46;width:41px;height:41px;padding:0;margin:0;border-radius:50%;
+  display:grid;place-items:center;background:#fff;color:#171B24;border:1px solid rgba(23,27,36,.16);box-shadow:0 4px 16px rgba(23,27,36,.10);cursor:pointer;
+  --dotu:30px;opacity:0;visibility:hidden;transform:translateY(6px);transition:opacity .3s,transform .3s cubic-bezier(.2,.7,.2,1),visibility 0s .3s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.os-play.on{opacity:1;visibility:visible;transform:none;transition-delay:0s}
+.os-play .ic{width:18px;height:18px;display:block}
+.os-play .ic svg{width:100%;height:100%;display:block;fill:currentColor}
+.os-play .snd{left:50%;top:50%;opacity:0;transition:opacity .25s,transform .12s}
+.os-play.press .snd{opacity:1;transform:scale(.75)}
+.os-play:focus{outline:none}
+.os-play:focus-visible{outline:2px solid #3F529F;outline-offset:3px}
+body.os-pb .totop{bottom:84px}
+@media (prefers-reduced-motion:reduce){ .os-play{transition:none} }
