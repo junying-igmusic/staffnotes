@@ -430,9 +430,9 @@ footer .legal span{margin-left:auto;white-space:nowrap}
   .big .w{opacity:1;filter:none}
 }
 </style>
-<link rel="stylesheet" href="components/r13/dot-r13.css?v=397fe137">
-<link rel="stylesheet" href="components/r13/onescore-r13.css?v=397fe137">
-<script src="components/r13/i18n-r13.js?v=397fe137"></script>
+<link rel="stylesheet" href="components/r13/dot-r13.css?v=2ad12890">
+<link rel="stylesheet" href="components/r13/onescore-r13.css?v=2ad12890">
+<script src="components/r13/i18n-r13.js?v=2ad12890"></script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="sn-mark" viewBox="145 248 510 302"><g data-key="q8xqzuy8nm" transform="translate(400 399.3127136230469) rotate(-90) scale(1 -1)"><path  transform="scale(1.1682242990654206) translate(-125 -214)" d="M92 132C91 128 90 123 90 120C91 116 93 114 97 114C107 114 123 126 130 128C141 132 155 135 169 135C178 135 187 133 195 131C205 129 214 124 223 118C238 106 250 88 250 67C250 30 220 0 183 0C146 0 116 30 116 67V77C83 77 33 17 26 11C22 9 19 7 16 7C8 7 4 18 4 28V34C7 57 24 83 37 102C50 120 59 139 71 157C89 187 108 216 125 246C131 255 155 284 155 300C155 303 154 306 152 308C151 309 149 310 147 310C139 310 126 302 120 300C109 296 95 293 81 293C72 293 63 295 55 297C45 299 36 304 27 310C12 322 0 340 0 361C0 398 30 428 67 428C104 428 134 398 134 361V351C167 351 217 411 224 417C230 421 233 421 235 421C244 421 247 416 247 408C247 382 213 327 206 316L104 155C101 150 95 141 92 132Z"/></g></symbol></svg>
@@ -443,6 +443,7 @@ footer .legal span{margin-left:auto;white-space:nowrap}
   <div class="links" id="links">
     <i class="slider"></i>
     <div class="feat" id="feat"><button class="feat-btn" type="button" aria-expanded="false" aria-controls="feats">功能<svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg></button><div class="feats" id="feats">
+      <a href="#import" data-s="import">导入</a>
       <a href="#organize" data-s="organize">整理</a>
       <a href="#read" data-s="read">阅读</a>
       <a href="#practice" data-s="practice">练习</a>
@@ -479,27 +480,40 @@ footer .legal span{margin-left:auto;white-space:nowrap}
 <!-- ONE SCORE (r13): one K. 545 from the dropped PDF to one portrait reader, full page, that tells every feature with the original demos. components/r13/onescore-r13.js drives it -->
 <section class="show os" id="organize" data-theme="light">
   <div class="os-track wrap">
-    <div class="os-mark" id="features"></div><div class="os-mark" id="read"></div><div class="os-mark" id="practice"></div><div class="os-mark" id="play"></div>
+    <div class="os-mark" id="features"></div><div class="os-mark" id="import"></div><div class="os-mark" id="read"></div><div class="os-mark" id="practice"></div><div class="os-mark" id="play"></div>
     <div class="os-pin">
       <div class="os-stage">
         <div class="os-sbox"><div class="fx-sim" data-sim="r13/story-r13" data-drive="scroll"></div></div>
-        <div class="fx-prog"><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button></div>
+        <div class="fx-prog"><div class="on"><button><i></i></button><button><i></i></button><button><i></i></button></div><div><button><i></i></button><button><i></i></button><button><i></i></button></div></div>
         <div class="os-rbox"><div class="sim" data-sim="r13/reader-r13" data-drive="scroll"></div></div>
-        <div class="os-rprog"><div data-ch="pen"><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="lay"><button><i></i></button><button><i></i></button></div><div data-ch="dict"><button><i></i></button><button><i></i></button></div><div data-ch="prac"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="am"><button><i></i></button><button><i></i></button></div><div data-ch="turn"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="bar"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="fol"><button><i></i></button><button><i></i></button></div></div>
+        <div class="os-rprog"><div data-ch="pen"><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="lay"><button><i></i></button><button><i></i></button></div><div data-ch="dict"><button><i></i></button><button><i></i></button></div><div data-ch="prac"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="am"><button><i></i></button><button><i></i></button></div><div data-ch="turn"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="bar"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="fol"><button><i></i></button><button><i></i></button></div><div data-ch="sync"><button><i></i></button><button><i></i></button></div></div>
       </div>
       <div class="os-copy">
       <div class="fx-copy">
-        <div class="label"><span>PDF 导入</span>任意 PDF · 自动识别 · 无需手动输入</div>
+        <div class="fx-blk on">
+        <div class="label"><span>导入</span>任意 PDF · 公版曲库</div>
+        <h2 class="sec-title"><span class="ln">多种来源</span><span class="ln">乐谱导入</span></h2>
+        <div class="fx-run">
+        <div class="fx-nodes"><i></i><i></i><i></i></div>
+        <div class="fx-beats">
+          <div class="fx-beat on"><h3>公版乐谱下载 <b class="basic-tag">Basic</b></h3><p>按作品、作曲家或作品号搜索，Urtext、手稿、编订版和改编版分组<span style="white-space:nowrap">显示。</span></p></div>
+          <div class="fx-beat"><h3>标注导入 <b class="pro-tag">Pro</b><b class="soon-tag">即将推出</b></h3><p>PDF 里已有的标注，包括在其他 App 里写的，按颜色分进<span style="white-space:nowrap">图层。</span></p></div>
+          <div class="fx-beat"><h3>PDF 导入 <b class="basic-tag">Basic</b></h3><p>扫描件、下载文件均可，文件名<span style="white-space:nowrap">不限。</span></p></div>
+        </div>
+        </div>
+        </div>
+        <div class="fx-blk">
+        <div class="label"><span>整理</span>自动识别 · 自动归档 · 作曲家文件夹</div>
         <h2 class="sec-title"><span class="ln">PDF 乐谱</span><span class="ln">自动识别</span></h2>
         <div class="fx-run">
-        <div class="fx-nodes"><i></i><i></i><i></i><i></i></div>
+        <div class="fx-nodes"><i></i><i></i><i></i></div>
         <div class="fx-beats">
-          <div class="fx-beat on"><h3>PDF 导入 <b class="basic-tag">Basic</b></h3><p>扫描件、下载文件均可，文件名<span style="white-space:nowrap">不限。</span></p></div>
           <div class="fx-beat"><h3>乐谱识别 <b class="basic-tag">Basic</b></h3><p>自动识别曲名、作曲家、作品号和各乐章的<span style="white-space:nowrap">起始页。</span></p></div>
           <div class="fx-beat"><h3>自动归档 <b class="basic-tag">Basic</b></h3><p>按作曲家和时期存入图书馆，并自动命名。</p></div>
           <div class="fx-beat"><h3>作曲家文件夹 <b class="basic-tag">Basic</b></h3><p>图书馆自动按作曲家建文件夹，无需<span style="white-space:nowrap">手动整理。</span></p></div>
         </div>
-      </div>
+        </div>
+        </div>
       </div>
         <div class="os-chcopy sk-g on" data-ch="pen" data-side="L" data-beats="5">
           <div class="label"><span>标注</span>3 种笔 · 6 种颜色 · 每种 5 档粗细</div>
@@ -575,36 +589,19 @@ footer .legal span{margin-left:auto;white-space:nowrap}
           <h2 class="sec-title">AI 自动翻谱</h2>
           <p>通过麦克风识别演奏位置，弹到本页最后一小节时自动翻页。</p>
           <ul>
-            <li tabindex="0" role="button">AI 位置识别 <b class="pro-tag">Pro</b><span>实时标出正在演奏的小节。</span></li>
-            <li tabindex="0" role="button">AI 自动翻谱 <b class="pro-tag">Pro</b><span>弹到最后一小节，自动翻到下一页。</span></li>
+            <li tabindex="0" role="button">AI 位置识别 <b class="pro-tag">Pro</b><b class="exp-tag">实验功能</b><span>实时标出正在演奏的小节。</span></li>
+            <li tabindex="0" role="button">AI 自动翻谱 <b class="pro-tag">Pro</b><b class="exp-tag">实验功能</b><span>弹到最后一小节，自动翻到下一页。</span></li>
           </ul>
         </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- LIBRARY -->
-<section class="lib wrap" id="library" data-nav="organize" data-theme="light">
-  <div class="cols">
-    <div>
-      <div class="label rv" style="margin-bottom:26px"><span>在线曲库</span>公版乐谱 · 按版本分组 <b class="basic-tag">Basic</b></div>
-      <h2 class="sec-title rv"><span class="ln">公版乐谱</span><span class="ln">免费下载</span></h2>
-      <p class="rv" style="--i:1">按作品、作曲家或作品号搜索，Urtext、手稿、编订版和改编版分组显示，下载后自动命名并存入<span style="white-space:nowrap">图书馆。</span></p>
-    </div>
-    <div class="ed rv" style="--i:2">
-      <div class="ttl">版本与分谱</div>
-      <h4>Piano Sonata No.16, K.545</h4>
-      <div class="by">莫扎特</div>
-      <div class="chips" id="chips"><i class="sl"></i>
-        <button class="on" data-f="all">全部</button><button data-f="urtext">Urtext</button><button data-f="ms">手稿</button><button data-f="ed">编订版</button><button data-f="arr">改编版</button>
-      </div>
-      <div class="list" id="vlist">
-        <div class="ver" data-k="urtext"><div class="th"></div><div class="tx">Urtext 版<span>完整乐谱</span></div><span class="badge">Urtext</span></div>
-        <div class="ver" data-k="ed"><div class="th"></div><div class="tx">编订版<span>完整乐谱 · 编订者指法</span></div><span class="badge">编订</span></div>
-        <div class="ver" data-k="ms"><div class="th"></div><div class="tx">手稿扫描<span>影印本</span></div><span class="badge">手稿</span></div>
-        <div class="ver" data-k="ed"><div class="th"></div><div class="tx">编订版<span>单个乐章</span></div><span class="badge">编订</span></div>
-        <div class="ver" data-k="arr"><div class="th"></div><div class="tx">改编版<span>双钢琴</span></div><span class="badge">改编</span></div>
+        <div class="os-chcopy sk-g on" data-ch="sync" data-side="L" data-beats="2">
+          <div class="label"><span>云同步</span>乐谱 · 标注 · 实时更新</div>
+          <h2 class="sec-title">多台 iPad 同步</h2>
+          <p>乐谱和标注在多台 iPad 之间同步。</p>
+          <ul>
+            <li tabindex="0" role="button">标注同步 <b class="pro-tag">Pro</b><span>一台 iPad 上写的标注，另一台随即显示。</span></li>
+            <li tabindex="0" role="button">设备状态显示 <b class="pro-tag">Pro</b><span>同一份谱在另一台 iPad 上打开时，阅读器顶部显示设备名。</span></li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
@@ -619,7 +616,7 @@ footer .legal span{margin-left:auto;white-space:nowrap}
         <p class="rv" style="--i:1">按乐谱打开时长自动记录，无需手动计时，数据仅<span style="white-space:nowrap">保存在本机。</span></p>
       </div>
       <div class="sim" data-sim="stats" aria-label="一个月的示例统计"></div>
-      <script src="components/stats.js?v=397fe137" defer></script>
+      <script src="components/stats.js?v=2ad12890" defer></script>
     </div>
 </section>
 
@@ -662,10 +659,10 @@ footer .legal span{margin-left:auto;white-space:nowrap}
         <li class="plus">图层分组</li>
         <li class="plus">词典搜索</li>
         <li class="plus">小节识别</li>
-        <li class="plus">AI 自动翻谱</li>
+        <li class="plus">AI 自动翻谱 <b class="exp-tag">实验功能</b></li>
         <li class="plus">练习时长统计</li>
         <li class="plus">云同步</li>
-        <li class="plus">标注导入</li>
+        <li class="plus">标注导入 <b class="soon-tag">即将推出</b></li>
       </ul>
     </div>
   </div>
@@ -697,7 +694,7 @@ footer .legal span{margin-left:auto;white-space:nowrap}
   <footer class="wrap">
     <div class="cols">
       <div class="brand" style="font-size:20px"><span class="bm"><svg class="mk"><use href="/zh/#sn-mark"/></svg></span>StaffNotes</div>
-      <div><div class="n">页面</div><ul><li><a href="#features">导入</a></li><li><a href="#library">在线曲库</a></li><li><a href="#read">阅读</a></li><li><a href="#practice">练习</a></li><li><a href="#play">演奏</a></li><li><a href="#stats">统计</a></li><li><a href="#pricing">方案</a></li><li><a href="#faq">常见问题</a></li></ul></div>
+      <div><div class="n">页面</div><ul><li><a href="#import">导入</a></li><li><a href="#organize">整理</a></li><li><a href="#read">阅读</a></li><li><a href="#practice">练习</a></li><li><a href="#play">演奏</a></li><li><a href="#stats">统计</a></li><li><a href="#pricing">方案</a></li><li><a href="#faq">常见问题</a></li></ul></div>
       <div><div class="n">联系</div><ul><li><a href="#">支持</a></li><li><a href="#">媒体资料</a></li></ul></div>
     </div>
     <div class="legal"><a href="#">隐私政策</a><a href="#">使用条款</a><span>© 2026 StaffNotes</span></div>
@@ -785,7 +782,7 @@ const simFiles = {};
 function simFactory(name){
   return simFiles[name] ??= new Promise(done=>{
     if(SNSims[name]) return done(SNSims[name]);
-    const s=document.createElement('script'); s.src=`components/${name}.js?v=397fe137`; s.async=true;
+    const s=document.createElement('script'); s.src=`components/${name}.js?v=2ad12890`; s.async=true;
     s.onload=()=>done(SNSims[name]||null); s.onerror=()=>{ s.remove(); done(null); };
     document.head.appendChild(s);
   });
@@ -981,38 +978,9 @@ requestAnimationFrame(frame);
   });
 })();
 
-/* edition chips: list keeps one height; rows that stay glide (FLIP), rows that go fade where they are, new rows rise in place */
-(function(){
-  const chips=$('#chips'), sl=chips.querySelector('.sl'), bs=$$('#chips button'), list=$('#vlist'), vs=$$('#vlist .ver');
-  const E='cubic-bezier(.2,.7,.2,1)';
-  function place(b){ sl.style.left=b.offsetLeft+'px'; sl.style.top=b.offsetTop+'px'; sl.style.width=b.offsetWidth+'px'; sl.style.height=b.offsetHeight+'px'; }
-  function fit(){ list.style.height=''; const sh=vs.map(v=>v.classList.contains('out')); vs.forEach(v=>v.classList.remove('out','leaving')); list.style.height=list.offsetHeight+'px'; vs.forEach((v,i)=>v.classList.toggle('out',sh[i])); }
-  function show(f){
-    const top=v=>v.getBoundingClientRect().top-list.getBoundingClientRect().top;
-    const first=new Map(vs.map(v=>[v,v.classList.contains('out')||v.classList.contains('leaving')?null:top(v)]));
-    vs.forEach(v=>{ v.getAnimations().forEach(a=>a.cancel()); v.classList.remove('leaving'); v.style.top=''; });
-    const keep=v=>f==='all'||v.dataset.k===f;
-    vs.forEach(v=>v.classList.toggle('out',!keep(v)));
-    let n=0;
-    vs.forEach(v=>{
-      const was=first.get(v);
-      if(keep(v) && was!=null){ const d=was-top(v); if(d && !RM) v.animate([{transform:`translateY(${d}px)`},{transform:'none'}],{duration:560,easing:E}); }
-      else if(keep(v)){ if(!RM) v.animate([{opacity:0,transform:'translateY(12px)'},{opacity:1,transform:'none'}],{duration:480,delay:140+n++*60,easing:E,fill:'backwards'}); }
-      else if(was!=null && !RM){
-        v.classList.remove('out'); v.classList.add('leaving'); v.style.top=was+'px';
-        const a=v.animate([{opacity:1,transform:'none'},{opacity:0,transform:'scale(.97)'}],{duration:260,easing:'ease-out',fill:'forwards'});
-        a.onfinish=()=>{ v.classList.remove('leaving'); v.classList.add('out'); v.style.top=''; a.cancel(); };
-      }
-    });
-  }
-  bs.forEach(b=>b.onclick=()=>{ if(b.classList.contains('on')) return; bs.forEach(x=>x.classList.toggle('on',x===b)); place(b); show(b.dataset.f); });
-  const re=()=>{ place(chips.querySelector('.on')); fit(); };
-  addEventListener('resize',re); document.fonts.ready.then(re); re();
-})();
-
 /* FAQ */
 $$('.qa button').forEach(b=>b.onclick=()=>{ const q=b.parentElement, was=q.classList.contains('open'); $$('.qa').forEach(x=>x.classList.remove('open')); if(!was) q.classList.add('open'); });
 </script>
-<script src="components/r13/onescore-r13.js?v=397fe137"></script>
+<script src="components/r13/onescore-r13.js?v=2ad12890"></script>
 </body>
 </html>

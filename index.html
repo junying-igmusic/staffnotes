@@ -433,9 +433,9 @@ footer .legal span{margin-left:auto;white-space:nowrap}
   .big .w{opacity:1;filter:none}
 }
 </style>
-<link rel="stylesheet" href="components/r13/dot-r13.css?v=397fe137">
-<link rel="stylesheet" href="components/r13/onescore-r13.css?v=397fe137">
-<script src="components/r13/i18n-r13.js?v=397fe137"></script>
+<link rel="stylesheet" href="components/r13/dot-r13.css?v=2ad12890">
+<link rel="stylesheet" href="components/r13/onescore-r13.css?v=2ad12890">
+<script src="components/r13/i18n-r13.js?v=2ad12890"></script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="sn-mark" viewBox="145 248 510 302"><g data-key="q8xqzuy8nm" transform="translate(400 399.3127136230469) rotate(-90) scale(1 -1)"><path  transform="scale(1.1682242990654206) translate(-125 -214)" d="M92 132C91 128 90 123 90 120C91 116 93 114 97 114C107 114 123 126 130 128C141 132 155 135 169 135C178 135 187 133 195 131C205 129 214 124 223 118C238 106 250 88 250 67C250 30 220 0 183 0C146 0 116 30 116 67V77C83 77 33 17 26 11C22 9 19 7 16 7C8 7 4 18 4 28V34C7 57 24 83 37 102C50 120 59 139 71 157C89 187 108 216 125 246C131 255 155 284 155 300C155 303 154 306 152 308C151 309 149 310 147 310C139 310 126 302 120 300C109 296 95 293 81 293C72 293 63 295 55 297C45 299 36 304 27 310C12 322 0 340 0 361C0 398 30 428 67 428C104 428 134 398 134 361V351C167 351 217 411 224 417C230 421 233 421 235 421C244 421 247 416 247 408C247 382 213 327 206 316L104 155C101 150 95 141 92 132Z"/></g></symbol></svg>
@@ -446,6 +446,7 @@ footer .legal span{margin-left:auto;white-space:nowrap}
   <div class="links" id="links">
     <i class="slider"></i>
     <div class="feat" id="feat"><button class="feat-btn" type="button" aria-expanded="false" aria-controls="feats">Features<svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg></button><div class="feats" id="feats">
+      <a href="#import" data-s="import">Import</a>
       <a href="#organize" data-s="organize">Organize</a>
       <a href="#read" data-s="read">Read</a>
       <a href="#practice" data-s="practice">Practice</a>
@@ -482,27 +483,40 @@ footer .legal span{margin-left:auto;white-space:nowrap}
 <!-- ONE SCORE (r13): one K. 545 from the dropped PDF to one portrait reader, full page, that tells every feature with the original demos. components/r13/onescore-r13.js drives it -->
 <section class="show os" id="organize" data-theme="light">
   <div class="os-track wrap">
-    <div class="os-mark" id="features"></div><div class="os-mark" id="read"></div><div class="os-mark" id="practice"></div><div class="os-mark" id="play"></div>
+    <div class="os-mark" id="features"></div><div class="os-mark" id="import"></div><div class="os-mark" id="read"></div><div class="os-mark" id="practice"></div><div class="os-mark" id="play"></div>
     <div class="os-pin">
       <div class="os-stage">
         <div class="os-sbox"><div class="fx-sim" data-sim="r13/story-r13" data-drive="scroll"></div></div>
-        <div class="fx-prog"><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button></div>
+        <div class="fx-prog"><div class="on"><button><i></i></button><button><i></i></button><button><i></i></button></div><div><button><i></i></button><button><i></i></button><button><i></i></button></div></div>
         <div class="os-rbox"><div class="sim" data-sim="r13/reader-r13" data-drive="scroll"></div></div>
-        <div class="os-rprog"><div data-ch="pen"><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="lay"><button><i></i></button><button><i></i></button></div><div data-ch="dict"><button><i></i></button><button><i></i></button></div><div data-ch="prac"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="am"><button><i></i></button><button><i></i></button></div><div data-ch="turn"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="bar"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="fol"><button><i></i></button><button><i></i></button></div></div>
+        <div class="os-rprog"><div data-ch="pen"><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="lay"><button><i></i></button><button><i></i></button></div><div data-ch="dict"><button><i></i></button><button><i></i></button></div><div data-ch="prac"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="am"><button><i></i></button><button><i></i></button></div><div data-ch="turn"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="bar"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="fol"><button><i></i></button><button><i></i></button></div><div data-ch="sync"><button><i></i></button><button><i></i></button></div></div>
       </div>
       <div class="os-copy">
       <div class="fx-copy">
-        <div class="label"><span>Import</span>Any PDF · automatic recognition · no manual entry</div>
+        <div class="fx-blk on">
+        <div class="label"><span>Import</span>Any PDF · public-domain library</div>
+        <h2 class="sec-title"><span class="ln">Score import</span> <span class="ln">from any source</span></h2>
+        <div class="fx-run">
+        <div class="fx-nodes"><i></i><i></i><i></i></div>
+        <div class="fx-beats">
+          <div class="fx-beat on"><h3>Public-domain downloads <b class="basic-tag">Basic</b></h3><p>Search by work, composer or catalog number. Urtext, manuscripts, edited editions and arrangements are grouped.</p></div>
+          <div class="fx-beat"><h3>Annotation import <b class="pro-tag">Pro</b><b class="soon-tag">Coming soon</b></h3><p>Annotations already in a PDF, including ones made in other apps, are sorted into layers by color.</p></div>
+          <div class="fx-beat"><h3>PDF import <b class="basic-tag">Basic</b></h3><p>Scans and downloads under any file name.</p></div>
+        </div>
+        </div>
+        </div>
+        <div class="fx-blk">
+        <div class="label"><span>Organize</span>Automatic recognition · filing · composer folders</div>
         <h2 class="sec-title"><span class="ln">Automatic</span> <span class="ln">score recognition</span></h2>
         <div class="fx-run">
-        <div class="fx-nodes"><i></i><i></i><i></i><i></i></div>
+        <div class="fx-nodes"><i></i><i></i><i></i></div>
         <div class="fx-beats">
-          <div class="fx-beat on"><h3>PDF import <b class="basic-tag">Basic</b></h3><p>Scans and downloads under any file name.</p></div>
           <div class="fx-beat"><h3>Score recognition <b class="basic-tag">Basic</b></h3><p>Title, composer, catalog number and the start page of each movement.</p></div>
           <div class="fx-beat"><h3>Auto filing <b class="basic-tag">Basic</b></h3><p>Saved to the library by composer and period, and named automatically.</p></div>
           <div class="fx-beat"><h3>Composer folders <b class="basic-tag">Basic</b></h3><p>The library makes a folder for each composer.</p></div>
         </div>
-      </div>
+        </div>
+        </div>
       </div>
         <div class="os-chcopy sk-g on" data-ch="pen" data-side="L" data-beats="5">
           <div class="label"><span>Annotate</span>3 pens · 6 colors · 5 widths each</div>
@@ -578,36 +592,19 @@ footer .legal span{margin-left:auto;white-space:nowrap}
           <h2 class="sec-title">AI page turning</h2>
           <p>The microphone tracks which bar you are playing, and the page turns at the last bar.</p>
           <ul>
-            <li tabindex="0" role="button">AI position tracking <b class="pro-tag">Pro</b><span>A box marks the bar you are playing.</span></li>
-            <li tabindex="0" role="button">AI page turning <b class="pro-tag">Pro</b><span>At the last bar, the next page slides in.</span></li>
+            <li tabindex="0" role="button">AI position tracking <b class="pro-tag">Pro</b><b class="exp-tag">Experimental</b><span>A box marks the bar you are playing.</span></li>
+            <li tabindex="0" role="button">AI page turning <b class="pro-tag">Pro</b><b class="exp-tag">Experimental</b><span>At the last bar, the next page slides in.</span></li>
           </ul>
         </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- LIBRARY -->
-<section class="lib wrap" id="library" data-nav="organize" data-theme="light">
-  <div class="cols">
-    <div>
-      <div class="label rv" style="margin-bottom:26px"><span>Online Library</span>Public-domain scores · grouped by edition <b class="basic-tag">Basic</b></div>
-      <h2 class="sec-title rv"><span class="ln">Free scores</span> <span class="ln">from the public domain</span></h2>
-      <p class="rv" style="--i:1">Search by work, composer or catalog number. Urtext, manuscripts, edited editions and arrangements are grouped. Downloads are named and saved to your library automatically.</p>
-    </div>
-    <div class="ed rv" style="--i:2">
-      <div class="ttl">Editions and Parts</div>
-      <h4>Piano Sonata No.16, K.545</h4>
-      <div class="by">Wolfgang Amadeus Mozart</div>
-      <div class="chips" id="chips"><i class="sl"></i>
-        <button class="on" data-f="all">All</button><button data-f="urtext">Urtext</button><button data-f="ms">Manuscripts</button><button data-f="ed">Edited Editions</button><button data-f="arr">Arrangements</button>
-      </div>
-      <div class="list" id="vlist">
-        <div class="ver" data-k="urtext"><div class="th"></div><div class="tx">Urtext edition<span>Complete score</span></div><span class="badge">Urtext</span></div>
-        <div class="ver" data-k="ed"><div class="th"></div><div class="tx">Edited edition<span>Complete score · fingerings by the editor</span></div><span class="badge">Edited</span></div>
-        <div class="ver" data-k="ms"><div class="th"></div><div class="tx">Manuscript scan<span>Facsimile</span></div><span class="badge">Manuscript</span></div>
-        <div class="ver" data-k="ed"><div class="th"></div><div class="tx">Edited edition<span>Single movements</span></div><span class="badge">Edited</span></div>
-        <div class="ver" data-k="arr"><div class="th"></div><div class="tx">Arrangement<span>For two pianos</span></div><span class="badge">Arrangement</span></div>
+        <div class="os-chcopy sk-g on" data-ch="sync" data-side="L" data-beats="2">
+          <div class="label"><span>Cloud Sync</span>Scores · annotations · live updates</div>
+          <h2 class="sec-title">Sync across iPads</h2>
+          <p>Scores and annotations sync between your iPads.</p>
+          <ul>
+            <li tabindex="0" role="button">Annotation sync <b class="pro-tag">Pro</b><span>Annotations written on one iPad appear on the other.</span></li>
+            <li tabindex="0" role="button">Device status <b class="pro-tag">Pro</b><span>The reader shows which other iPad has the score open.</span></li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
@@ -622,7 +619,7 @@ footer .legal span{margin-left:auto;white-space:nowrap}
         <p class="rv" style="--i:1">Time is counted while a score is open. No timer to start, and the data stays on your iPad.</p>
       </div>
       <div class="sim" data-sim="stats" aria-label="Sample statistics for one month"></div>
-      <script src="components/stats.js?v=397fe137" defer></script>
+      <script src="components/stats.js?v=2ad12890" defer></script>
     </div>
 </section>
 
@@ -665,10 +662,10 @@ footer .legal span{margin-left:auto;white-space:nowrap}
         <li class="plus">Layer groups</li>
         <li class="plus">Dictionary search</li>
         <li class="plus">Bar recognition</li>
-        <li class="plus">AI page turning</li>
+        <li class="plus">AI page turning <b class="exp-tag">Experimental</b></li>
         <li class="plus">Practice statistics</li>
         <li class="plus">Cloud sync</li>
-        <li class="plus">Annotation import</li>
+        <li class="plus">Annotation import <b class="soon-tag">Coming soon</b></li>
       </ul>
     </div>
   </div>
@@ -700,7 +697,7 @@ footer .legal span{margin-left:auto;white-space:nowrap}
   <footer class="wrap">
     <div class="cols">
       <div class="brand" style="font-size:20px"><span class="bm"><svg class="mk"><use href="#sn-mark"/></svg></span>StaffNotes</div>
-      <div><div class="n">Pages</div><ul><li><a href="#features">Import</a></li><li><a href="#library">Online Library</a></li><li><a href="#read">Read</a></li><li><a href="#practice">Practice</a></li><li><a href="#play">Play</a></li><li><a href="#stats">Statistics</a></li><li><a href="#pricing">Plans</a></li><li><a href="#faq">FAQ</a></li></ul></div>
+      <div><div class="n">Pages</div><ul><li><a href="#import">Import</a></li><li><a href="#organize">Organize</a></li><li><a href="#read">Read</a></li><li><a href="#practice">Practice</a></li><li><a href="#play">Play</a></li><li><a href="#stats">Statistics</a></li><li><a href="#pricing">Plans</a></li><li><a href="#faq">FAQ</a></li></ul></div>
       <div><div class="n">Contact</div><ul><li><a href="#">Support</a></li><li><a href="#">Press kit</a></li></ul></div>
     </div>
     <div class="legal"><a href="#">Privacy Policy</a><a href="#">Terms of Use</a><span>© 2026 StaffNotes</span></div>
@@ -788,7 +785,7 @@ const simFiles = {};
 function simFactory(name){
   return simFiles[name] ??= new Promise(done=>{
     if(SNSims[name]) return done(SNSims[name]);
-    const s=document.createElement('script'); s.src=`components/${name}.js?v=397fe137`; s.async=true;
+    const s=document.createElement('script'); s.src=`components/${name}.js?v=2ad12890`; s.async=true;
     s.onload=()=>done(SNSims[name]||null); s.onerror=()=>{ s.remove(); done(null); };
     document.head.appendChild(s);
   });
@@ -984,38 +981,9 @@ requestAnimationFrame(frame);
   });
 })();
 
-/* edition chips: list keeps one height; rows that stay glide (FLIP), rows that go fade where they are, new rows rise in place */
-(function(){
-  const chips=$('#chips'), sl=chips.querySelector('.sl'), bs=$$('#chips button'), list=$('#vlist'), vs=$$('#vlist .ver');
-  const E='cubic-bezier(.2,.7,.2,1)';
-  function place(b){ sl.style.left=b.offsetLeft+'px'; sl.style.top=b.offsetTop+'px'; sl.style.width=b.offsetWidth+'px'; sl.style.height=b.offsetHeight+'px'; }
-  function fit(){ list.style.height=''; const sh=vs.map(v=>v.classList.contains('out')); vs.forEach(v=>v.classList.remove('out','leaving')); list.style.height=list.offsetHeight+'px'; vs.forEach((v,i)=>v.classList.toggle('out',sh[i])); }
-  function show(f){
-    const top=v=>v.getBoundingClientRect().top-list.getBoundingClientRect().top;
-    const first=new Map(vs.map(v=>[v,v.classList.contains('out')||v.classList.contains('leaving')?null:top(v)]));
-    vs.forEach(v=>{ v.getAnimations().forEach(a=>a.cancel()); v.classList.remove('leaving'); v.style.top=''; });
-    const keep=v=>f==='all'||v.dataset.k===f;
-    vs.forEach(v=>v.classList.toggle('out',!keep(v)));
-    let n=0;
-    vs.forEach(v=>{
-      const was=first.get(v);
-      if(keep(v) && was!=null){ const d=was-top(v); if(d && !RM) v.animate([{transform:`translateY(${d}px)`},{transform:'none'}],{duration:560,easing:E}); }
-      else if(keep(v)){ if(!RM) v.animate([{opacity:0,transform:'translateY(12px)'},{opacity:1,transform:'none'}],{duration:480,delay:140+n++*60,easing:E,fill:'backwards'}); }
-      else if(was!=null && !RM){
-        v.classList.remove('out'); v.classList.add('leaving'); v.style.top=was+'px';
-        const a=v.animate([{opacity:1,transform:'none'},{opacity:0,transform:'scale(.97)'}],{duration:260,easing:'ease-out',fill:'forwards'});
-        a.onfinish=()=>{ v.classList.remove('leaving'); v.classList.add('out'); v.style.top=''; a.cancel(); };
-      }
-    });
-  }
-  bs.forEach(b=>b.onclick=()=>{ if(b.classList.contains('on')) return; bs.forEach(x=>x.classList.toggle('on',x===b)); place(b); show(b.dataset.f); });
-  const re=()=>{ place(chips.querySelector('.on')); fit(); };
-  addEventListener('resize',re); document.fonts.ready.then(re); re();
-})();
-
 /* FAQ */
 $$('.qa button').forEach(b=>b.onclick=()=>{ const q=b.parentElement, was=q.classList.contains('open'); $$('.qa').forEach(x=>x.classList.remove('open')); if(!was) q.classList.add('open'); });
 </script>
-<script src="components/r13/onescore-r13.js?v=397fe137"></script>
+<script src="components/r13/onescore-r13.js?v=2ad12890"></script>
 </body>
 </html>

@@ -13,6 +13,8 @@
 .os-rbox{position:absolute;left:0;top:0;z-index:2;overflow:hidden;background:#fff;opacity:0;visibility:hidden;pointer-events:auto;
   box-shadow:0 0 0 1px rgba(41,45,56,.06),0 1px 2px rgba(41,45,56,.06),0 24px 60px -24px rgba(41,45,56,.3)}
 .os-rbox .sim{width:100%;height:100%;aspect-ratio:auto!important;border-radius:0;background:#fff;overflow:hidden}
+/* 触屏只看不摸：演示里的东西一律不接手指，手指落在阅读器 / 舞台本身上，滑动交给 onescore-r13.js 走站 */
+.os-touch .os-rbox .sim *,.os-touch .os-sbox *{pointer-events:none!important}
 /* 各章进度条：阅读器正下方居中，一章一组，只显示正在台上那一章的 */
 .os-rprog{position:absolute;z-index:3;width:min(240px,20vw);transform:translateX(-50%);opacity:0;transition:opacity .45s ease .1s;pointer-events:none}
 .os-rprog.live{opacity:1;pointer-events:auto}
@@ -34,6 +36,12 @@
 .os .fx-beat h3{font-size:clamp(24px,1.8vw,30px);margin-bottom:12px}
 .os .fx-beat p{font-size:15px}
 /* r17：导入、整理两块文案叠在 .fx-copy 同一格里，拍 1–3 亮导入那块，拍 4 起亮整理那块；每块一条三节点的线，进度条也分两组 */
+.os .fx-copy{display:grid}
+.os .fx-blk{grid-area:1/1;opacity:0;transform:translateY(10px);transition:opacity .25s ease,transform 0s .25s;pointer-events:none}
+.os .fx-blk.on{opacity:1;transform:none;transition:opacity .45s var(--ease) .2s,transform .6s var(--ease) .2s;pointer-events:auto}
+.os .fx-nodes::before{height:calc(var(--b,0)*100%/2)}
+.os .fx-prog>div{display:none;gap:6px;flex:1}
+.os .fx-prog>div.on{display:flex}
 /* 各章文案借了 .sk-g 的样子，淡入淡出完全跟翻页走，不要它自带的过渡；说明跟着当前那一站展开 */
 .os-chcopy{position:absolute;top:50%;opacity:0;pointer-events:none!important}
 .os-chcopy.live{pointer-events:auto!important}
@@ -49,6 +57,10 @@
 .basic-tag,.pro-tag{font-family:var(--sans);white-space:nowrap}
 .fx-beat h3 .basic-tag,.fx-beat h3 .pro-tag{vertical-align:6px}
 /* 标注导入是 Coming soon（灰描边），AI 自动翻谱是 Experimental（浅灰底）；会放进衬线大标题里，字体单独指定 */
+.soon-tag,.exp-tag{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:999px;font-family:var(--sans);font-size:11px;font-weight:600;line-height:18px;vertical-align:2px;letter-spacing:.02em;color:var(--ink2);white-space:nowrap}
+.soon-tag{box-shadow:inset 0 0 0 1px rgba(41,45,56,.35)}
+.exp-tag{background:rgba(41,45,56,.08)}
+.fx-beat h3 .soon-tag{vertical-align:6px}
 /* 统计单独一块，在在线曲库后面、Pro 横条前面 */
 #stats{padding:150px 0 120px}
 #stats .st{margin-top:0;margin-bottom:0}
