@@ -15,6 +15,8 @@
 .os-rbox .sim{width:100%;height:100%;aspect-ratio:auto!important;border-radius:0;background:#fff;overflow:hidden}
 /* 触屏只看不摸：演示里的东西一律不接手指，手指落在阅读器 / 舞台本身上，滑动交给 onescore-r13.js 走站 */
 .os-touch .os-rbox .sim *,.os-touch .os-sbox *{pointer-events:none!important}
+/* 画笔章「可用鼠标在本页试用」只在电脑上显示 */
+.os-touch .os-try{display:none}
 /* 各章进度条：阅读器正下方居中，一章一组，只显示正在台上那一章的 */
 .os-rprog{position:absolute;z-index:3;width:min(240px,20vw);transform:translateX(-50%);opacity:0;transition:opacity .45s ease .1s;pointer-events:none}
 .os-rprog.live{opacity:1;pointer-events:auto}
