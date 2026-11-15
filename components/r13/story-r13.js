@@ -76,7 +76,7 @@ const menu = name => `@keyframes ${name}{0%,${pc(TM, TC+.2)}{opacity:0;transform
 const CSS = `
 /* 批注 81：只裁左右、上下放开。原来靠 overflow:clip visible，不认它的浏览器（Safari）退回 hidden，把导入卡片落在底下的阴影齐刷刷切掉，成了一道没有渐变的黑边；改用 clip-path 上下各留 400 px */
 .sns-story{position:relative;width:100%;aspect-ratio:${W}/${H};--k:1;--ds:1.9;--dp:1.8;clip-path:inset(-400px 0 -400px 0)}
-.sns-story.narrow{aspect-ratio:${VN}/${H};--ds:2.2;--dp:2.08}
+.sns-story.narrow{aspect-ratio:${VN}/${H};--ds:2.2;--dp:2}
 /* 批注 77：手机竖屏一行只放得下 4 个文件夹，拍 1–5 收起第 1 列（Bach、Baroque），其余 4 列居中，标题对齐它们；拍 6 镜头左移时 Bach 再淡入 */
 .sns-story.narrow .hd{left:${colX(1)+2}px}
 .sns-story.narrow:not(.g6) .it.c0{opacity:0;transition-delay:0s}

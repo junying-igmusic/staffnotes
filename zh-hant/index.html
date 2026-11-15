@@ -430,9 +430,9 @@ footer .legal span{margin-left:auto;white-space:nowrap}
   .big .w{opacity:1;filter:none}
 }
 </style>
-<link rel="stylesheet" href="components/r13/dot-r13.css?v=06b49a91">
-<link rel="stylesheet" href="components/r13/onescore-r13.css?v=06b49a91">
-<script src="components/r13/i18n-r13.js?v=06b49a91"></script>
+<link rel="stylesheet" href="components/r13/dot-r13.css?v=8edf8639">
+<link rel="stylesheet" href="components/r13/onescore-r13.css?v=8edf8639">
+<script src="components/r13/i18n-r13.js?v=8edf8639"></script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="sn-mark" viewBox="145 248 510 302"><g data-key="q8xqzuy8nm" transform="translate(400 399.3127136230469) rotate(-90) scale(1 -1)"><path  transform="scale(1.1682242990654206) translate(-125 -214)" d="M92 132C91 128 90 123 90 120C91 116 93 114 97 114C107 114 123 126 130 128C141 132 155 135 169 135C178 135 187 133 195 131C205 129 214 124 223 118C238 106 250 88 250 67C250 30 220 0 183 0C146 0 116 30 116 67V77C83 77 33 17 26 11C22 9 19 7 16 7C8 7 4 18 4 28V34C7 57 24 83 37 102C50 120 59 139 71 157C89 187 108 216 125 246C131 255 155 284 155 300C155 303 154 306 152 308C151 309 149 310 147 310C139 310 126 302 120 300C109 296 95 293 81 293C72 293 63 295 55 297C45 299 36 304 27 310C12 322 0 340 0 361C0 398 30 428 67 428C104 428 134 398 134 361V351C167 351 217 411 224 417C230 421 233 421 235 421C244 421 247 416 247 408C247 382 213 327 206 316L104 155C101 150 95 141 92 132Z"/></g></symbol></svg>
@@ -616,7 +616,7 @@ footer .legal span{margin-left:auto;white-space:nowrap}
         <p class="rv" style="--i:1">按樂譜開啟時長自動記錄，無需手動計時，資料僅<span style="white-space:nowrap">儲存在本機。</span></p>
       </div>
       <div class="sim" data-sim="stats" aria-label="一個月的示例統計"></div>
-      <script src="components/stats.js?v=06b49a91" defer></script>
+      <script src="components/stats.js?v=8edf8639" defer></script>
     </div>
 </section>
 
@@ -782,7 +782,7 @@ const simFiles = {};
 function simFactory(name){
   return simFiles[name] ??= new Promise(done=>{
     if(SNSims[name]) return done(SNSims[name]);
-    const s=document.createElement('script'); s.src=`components/${name}.js?v=06b49a91`; s.async=true;
+    const s=document.createElement('script'); s.src=`components/${name}.js?v=8edf8639`; s.async=true;
     s.onload=()=>done(SNSims[name]||null); s.onerror=()=>{ s.remove(); done(null); };
     document.head.appendChild(s);
   });
@@ -981,6 +981,6 @@ requestAnimationFrame(frame);
 /* FAQ */
 $$('.qa button').forEach(b=>b.onclick=()=>{ const q=b.parentElement, was=q.classList.contains('open'); $$('.qa').forEach(x=>x.classList.remove('open')); if(!was) q.classList.add('open'); });
 </script>
-<script src="components/r13/onescore-r13.js?v=06b49a91"></script>
+<script src="components/r13/onescore-r13.js?v=8edf8639"></script>
 </body>
 </html>
