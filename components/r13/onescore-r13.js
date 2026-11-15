@@ -8,6 +8,7 @@
    到站后演示自己播，播完停 HOLD_MS 自动进下一站，一章播完自动进下一章，到跟谱最后一站停住；切到后台、离开这一段、或者用户在谱上按了一下（画、拖、点）就暂停，翻到下一站再接着连播。
    手机和 iPad（触屏）上演示只看不摸：谱上画不了、面板点不了也拖不了，手指上下滑就是走站（小谭 2026-11-15）。
    菜单：Import、Organize、Read、Practice、Play 落到各自第一站；钉住段里菜单的滑块跟着当前这一站走（sec._os.nav）。
+   练习统计（#stats）接在云同步后面当最后一站：滚一格停到统计标题，再滚一格才放开到方案；自动连播不进这一站（小谭 2026-11-15）。
    右下角播放 / 暂停按钮（.os-play）直接管自动连播：暂停后滚动、菜单照常走站，只是不自己往下走；批注工具改 sec._os.auto 时图标跟着变。只在钉住段（hero 之后）出现。
    减少动态效果：不缩放不平移，一律淡入淡出；自动连播默认停着，点播放才连播。 */
 (function(){
@@ -22,7 +23,7 @@ const track = q1('.os-track'), pin = q1('.os-pin'), stage = q1('.os-stage'), sbo
 const prog = q1('.fx-prog'), progB = qa('.fx-prog button'), progG = qa('.fx-prog>div');
 const rbox = q1('.os-rbox'), rsim = q1('.os-rbox .sim'), rprog = q1('.os-rprog');
 const copyEl = q1('.os-copy'), fxCopy = q1('.fx-copy'), beats = qa('.fx-beat'), nodes = qa('.fx-nodes i'), lines = qa('.fx-nodes'), blks = qa('.fx-blk');
-const marks = [['read', 'pen'], ['practice', 'prac'], ['play', 'turn']].map(([id, key]) => [document.getElementById(id), key]).filter(m => m[0] && sec.contains(m[0])), ovSec = document.getElementById('overview'), wordsEl = document.getElementById('words'), navEl = document.getElementById('nav');
+const marks = [['read', 'pen'], ['practice', 'prac'], ['play', 'turn']].map(([id, key]) => [document.getElementById(id), key]).filter(m => m[0] && sec.contains(m[0])), ovSec = document.getElementById('overview'), stSec = document.getElementById('stats'), wordsEl = document.getElementById('words'), navEl = document.getElementById('nav');
 const cl = (v, a=0, b=1) => Math.min(b, Math.max(a, v)), lp = (a, b, t) => a + (b - a)*t;
 const io = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3)/2;
 
@@ -52,12 +53,13 @@ const LEN = CH[CH.length - 1].e;
 });
 const desk = () => innerWidth > 900;
 
-/* 锚点：hero（起点）、Overview、导入三拍和整理两拍（k: 'org'，b 1–5）、各章每一站。abs 是不在钉住段里、按页面位置算的；big 是进这个锚点那段算大过场，long 是整理第 2 拍 → 画笔那整段（含文件夹打开） */
+/* 锚点：hero（起点）、Overview、导入三拍和整理两拍（k: 'org'，b 1–5）、各章每一站、练习统计（st，最后一站）。abs 是不在钉住段里、按页面位置算的；big 是进这个锚点那段算大过场，long 是整理第 2 拍 → 画笔那整段（含文件夹打开） */
 let A = null;
 function buildA(){
   A = [{k: 'hero', abs: 1}, {k: 'ov', abs: 1, big: 1}];
   for(let b = 1; b <= NB; b++) A.push({k: 'org', b, v: AH/2 + (b - 1)*BT, big: b === 1});
   CH.forEach(c => { for(let b = 1; b <= c.nb; b++) A.push({k: 'ch', c, b, key: c.key + b, ri: c.k0 + b - 1, v: c.s + X + AH/2 + (b - 1)*BT, long: c.i === 0 && b === 1, big: c.i > 0 && b === 1}); });
+  if(stSec) A.push({k: 'st', key: 'st', abs: 1, big: 1});
 }
 
 /* ---------- 版面：按窗口把谱子、阅读器和文案摆好 ---------- */
@@ -113,6 +115,8 @@ function layout(){
   // Overview 这一站：正文在导航条以下那块屏幕里上下居中
   const cs = getComputedStyle(ovSec), pt = parseFloat(cs.paddingTop), pb = parseFloat(cs.paddingBottom), r = ovSec.getBoundingClientRect();
   G.ov = Math.max(0, Math.round(r.top + scrollY + pt + (r.height - pt - pb)/2 - (vh + (navEl ? navEl.getBoundingClientRect().bottom : 92))/2));
+  // 练习统计这一站：标题停在导航条下面，跟页面里菜单滑过去的位置一样（标题那块顶边往上 112）
+  if(stSec){ const h = stSec.querySelector('h2'); G.st = Math.round((h ? h.parentElement : stSec).getBoundingClientRect().top + scrollY - 112); }
   if(!A) buildA();
   dotSync();
   if(d !== A.d){ A.d = d; if(engaged) land(cur, 'jump'); }
@@ -274,7 +278,7 @@ function wordsPlay(){
 /* ---------- 翻页：锚点之间按时间播；钉住段里页面停在锚点对应的滚动位置不动，hero ↔ Overview ↔ Organize 是真的滚页面 ---------- */
 let engaged = false, cur = 0, vy = 0, anim = null, seq = 0, doneAt = 0, lastY = scrollY, lastScroll = 0, sbDrag = false;
 const last = () => A.length - 1;
-const pos = i => { const a = A[i]; return a.k === 'hero' ? 0 : a.k === 'ov' ? G.ov : Math.round(track.getBoundingClientRect().top + scrollY + a.v*G.vh); };
+const pos = i => { const a = A[i]; return a.k === 'hero' ? 0 : a.k === 'ov' ? G.ov : a.k === 'st' ? G.st : Math.round(track.getBoundingClientRect().top + scrollY + a.v*G.vh); };
 const inZone = y => y >= -2 && y <= pos(last()) + 2;
 const nearest = y => A.reduce((m, a, i) => Math.abs(pos(i) - y) < Math.abs(pos(m) - y) ? i : m, 0);
 // 一站之前那一站在阅读器里的名字（没有就是刚打开的谱）
@@ -318,16 +322,21 @@ function enter(){ const i = nearest(scrollY); if(Math.abs(scrollY - pos(i)) <= 2
 function goTo(i){ if(engaged && !anim && Math.abs(i - cur) === 1) step(i - cur); else land(i, 'jump'); }
 function release(){ engaged = false; anim = null; doneAt = 0; }
 const veil = (on, ms) => { const r = document.documentElement; r.style.setProperty('--veil-ms', ms + 'ms'); r.classList.toggle('veil', on); };
-// 菜单和页脚：整页淡出、落到锚点、再淡回来
+// 菜单和页脚：整页淡出、落到锚点、再淡回来，回来时这一屏从下面上移一点，看得出换了地方（小谭 2026-11-15：原来 0.2 秒淡出看着像瞬间切换）
 function leap(fn){
   if(RMq){ fn(); return; }
-  veil(true, 200); setTimeout(() => { fn(); requestAnimationFrame(() => veil(false, 420)); }, 220);
+  veil(true, 320); setTimeout(() => { fn(); requestAnimationFrame(() => {
+    veil(false, 650);
+    const a = A[cur], el = a.k === 'st' ? stSec.querySelector('.st') : a.k === 'ov' ? ovSec : a.k === 'hero' ? null : pin;
+    el?.animate([{transform: 'translateY(28px)'}, {transform: 'none'}], {duration: 850, easing: 'cubic-bezier(.2,.7,.2,1)'});
+  }); }, 340);
 }
 // 到了锚点：播这一站的演示（往回走、跳过来、点了重播都重播）
 function arrive(i, how){
   const a = A[i]; doneAt = 0;
   if(a.k === 'hero'){ wordsSet(false); rSet(null); }
   else if(a.k === 'ov'){ if(how === 'back') wordsSet(true); else wordsPlay(); rSet(null); }
+  else if(a.k === 'st'){}
   else if(a.k === 'org'){ if(how !== 'pre' && how !== 'rev' && (how !== 'enter' || !played)){ played = true; api.beat(a.b); } rSet(null); }
   else if(rd){ rKey = a.key; RMq ? rd.beat(a.key) : rd.one(a.key); }
 }
@@ -338,10 +347,10 @@ function finished(a){
   if(a.k === 'org') return api.beatNow === a.b && !api.busy;
   return !!rd && rd.beatNow === a.ri && !rd.busy;
 }
-// 自动连播：播完停 HOLD_MS 再走下一步；hero、Overview 和最后一站不动；后台、离开这一段时不走；手势还没停（连惯性）也不计，停了再从头计
+// 自动连播：播完停 HOLD_MS 再走下一步；hero、Overview、云同步最后一站（下一站是统计）和统计不动；后台、离开这一段时不走；手势还没停（连惯性）也不计，停了再从头计
 let autoOn = !RMq, held = -1, userPlay = false;
 function autoTick(now){
-  if((RMq && !userPlay) || !autoOn || !engaged || anim || held === seq || document.hidden || cur >= last() || A[cur].k === 'hero' || A[cur].k === 'ov' || now - lastWheel < QUIET || tch || !finished(A[cur])){ doneAt = 0; return; }
+  if((RMq && !userPlay) || !autoOn || !engaged || anim || held === seq || document.hidden || cur >= last() || A[cur + 1].k === 'st' || A[cur].k === 'hero' || A[cur].k === 'ov' || now - lastWheel < QUIET || tch || !finished(A[cur])){ doneAt = 0; return; }
   if(!doneAt) doneAt = now; else if(now - doneAt >= HOLD_MS) step(1);
 }
 document.addEventListener('visibilitychange', () => { doneAt = 0; });
@@ -446,8 +455,8 @@ CH.forEach(c => [c.li, c.btn].forEach(els => els.forEach((el, k) => {
   el.addEventListener('click', go);
   el.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); go(); } });
 })));
-// 菜单和页脚的 Import、Organize、Read、Practice、Play、回到顶部直接落到锚点；其他链接（Stats、Pricing、FAQ……）放开，交给页面自己滑过去
-const NAVTO = {import: 'org1', features: 'org1', organize: 'org4', read: 'pen1', practice: 'prac1', play: 'turn1'};
+// 菜单和页脚的 Import、Organize、Read、Practice、Play、Stats、回到顶部直接落到锚点；其他链接（Pricing、FAQ……）放开，交给页面自己滑过去
+const NAVTO = {import: 'org1', features: 'org1', organize: 'org4', read: 'pen1', practice: 'prac1', play: 'turn1', stats: 'st'};
 document.addEventListener('click', e => {
   if(e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || !api || !rd || !G || !A) return;
   const a = e.target.closest?.('a[href^="#"]'); if(!a) return;
@@ -495,7 +504,7 @@ document.fonts?.ready.then(layout);
     if(!engaged) rSet(keyAt(y));
     desk() ? tickDesk(y) : tickPhone(y); syncCopy(y);
     if(fin && anim === fin){ anim = null; arrive(cur, fin.how); }
-    autoTick(now); showPlay(engaged && A[cur].k !== 'hero' && A[cur].k !== 'ov');
+    autoTick(now); showPlay(engaged && A[cur].k !== 'hero' && A[cur].k !== 'ov' && A[cur].k !== 'st');
   }
   requestAnimationFrame(loop);
 })(performance.now());

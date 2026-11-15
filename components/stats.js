@@ -159,9 +159,10 @@ function card(cls,label,html){
 }
 function count(el,to,fmt,dur,delay){
   if(RM){ el.innerHTML=fmt(to); return; }
+  const id=el._run=(el._run||0)+1;   // 重播时上一次还没数完的停掉
   el.innerHTML=fmt(0);
-  setTimeout(()=>{ const t0=performance.now();
-    (function tick(now){ const p=Math.min(1,(now-t0)/dur); el.innerHTML=fmt(Math.round(to*ease(p))); if(p<1) requestAnimationFrame(tick); })(t0);
+  setTimeout(()=>{ if(id!==el._run) return; const t0=performance.now();
+    (function tick(now){ if(id!==el._run) return; const p=Math.min(1,(now-t0)/dur); el.innerHTML=fmt(Math.round(to*ease(p))); if(p<1) requestAnimationFrame(tick); })(t0);
   },delay);
 }
 
@@ -251,6 +252,15 @@ SNSims.stats=function(el){
     es.forEach(e=>{ if(!e.isIntersecting) return; io.unobserve(e.target); const c=e.target; setTimeout(()=>go(c),k++*110); });
   },{threshold:.3});
   g.querySelectorAll('.c').forEach(c=>io.observe(c));
+  // 整块离开屏幕就悄悄复位，下次进屏（翻页到统计这一站、菜单跳过来、往回滚）再播一遍
+  new IntersectionObserver(([e])=>{
+    if(e.isIntersecting || !g.querySelector('.c.go')) return;
+    const cs=[...g.querySelectorAll('.c')], all=[...g.querySelectorAll('.c, .c *')];
+    all.forEach(x=>x.style.transition='none');
+    cs.forEach(c=>{ c.classList.remove('go'); const n=nums[c.classList[1]]; if(n){ const b=c.querySelector('.big'); b._run=(b._run||0)+1; b.innerHTML=n[2](0); } });
+    void g.offsetWidth; all.forEach(x=>x.style.transition='');
+    cs.forEach(c=>io.observe(c));
+  }).observe(g);
   return el._st={};
 };
 // 页面解析时就把卡片搭好：区块高度和负边距一开始就是终值，菜单从远处跳到 #pricing 不会因为这块晚长出来而落偏；
