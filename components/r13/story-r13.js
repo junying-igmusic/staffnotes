@@ -75,8 +75,8 @@ const menu = name => `@keyframes ${name}{0%,${pc(TM, TC+.2)}{opacity:0;transform
 
 const CSS = `
 /* 批注 81：只裁左右、上下放开。原来靠 overflow:clip visible，不认它的浏览器（Safari）退回 hidden，把导入卡片落在底下的阴影齐刷刷切掉，成了一道没有渐变的黑边；改用 clip-path 上下各留 400 px */
-.sns-story{position:relative;width:100%;aspect-ratio:${W}/${H};--k:1;--ds:1.9;clip-path:inset(-400px 0 -400px 0)}
-.sns-story.narrow{aspect-ratio:${VN}/${H};--ds:2.2}
+.sns-story{position:relative;width:100%;aspect-ratio:${W}/${H};--k:1;--ds:1.9;--dp:1.8;clip-path:inset(-400px 0 -400px 0)}
+.sns-story.narrow{aspect-ratio:${VN}/${H};--ds:2.2;--dp:2.08}
 /* 批注 77：手机竖屏一行只放得下 4 个文件夹，拍 1–5 收起第 1 列（Bach、Baroque），其余 4 列居中，标题对齐它们；拍 6 镜头左移时 Bach 再淡入 */
 .sns-story.narrow .hd{left:${colX(1)+2}px}
 .sns-story.narrow:not(.g6) .it.c0{opacity:0;transition-delay:0s}
@@ -119,6 +119,12 @@ ${G(1)} .ib{opacity:1}
 .sns-story[data-s="2"] .ib{animation:snsTap2 calc(.35s*var(--k)) calc(${TI+.25}s*var(--k)) ease both}
 @keyframes snsTap1{50%{transform:scale(.93)}100%{transform:none}}
 @keyframes snsTap2{50%{transform:scale(.93)}100%{transform:none}}
+/* 桌面宽度：弹窗盖住按钮时先隐去，免得从弹窗右边露出半截 */
+.sns-story:not(.narrow)[data-s="1"] .ib{animation:snsTap1 calc(.35s*var(--k)) calc(${TI+.25}s*var(--k)) ease both,snsIbH1 calc(${QX+.3}s*var(--k)) linear both}
+@keyframes snsIbH1{0%,${pc(TC, QX+.3)}{opacity:1}${pc(TC+.2, QX+.3)},${pc(QX+.05, QX+.3)}{opacity:0}100%{opacity:1}}
+.sns-story:not(.narrow)[data-s="3"] .ib{animation:snsIbH3 calc(${M4+.35}s*var(--k)) linear both}
+@keyframes snsIbH3{0%,${pc(.1, M4+.35)}{opacity:1}${pc(.3, M4+.35)},${pc(M4, M4+.35)}{opacity:0}100%{opacity:1}}
+.sns-story:not(.narrow)[data-s="4"] .ib{opacity:0}
 .sns-story .mn{position:absolute;top:72px;right:17px;min-width:220px;padding:6px 0;border-radius:14px;background:rgba(255,255,255,.98);z-index:7;opacity:0;transform-origin:100% 0;
   box-shadow:0 0 0 .5px rgba(0,0,0,.06),0 12px 36px -10px rgba(41,45,56,.32)}
 .sns-story .mi{position:relative;isolation:isolate;display:flex;align-items:center;gap:12px;height:44px;padding:0 22px 0 16px;font-size:15px;white-space:nowrap}
