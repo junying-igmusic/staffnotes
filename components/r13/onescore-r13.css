@@ -65,7 +65,8 @@
 .fx-beat h3 .soon-tag{vertical-align:6px}
 /* 统计单独一块，在在线曲库后面、Pro 横条前面 */
 #stats{padding:150px 0 120px}
-#stats .st{margin-top:0;margin-bottom:0}
+/* stats.js 自带一条旧规则把 .st 往上提了约 150px（原来接在别的块下面），这里要压过它，跟上一块留出正常间距（小谭 2026-11-15） */
+section#stats .st{margin-top:0}
 /* 标题照在线曲库排：小标签、大标题、一段说明 */
 #stats .st-top{margin-bottom:56px}
 #stats .st-top p{color:var(--ink2);max-width:400px;margin-top:22px;font-size:16px}
