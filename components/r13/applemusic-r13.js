@@ -107,7 +107,7 @@ const CSS=`
 .sns-am .hd{display:flex;align-items:flex-start;margin-bottom:10px}
 .sns-am .hd .cv{width:64px;height:64px;border-radius:10px}
 .sns-am .hd .tx{flex:1;margin-left:12px}
-.sns-am .hd .tx b{display:block;font:400 17px/1.22 "Timeless Serif",Georgia,serif}
+.sns-am .hd .tx b{display:block;font:400 17px/1.22 var(--serif,"Timeless Serif",Georgia,serif)}
 .sns-am .hd .tx i{display:block;font-style:normal;font-size:12px;color:${SEC};margin-top:4px;line-height:1.3}
 .sns-am .mr{display:flex;align-items:center;min-height:50px;padding:8px;margin:0 -8px;border-radius:12px;cursor:pointer}
 .sns-am .mr .n{width:28px;font-size:13px;color:${SEC};font-variant-numeric:tabular-nums;flex:none;display:flex;align-items:center}

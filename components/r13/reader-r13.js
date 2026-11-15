@@ -37,7 +37,7 @@ const CSS = `
 function load(name){
   return new Promise(done => {
     if (NS['r13/' + name]) return done();
-    const s = document.createElement('script'); s.src = BASE + name + '.js?v=44fd479b'; s.async = false;
+    const s = document.createElement('script'); s.src = BASE + name + '.js?v=2dc48a6d'; s.async = false;
     s.onload = s.onerror = () => done(); document.head.appendChild(s);
   });
 }

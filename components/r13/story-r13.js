@@ -168,7 +168,7 @@ ${G(3)} .hit .n .b{opacity:1;transform:none;transition-delay:calc(1.22s*var(--k)
 .sns-story .ic{position:absolute;left:30%;top:31%;width:40%;height:24%;background:#292D38;-webkit-mask:center/contain no-repeat;mask:center/contain no-repeat}
 .sns-story svg.ic{background:none}
 .sns-story .av{position:absolute;left:6%;top:9%;width:88%;height:62%;background:#fff center bottom/contain no-repeat}
-.sns-story .t{position:absolute;left:12px;right:8px;bottom:14px;font:16.1px/1.08 "Timeless Serif",Georgia,serif}
+.sns-story .t{position:absolute;left:12px;right:8px;bottom:14px;font:16.1px/1.08 var(--serif,"Timeless Serif",Georgia,serif)}
 .sns-story .t small{display:block;font:11px "Timeless Sans",sans-serif;color:#646A75;margin-bottom:3px}
 .sns-story .t .f{display:block;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:1px}
 .sns-story .t .z{font-size:18px}

@@ -43,7 +43,7 @@ function matches(q){
 }
 const tr = (s, v) => window.snT ? snT(s, v) : s;
 const esc = s => s.replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'})[c]);
-const SERIF = '"Timeless Serif",Georgia,serif';
+const SERIF = 'var(--serif,"Timeless Serif",Georgia,serif)';
 const CSS = `
 .sns-r13d{overflow:hidden;-webkit-user-select:none;user-select:none}
 .sns-r13d *{box-sizing:border-box}
