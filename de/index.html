@@ -333,6 +333,7 @@ h1,h2,h3{text-wrap:balance}
 .plan .top{display:flex;justify-content:space-between;align-items:baseline}
 .plan h3{font-family:var(--serif);font-weight:400;font-size:40px;letter-spacing:-.03em}
 .plan .price{font-size:13px;color:var(--ink2);margin:6px 0 30px}
+.plan .price b{font-family:var(--serif);font-weight:400;font-size:30px;letter-spacing:-.02em;color:var(--ink);margin:0 2px}
 .plan ul{list-style:none}
 .plan li{display:flex;gap:14px;padding:12px 0;border-top:1px solid var(--line);font-size:15px}
 .plan li::before{content:"";flex:none;width:6px;height:6px;border-radius:50%;margin-top:8px;border:1px solid var(--blue)}
@@ -365,14 +366,13 @@ footer li a:hover{color:var(--blue-n)}
 footer .legal{display:flex;gap:24px;margin-top:110px;font-size:12px;color:var(--on-night2)}
 footer .legal span{margin-left:auto}
 
-.totop{position:fixed;right:28px;top:auto;bottom:28px;z-index:45;width:56px;height:32px;border:1px solid var(--blue);border-radius:4px;display:grid;place-items:center;opacity:0;transform:translateY(8px);transition:opacity .4s,transform .4s var(--ease),background .3s}
-.totop .mk{width:26px;height:15px;fill:#171B24}
+/* 回到顶部和右下角播放键一个样子：白色圆按钮，41 px，离边 20 px */
+.totop{position:fixed;right:20px;top:auto;bottom:20px;z-index:45;width:41px;height:41px;box-sizing:border-box;border-radius:50%;background:#fff;border:1px solid rgba(23,27,36,.16);box-shadow:0 4px 16px rgba(23,27,36,.10);display:grid;place-items:center;opacity:0;transform:translateY(8px)}
+.totop .mk{width:20px;height:12px;fill:#171B24}
 .totop.on{opacity:1;transform:none}
-.totop{transition:opacity .4s,transform .4s,bottom .4s cubic-bezier(.2,.7,.2,1),border-color .3s}
-.totop.dark{border-color:rgba(176,187,240,.5)}
-.totop.dark .mk{fill:#F2F2F4}
+.totop{transition:opacity .4s,transform .4s,bottom .4s cubic-bezier(.2,.7,.2,1),background .3s}
 .totop.lift{bottom:84px}
-.totop:hover{background:rgba(63,82,159,.08)}
+.totop:hover{background:#F2F3F7}
 
 @media (max-width:900px){
   .links{display:none}.menu-btn{display:flex;height:44px;align-items:center;padding:0 16px;border-radius:999px;background:rgba(120,120,120,.1);backdrop-filter:blur(20px);font-size:14px}
@@ -407,9 +407,9 @@ footer .legal span{margin-left:auto}
   .big .w{opacity:1;filter:none}
 }
 </style>
-<link rel="stylesheet" href="components/r13/dot-r13.css?v=b03b9811">
-<link rel="stylesheet" href="components/r13/onescore-r13.css?v=b03b9811">
-<script src="components/r13/i18n-r13.js?v=b03b9811"></script>
+<link rel="stylesheet" href="components/r13/dot-r13.css?v=8bed395e">
+<link rel="stylesheet" href="components/r13/onescore-r13.css?v=8bed395e">
+<script src="components/r13/i18n-r13.js?v=8bed395e"></script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="sn-mark" viewBox="145 248 510 302"><g data-key="q8xqzuy8nm" transform="translate(400 399.3127136230469) rotate(-90) scale(1 -1)"><path  transform="scale(1.1682242990654206) translate(-125 -214)" d="M92 132C91 128 90 123 90 120C91 116 93 114 97 114C107 114 123 126 130 128C141 132 155 135 169 135C178 135 187 133 195 131C205 129 214 124 223 118C238 106 250 88 250 67C250 30 220 0 183 0C146 0 116 30 116 67V77C83 77 33 17 26 11C22 9 19 7 16 7C8 7 4 18 4 28V34C7 57 24 83 37 102C50 120 59 139 71 157C89 187 108 216 125 246C131 255 155 284 155 300C155 303 154 306 152 308C151 309 149 310 147 310C139 310 126 302 120 300C109 296 95 293 81 293C72 293 63 295 55 297C45 299 36 304 27 310C12 322 0 340 0 361C0 398 30 428 67 428C104 428 134 398 134 361V351C167 351 217 411 224 417C230 421 233 421 235 421C244 421 247 416 247 408C247 382 213 327 206 316L104 155C101 150 95 141 92 132Z"/></g></symbol></svg>
@@ -464,15 +464,15 @@ footer .legal span{margin-left:auto}
       </div>
       <div class="os-copy">
       <div class="fx-copy">
-        <div class="label"><span>Importieren</span>Jedes PDF · einzeln oder im Stapel · automatische Erkennung <b class="basic-tag">Basic</b></div>
+        <div class="label"><span>Importieren</span>Jedes PDF · automatische Erkennung · ohne manuelle Eingabe <b class="basic-tag">Basic</b></div>
         <h2 class="sec-title"><span class="ln">Automatische</span> <span class="ln">Notenerkennung</span></h2>
         <div class="fx-run">
         <div class="fx-nodes"><i></i><i></i><i></i><i></i></div>
         <div class="fx-beats">
-          <div class="fx-beat on"><h3>PDF-Import</h3><p>Scans und Downloads mit beliebigem Dateinamen, auch <span style="white-space:nowrap">Scan 2026-11-03.</span> Eine Datei oder ein ganzer Ordner.</p></div>
+          <div class="fx-beat on"><h3>PDF-Import</h3><p>Scans und Downloads mit beliebigem Dateinamen.</p></div>
           <div class="fx-beat"><h3>Notenerkennung</h3><p>Titel, Komponist, Werknummer und die Startseite jedes Satzes.</p></div>
           <div class="fx-beat"><h3>Automatische Ablage</h3><p>Nach Komponist und Epoche in der Bibliothek abgelegt und automatisch benannt.</p></div>
-          <div class="fx-beat"><h3>Komponistenordner</h3><p>Die Bibliothek legt für jeden Komponisten einen Ordner an. KV&nbsp;545 landet direkt bei Mozart.</p></div>
+          <div class="fx-beat"><h3>Komponistenordner</h3><p>Die Bibliothek legt für jeden Komponisten einen Ordner an.</p></div>
         </div>
       </div>
       </div>
@@ -499,26 +499,26 @@ footer .legal span{margin-left:auto}
         </div>
         <div class="os-chcopy sk-g on" data-ch="dict" data-side="L" data-beats="2">
           <div class="label"><span>Musikwörterbuch</span>5.000 Begriffe · Tempo, Dynamik, Vortrag <b class="pro-tag">Pro</b></div>
-          <h2 class="sec-title">Integriertes Musikwörterbuch</h2>
+          <h2 class="sec-title">Musikwörterbuch</h2>
           <p>Einen Begriff in den Noten lange drücken, die Erklärung erscheint neben der Seite.</p>
           <ul>
-            <li tabindex="0" role="button">Nachschlagen<span>Allegro lange drücken, der Eintrag öffnet sich neben den Noten.</span></li>
+            <li tabindex="0" role="button">Nachschlagen<span>Einen Begriff lange drücken, der Eintrag öffnet sich neben den Noten.</span></li>
             <li tabindex="0" role="button">Wörterbuchsuche<span>Begriffe, die nicht auf der Seite stehen, mit wenigen Buchstaben finden.</span></li>
           </ul>
         </div>
         <div class="os-chcopy sk-g on" data-ch="prac" data-side="R" data-beats="3">
           <div class="label"><span>Übungswerkzeuge</span>Metronom · Stimmgerät · Referenzton <b class="basic-tag">Basic</b></div>
-          <h2 class="sec-title">Übungswerkzeuge auf den Noten</h2>
+          <h2 class="sec-title">Übungswerkzeuge</h2>
           <p>Sie öffnen sich über der Seite, die Noten bleiben sichtbar.</p>
           <ul>
             <li tabindex="0" role="button">Metronom<span>Tempo tippen, jede Taktart. Die Seitenränder blinken im Takt.</span></li>
-            <li tabindex="0" role="button">Stimmgerät<span>A4 auf 440, 442 oder eine eigene Tonhöhe stellen.</span></li>
+            <li tabindex="0" role="button">Stimmgerät<span>A4 auf eine beliebige Tonhöhe stellen.</span></li>
             <li tabindex="0" role="button">Referenzton<span>Jeder Ton in jeder Oktave, so lange wie nötig gehalten.</span></li>
           </ul>
         </div>
         <div class="os-chcopy sk-g on" data-ch="am" data-side="L" data-beats="2">
           <div class="label"><span>Apple Music</span>Aufnahmen desselben Werks · viele Pianisten <b class="basic-tag">Basic</b></div>
-          <h2 class="sec-title">Beim Lesen hören</h2>
+          <h2 class="sec-title">Apple-Music-Player</h2>
           <p>Aufnahmen des geöffneten Werks spielen in einem Panel über der Seite.</p>
           <ul>
             <li tabindex="0" role="button">Aufnahmesammlung<span>Dasselbe Werk von vielen Pianisten. Antippen zum Abspielen.</span></li>
@@ -527,21 +527,21 @@ footer .legal span{margin-left:auto}
         </div>
         <div class="os-chcopy sk-g on" data-ch="turn" data-side="R" data-beats="3">
           <div class="label"><span>Umblättern</span>Seitenvorschau · Gehe zu Seite · Satzsprung <b class="basic-tag">Basic</b></div>
-          <h2 class="sec-title">Zu jeder Seite springen</h2>
-          <p>Die ganze Sonate ist ein PDF. Die Seitenleiste unten erreicht jede Seite.</p>
+          <h2 class="sec-title">Seiten- und Satzsprung</h2>
+          <p>Das ganze Werk ist ein PDF. Die Seitenleiste unten erreicht jede Seite.</p>
           <ul>
             <li tabindex="0" role="button">Seitenvorschau<span>An der Seitenleiste entlangziehen, um jede Seite zu sehen.</span></li>
-            <li tabindex="0" role="button">Gehe zu Seite<span>Auf die Seitenzahl tippen und 2 eingeben.</span></li>
-            <li tabindex="0" role="button">Satzsprung<span>Ein Tippen zum Andante, die erste Zeile wird hervorgehoben.</span></li>
+            <li tabindex="0" role="button">Gehe zu Seite<span>Seitenzahl eingeben, um zu dieser Seite zu springen.</span></li>
+            <li tabindex="0" role="button">Satzsprung<span>Ein Tippen zum Anfang jedes Satzes, die erste Zeile wird hervorgehoben.</span></li>
           </ul>
         </div>
         <div class="os-chcopy sk-g on" data-ch="bar" data-side="L" data-beats="3">
           <div class="label"><span>Taktzahlen</span>Jeder Takt nummeriert · Seite und Takt nebeneinander <b class="pro-tag">Pro</b></div>
-          <h2 class="sec-title">Per Taktzahl springen</h2>
+          <h2 class="sec-title">Takterkennung</h2>
           <p>Jeder Takt wird automatisch nummeriert, so zählen Sie wie Ihre Lehrkraft.</p>
           <ul>
-            <li tabindex="0" role="button">Taktzahlen-Anzeige<span>Zeigt Seite und Takt, von insgesamt 73.</span></li>
-            <li tabindex="0" role="button">Taktsprung<span>Auf Takt tippen, 24 eingeben, der Takt wird hervorgehoben.</span></li>
+            <li tabindex="0" role="button">Taktzahlen-Anzeige<span>Zeigt Seite und Takt zusammen.</span></li>
+            <li tabindex="0" role="button">Taktsprung<span>Taktzahl eingeben, der Takt wird angesprungen und hervorgehoben.</span></li>
             <li tabindex="0" role="button">Taktnummerierung<span>Jeder Takt wird erkannt und am Anfang nummeriert.</span></li>
           </ul>
         </div>
@@ -594,7 +594,7 @@ footer .legal span{margin-left:auto}
         <p class="rv" style="--i:1">Gezählt wird, solange eine Partitur geöffnet ist. Kein Timer, und die Daten bleiben auf Ihrem iPad.</p>
       </div>
       <div class="sim" data-sim="stats" aria-label="Beispielstatistik für einen Monat"></div>
-      <script src="components/stats.js?v=b03b9811" defer></script>
+      <script src="components/stats.js?v=8bed395e" defer></script>
     </div>
 </section>
 
@@ -603,7 +603,7 @@ footer .legal span{margin-left:auto}
   <div class="bg" id="bandBg"></div>
   <div class="wrap">
     <div><h2 class="rv">StaffNotes Pro</h2>
-    <p class="rv" style="--i:1">Taktzahlen, Musikwörterbuch und Umblättern mit KI. Dazu Cloud-Synchronisierung, MusicXML-Import und Import von Anmerkungen.</p>
+    <p class="rv" style="--i:1">Takterkennung, Musikwörterbuch und Umblättern mit KI. Dazu Cloud-Synchronisierung und Import von Anmerkungen.</p>
     <a class="cap rv" style="--i:2" href="#pricing"><i>↓</i>Pläne vergleichen</a></div>
   </div>
 </section>
@@ -612,36 +612,32 @@ footer .legal span{margin-left:auto}
 <section class="pricing wrap" id="pricing" data-theme="light">
   <div class="head">
     <div class="label rv"><span>Preise</span>Basic · Pro</div>
-    <h2 class="sec-title rv"><span class="ln">Basic ist kostenlos</span> <span class="ln">Pro schaltet alles frei</span></h2>
+    <h2 class="sec-title rv"><span class="ln">Basic und Pro</span> <span class="ln">im Monatsabo</span></h2>
   </div>
   <div class="plans">
     <div class="plan rv">
       <div class="top"><h3>Basic</h3><span class="pill basic">Basic</span></div>
-      <div class="price">Kostenlos im App Store</div>
+      <div class="price"><b>4,49 €</b> pro Monat</div>
       <ul>
-        <li>PDF-Import mit automatischer Erkennung</li>
-        <li>Stapelimport</li>
+        <li>Automatische Notenerkennung</li>
         <li>Online-Notenbibliothek</li>
-        <li>Bibliothek nach Komponist, Epoche und Sammlung</li>
-        <li>Kompakte und zweiseitige Ansicht</li>
-        <li>Gehe zu Seite und Satzsprung</li>
-        <li>Monoline-Stift, Wachsmalstift, Textmarker, Lasso, Formen</li>
-        <li>Ebenen und Gruppen</li>
-        <li>Metronom, Stimmgerät und Referenzton</li>
-        <li>Apple-Music-Panel</li>
+        <li>Handschriftliche Anmerkungen</li>
+        <li>Anmerkungen in Ebenen</li>
+        <li>Übungswerkzeuge</li>
+        <li>Apple-Music-Player</li>
+        <li>Seiten- und Satzsprung</li>
         <li>Übestatistik</li>
       </ul>
     </div>
     <div class="plan pro rv" style="--i:1">
       <div class="top"><h3>Pro</h3><span class="pill on">Pro</span></div>
-      <div class="price">Preis im App Store</div>
+      <div class="price"><b>12,49 €</b> pro Monat</div>
       <ul>
         <li>Alles aus Basic</li>
-        <li class="plus">Umblättern mit KI</li>
-        <li class="plus">Taktzahlen</li>
         <li class="plus">Musikwörterbuch</li>
+        <li class="plus">Takterkennung</li>
+        <li class="plus">Umblättern mit KI</li>
         <li class="plus">Cloud-Synchronisierung</li>
-        <li class="plus">MusicXML-Import</li>
         <li class="plus">Import von Anmerkungen</li>
       </ul>
     </div>
@@ -657,7 +653,7 @@ footer .legal span{margin-left:auto}
       <div class="qa open"><button>Brauche ich einen Apple Pencil?<i>+</i></button><div class="a"><div><p>Nein. Lesen, Umblättern und alle Übungswerkzeuge funktionieren mit dem Finger. Zum Schreiben auf den Noten empfehlen wir einen Apple Pencil.</p></div></div></div>
       <div class="qa"><button>Wie importiere ich Noten?<i>+</i></button><div class="a"><div><p>Aus der Dateien-App oder jeder App, die ein PDF teilt. Gemeinfreie Noten laden Sie direkt aus der eingebauten Online-Notenbibliothek.</p></div></div></div>
       <div class="qa"><button>Verändern meine Anmerkungen das PDF?<i>+</i></button><div class="a"><div><p>Nein. Anmerkungen liegen auf Ebenen über der Seite, das Original-PDF bleibt unverändert. Sie können eine Kopie mit den gewählten Ebenen exportieren.</p></div></div></div>
-      <div class="qa"><button>Was unterscheidet Basic und Pro?<i>+</i></button><div class="a"><div><p>Importieren, Lesen, Anmerken, die Bibliothek und alle Übungswerkzeuge gehören zu Basic und sind kostenlos. Umblättern mit KI, Taktzahlen, das Musikwörterbuch, Cloud-Synchronisierung, MusicXML-Import und Import von Anmerkungen gehören zu Pro.</p></div></div></div>
+      <div class="qa"><button>Was unterscheidet Basic und Pro?<i>+</i></button><div class="a"><div><p>Importieren, Lesen, Anmerken, die Bibliothek und alle Übungswerkzeuge gehören zu Basic. Pro enthält zusätzlich das Musikwörterbuch, die Takterkennung, Umblättern mit KI, Cloud-Synchronisierung und Import von Anmerkungen.</p></div></div></div>
       <div class="qa"><button>Kann ich vorhandene Anmerkungen importieren?<i>+</i></button><div class="a"><div><p>Ja. Pro übernimmt beim Importieren die Anmerkungen im PDF, auch solche aus anderen Apps.</p></div></div></div>
       <div class="qa"><button>Welche Sprachen werden unterstützt?<i>+</i></button><div class="a"><div><p>Englisch, Deutsch und Chinesisch. Stücktitel erscheinen in Ihrer Sprache, wenn der Katalog eine Übersetzung hat.</p></div></div></div>
     </div>
@@ -667,7 +663,7 @@ footer .legal span{margin-left:auto}
 <!-- END -->
 <section class="night" data-theme="dark">
   <div class="end wrap">
-    <h2 class="rv">Vom Import bis zum Üben</h2>
+    <h2 class="rv">Play on</h2>
     <p class="rv" style="--i:1">StaffNotes für iPad.</p>
     <a class="store light rv" style="--i:2" aria-disabled="true"><svg viewBox="0 0 24 24"><path d="M16.37 12.6c-.02-2.28 1.86-3.38 1.95-3.43-1.06-1.55-2.71-1.77-3.3-1.79-1.4-.14-2.74.83-3.45.83-.71 0-1.81-.81-2.97-.79-1.53.02-2.94.89-3.73 2.26-1.59 2.76-.41 6.84 1.14 9.08.76 1.1 1.66 2.33 2.84 2.28 1.14-.05 1.57-.74 2.95-.74 1.38 0 1.77.74 2.97.71 1.23-.02 2-1.11 2.75-2.21.87-1.27 1.22-2.5 1.24-2.57-.03-.01-2.38-.91-2.39-3.63zM14.1 5.9c.63-.76 1.05-1.82.94-2.87-.9.04-2 .6-2.65 1.36-.58.67-1.09 1.75-.95 2.78 1 .08 2.03-.51 2.66-1.27z"/></svg><span><small>Demnächst im</small><b>App Store</b></span></a>
   </div>
@@ -716,7 +712,7 @@ const simFiles = {};
 function simFactory(name){
   return simFiles[name] ??= new Promise(done=>{
     if(SNSims[name]) return done(SNSims[name]);
-    const s=document.createElement('script'); s.src=`components/${name}.js?v=b03b9811`; s.async=true;
+    const s=document.createElement('script'); s.src=`components/${name}.js?v=8bed395e`; s.async=true;
     s.onload=()=>done(SNSims[name]||null); s.onerror=()=>{ s.remove(); done(null); };
     document.head.appendChild(s);
   });
@@ -928,6 +924,6 @@ requestAnimationFrame(frame);
 /* FAQ */
 $$('.qa button').forEach(b=>b.onclick=()=>{ const q=b.parentElement, was=q.classList.contains('open'); $$('.qa').forEach(x=>x.classList.remove('open')); if(!was) q.classList.add('open'); });
 </script>
-<script src="components/r13/onescore-r13.js?v=b03b9811"></script>
+<script src="components/r13/onescore-r13.js?v=8bed395e"></script>
 </body>
 </html>
