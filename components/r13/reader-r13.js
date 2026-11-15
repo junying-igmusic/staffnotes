@@ -14,10 +14,10 @@ const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const BASE = (document.currentScript && document.currentScript.src) ? new URL('./', document.currentScript.src).href : 'components/r13/';
 const KEYS = ['pen1','pen2','pen3','pen4','pen5','lay1','lay2','dict1','dict2','prac1','prac2','prac3','am1','am2','turn1','turn2','turn3','bar1','bar2','bar3','fol1','fol2'];
 const IN = [...KEYS.slice(0, 19), 'fol1', 'fol2', 'fol3'];
-// 画笔五站：Pens（蓝）、Apple Pencil only（红）、Lasso（绿）、Shapes（金）、Undo（双指轻点两下撤销）
-const DEMO = ['palette', 'pencil', 'lasso', 'shapes', 'undo'];
+// 画笔五站：Pens（蓝）、Apple Pencil only（红）、Shapes（金）、Lasso（绿）、Undo（双指轻点两下撤销）；2026-11-15 小谭：Basic 的三站在前，Pro 的套索和撤销在后
+const DEMO = ['palette', 'pencil', 'shapes', 'lasso', 'undo'];
 // 画笔五个演示大概多长（毫秒，量过），给进度条用
-const PEN_MS = [7500, 7400, 10200, 8300, 4400];
+const PEN_MS = [7500, 7400, 8300, 10200, 4400];
 // 每一章用哪一层、这一章第 n 站对应那一层的第几拍
 const CH = {pen: {c: 'board', o: 0}, lay: {c: 'layers', o: 0}, dict: {c: 'dict', o: 0}, prac: {c: 'practice', o: 0}, am: {c: 'am', o: 0},
   turn: {c: 'turns', o: 0}, bar: {c: 'turns', o: 3}, fol: {c: 'follow', o: 0}};
@@ -37,7 +37,7 @@ const CSS = `
 function load(name){
   return new Promise(done => {
     if (NS['r13/' + name]) return done();
-    const s = document.createElement('script'); s.src = BASE + name + '.js?v=8bed395e'; s.async = false;
+    const s = document.createElement('script'); s.src = BASE + name + '.js?v=44fd479b'; s.async = false;
     s.onload = s.onerror = () => done(); document.head.appendChild(s);
   });
 }

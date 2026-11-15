@@ -38,11 +38,6 @@ const CH = qa('.os-chcopy').map((copy, i) => ({copy, i, key: copy.dataset.ch, si
 let i0 = 0;
 CH.forEach((c, i) => { c.k0 = i0; i0 += c.nb; c.s = i ? CH[i - 1].e : S_P - X; c.e = c.s + X + AH + (c.nb - 1)*BT; c.btn = c.pr ? [...c.pr.querySelectorAll('button')] : []; });
 const LEN = CH[CH.length - 1].e;
-// Basic / Pro 标签另抄一份放进大标题末尾，手机上显示这份（CSS 里切换）
-[fxCopy, ...CH.map(c => c.copy)].forEach(el => {
-  const t = el && el.querySelector('.label .basic-tag, .label .pro-tag'), h = el && el.querySelector('h2.sec-title'); if(!t || !h) return;
-  const c = t.cloneNode(true), ln = h.querySelectorAll('.ln'); c.classList.add('h-tag'); (ln.length ? ln[ln.length - 1] : h).append(' ', c);
-});
 const desk = () => innerWidth > 900;
 
 /* 锚点：hero（起点）、Overview、Organize 三拍、各章每一站。abs 是不在钉住段里、按页面位置算的；big 是进这个锚点那段算大过场，long 是 Organize 第 3 拍 → 画笔那整段（含文件夹打开） */
@@ -112,9 +107,9 @@ function layout(){
   else if(engaged && !anim?.real) pinTo(cur);
 }
 // 手机：播放键浮在右下角，不给它让位置；文案放不下先收掉导语，还放不下再连小标题一起收；
-// 文案底边落进播放键那一角（离底 20 + 41 高 + 9 空）时，说明在右边空出播放键的宽度
+// 文案底边落进右下角那两颗键（播放键 20 + 41，回到顶部叠在上面 73 + 41，再空 10）时，说明在右边空出键的宽度
 function fitCopy(){
-  const room = G.vh - G.ct - 20, btn = G.vh - G.ct - 70;
+  const room = G.vh - G.ct - 20, btn = G.vh - G.ct - 124;
   [fxCopy, ...CH.map(c => c.copy)].forEach(el => {
     el.classList.remove('tight', 'tight1', 'narrow');
     if(el.offsetHeight > room){ el.classList.add('tight1'); if(el.offsetHeight > room) el.classList.replace('tight1', 'tight'); }
@@ -127,7 +122,7 @@ mountSim(sim).then(a => { api = a; dotSync(); });
 mountSim(rsim).then(a => { rd = a; });
 // story 里的圆点和阅读器里的一样大：框宽 834 时 30 px，再小也不小于 18 px
 function dotSync(){ if(api && G && api.dot) api.dot(Math.max(18, 30*G.fw/RD.W)); }
-progB.forEach((b, i) => { b.setAttribute('aria-label', beats[i].querySelector('h3').textContent);
+progB.forEach((b, i) => { b.setAttribute('aria-label', beats[i].querySelector('h3').firstChild.textContent.trim());
   b.addEventListener('click', () => { if(!api || !A) return;
     const k = i < 3 ? A.findIndex(a => a.k === 'org' && a.b === i + 1) : A.findIndex(a => a.k === 'ch');
     if(engaged && k === cur && !anim){ seq++; arrive(k, 'replay'); } else goTo(k); }); });
