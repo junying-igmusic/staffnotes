@@ -93,7 +93,7 @@ const CSS = `
 .sns-r13d .dv{display:block;height:.5px;background:rgba(41,45,56,.2)}
 .sns-r13d .hw{font:400 20px/1.2 ${SERIF};letter-spacing:-.1px}
 .sns-r13d .sh{font-size:14px;font-weight:500;color:${A};margin-top:7px;line-height:1.35}
-.sns-r13d .dt{font-size:14px;margin-top:7px;line-height:1.4}
+.sns-r13d .dt{font-size:14px;margin-top:7px;line-height:1.4;text-wrap:pretty}
 .sns-r13d .rl{font-size:12px;font-weight:600;color:${SEC};margin-top:14px}
 .sns-r13d .rb{display:block;width:100%;border:0;background:none;text-align:left;color:${INK};padding:8px 0;font:400 16px/1.2 ${SERIF};cursor:pointer}
 .sns-r13d .nr{display:flex;align-items:center;gap:7px;padding:9px 11px;border-radius:12px;background:rgba(233,234,236,.7);color:${SEC};font-size:14px}

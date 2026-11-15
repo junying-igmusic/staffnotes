@@ -31,7 +31,12 @@
 :root:lang(zh) body{letter-spacing:0}
 /* 段落末行不留单个词或孤字（各语言都开） */
 p,li,.label,:root:lang(zh) h3{text-wrap:pretty}
-:root:lang(de) h1,:root:lang(de) h2,:root:lang(de) h3,:root:lang(de) p,:root:lang(de) li{-webkit-hyphens:auto;hyphens:auto}
+/* 德语断字收紧：不到 10 个字母的词不断，断开处前面至少 4 个字、后面至少 5 个（词后的句号也算一个），不再出现 Werknum-mer、Ausga-ben */
+:root:lang(de) h1,:root:lang(de) h2,:root:lang(de) h3,:root:lang(de) p,:root:lang(de) li{-webkit-hyphens:auto;hyphens:auto;hyphenate-limit-chars:10 4 5}
+/* 标题只断特别长的词（Handschriftliche 这种手机上一行放不下的），不再出现「Gemein- / freie Noten」 */
+:root:lang(de) h1,:root:lang(de) h2,:root:lang(de) h3{hyphenate-limit-chars:14 6 6}
+/* 中文一个词包在 sn-w 里，词中间不断行（见页尾「中文按词换行」） */
+sn-w{white-space:nowrap}
 *{box-sizing:border-box;margin:0;padding:0}
 html{background:var(--paper)}
 body{font-family:var(--sans);font-weight:400;color:var(--ink);background:var(--paper);font-size:16px;line-height:1.45;letter-spacing:-.01em;-webkit-font-smoothing:antialiased;overflow-x:hidden}
@@ -350,7 +355,7 @@ h1,h2,h3{text-wrap:balance}
 .faq .grid2{align-items:start}
 .qa{border-top:1px solid var(--line)}
 .qa:last-child{border-bottom:1px solid var(--line)}
-.qa button{width:100%;display:flex;justify-content:space-between;align-items:center;text-align:left;padding:24px 0;font-size:clamp(19px,1.7vw,23px);letter-spacing:-.025em;font-weight:400}
+.qa button{width:100%;display:flex;justify-content:space-between;align-items:center;text-align:left;padding:24px 0;font-size:clamp(19px,1.7vw,23px);letter-spacing:-.025em;font-weight:400;text-wrap:balance}
 .qa button i{font-style:normal;width:24px;height:24px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-size:15px;transition:transform .35s var(--ease),border-color .3s;flex:none;margin-left:20px}
 .qa.open button i{transform:rotate(45deg);border-color:var(--ink)}
 .qa .a{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s var(--ease)}
@@ -369,7 +374,9 @@ footer ul{list-style:none}
 footer li a{font-size:clamp(20px,1.9vw,25px);letter-spacing:-.025em;line-height:1.5;transition:color .3s}
 footer li a:hover{color:var(--blue-n)}
 footer .legal{display:flex;gap:24px;margin-top:110px;font-size:12px;color:var(--on-night2)}
-footer .legal span{margin-left:auto}
+footer .legal span{margin-left:auto;white-space:nowrap}
+/* 德语两个链接很长，手机上 © 那一行放到下面，不再挤成两行 */
+@media (max-width:440px){:root:lang(de) footer .legal{flex-wrap:wrap;row-gap:10px}:root:lang(de) footer .legal span{flex-basis:100%;margin-left:0}}
 
 /* 回到顶部和右下角播放键一个样子：白色圆按钮，41 px，离边 20 px */
 .totop{position:fixed;right:20px;top:auto;bottom:20px;z-index:45;width:41px;height:41px;box-sizing:border-box;border-radius:50%;background:#fff;border:1px solid rgba(23,27,36,.16);box-shadow:0 4px 16px rgba(23,27,36,.10);display:grid;place-items:center;opacity:0;transform:translateY(8px)}
@@ -411,9 +418,9 @@ footer .legal span{margin-left:auto}
   .big .w{opacity:1;filter:none}
 }
 </style>
-<link rel="stylesheet" href="components/r13/dot-r13.css?v=2dc48a6d">
-<link rel="stylesheet" href="components/r13/onescore-r13.css?v=2dc48a6d">
-<script src="components/r13/i18n-r13.js?v=2dc48a6d"></script>
+<link rel="stylesheet" href="components/r13/dot-r13.css?v=8e5233ed">
+<link rel="stylesheet" href="components/r13/onescore-r13.css?v=8e5233ed">
+<script src="components/r13/i18n-r13.js?v=8e5233ed"></script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="sn-mark" viewBox="145 248 510 302"><g data-key="q8xqzuy8nm" transform="translate(400 399.3127136230469) rotate(-90) scale(1 -1)"><path  transform="scale(1.1682242990654206) translate(-125 -214)" d="M92 132C91 128 90 123 90 120C91 116 93 114 97 114C107 114 123 126 130 128C141 132 155 135 169 135C178 135 187 133 195 131C205 129 214 124 223 118C238 106 250 88 250 67C250 30 220 0 183 0C146 0 116 30 116 67V77C83 77 33 17 26 11C22 9 19 7 16 7C8 7 4 18 4 28V34C7 57 24 83 37 102C50 120 59 139 71 157C89 187 108 216 125 246C131 255 155 284 155 300C155 303 154 306 152 308C151 309 149 310 147 310C139 310 126 302 120 300C109 296 95 293 81 293C72 293 63 295 55 297C45 299 36 304 27 310C12 322 0 340 0 361C0 398 30 428 67 428C104 428 134 398 134 361V351C167 351 217 411 224 417C230 421 233 421 235 421C244 421 247 416 247 408C247 382 213 327 206 316L104 155C101 150 95 141 92 132Z"/></g></symbol></svg>
@@ -598,7 +605,7 @@ footer .legal span{margin-left:auto}
         <p class="rv" style="--i:1">按乐谱打开时长自动记录，无需手动计时，数据仅<span style="white-space:nowrap">保存在本机。</span></p>
       </div>
       <div class="sim" data-sim="stats" aria-label="一个月的示例统计"></div>
-      <script src="components/stats.js?v=2dc48a6d" defer></script>
+      <script src="components/stats.js?v=8e5233ed" defer></script>
     </div>
 </section>
 
@@ -685,6 +692,52 @@ footer .legal span{margin-left:auto}
 
 <a class="totop" id="totop" href="#top" aria-label="回到顶部"><svg class="mk"><use href="/zh/#sn-mark"/></svg></a>
 
+<script>/* 中文按词换行：浏览器默认任意两个汉字之间都能断行，常把一个词拆到两行（「练习工 / 具」）。
+   这里用浏览器自带的中文分词，加上分词器认不出的产品和乐谱词，把一个词包进 <sn-w>（不断行），只在词和词之间换行；
+   每段文字外面再包一层 <sn-t>，弹性布局里仍算一块。演示里后写进去的字也照样处理。要加词就加进 KEEP */
+(()=>{
+  const L = document.documentElement.lang;
+  if(!/^zh/.test(L) || !window.Intl || !Intl.Segmenter) return;
+  const KEEP = new RegExp('AI 位置識別|AI 位置识别|AI 自动翻谱|AI 自動翻譜|作曲家文件夹|作曲家資料夾|練習時長統計|练习时长统计|小節號面板|小節號顯示|小节号显示|小节号面板|边弹边跟谱|邊彈邊跟譜|乐章跳转|乐谱识别|位置識別|位置识别|公版乐谱|公版樂譜|划词翻译|劃詞翻譯|图层分组|图层管理|圖層分組|圖層管理|在线曲库|套索工具|小節識別|小節跳轉|小节识别|小节跳转|录音合集|形状工具|形狀工具|手写标注|手势撤销|手勢復原|手寫標註|标注分层|标注导入|樂章跳轉|樂譜識別|標註分層|標註匯入|画笔工具|畫筆工具|線上曲庫|練習工具|練習時長|练习工具|练习时长|自动命名|自动归档|自动翻谱|自动识别|自動命名|自動歸檔|自動翻譜|自動識別|詞典搜尋|词典搜索|錄音合集|頁面跳轉|頁面預覽|页面跳转|页面预览|上一步|上一笔|上一筆|上一頁|上一页|下一个|下一個|下一頁|下一页|云同步|作品号|作品號|作曲家|剪貼簿|剪贴板|區域性|单线笔|参考音|參考音|双钢琴|單線筆|图书馆|圖書館|小節號|小节号|扫描件|掃描件|播放器|改編版|改编版|文件名|文件夹|未找到|校音器|歌唱性|生卒年|節拍器|編訂版|編訂者|编订版|编订者|自定义|自定義|节拍器|荧光笔|螢光筆|装饰音|裝飾音|該小節|調音器|该小节|資料夾|起始頁|起始页|近七日|鋼琴家|钢琴家|閱讀器|阅读器|雙鋼琴|雲同步|頁碼條|页码条|麥克風|麦克风|一鍵|一键|上台|上課|上课|下載|下载|中文|乐句|乐章|乐谱|书写|任一|任意|位置|作品|保留|停靠|儲存|免費|免费|內建|全曲|八度|公版|其他|内置|分享|分层|分層|分組|分组|分譜|分谱|切换|切換|划词|删除|刪除|剪下|剪切|副本|劃詞|力度|功能|包括|匯入|匯出|匹配|单个|双击|双指|发声|另含|合集|同一|命名|單個|图层|圆形|圓形|圖層|在线|复制|大調|大调|套索|字段|字母|存入|定位|定速|实时|實時|导入|导出|小調|小调|局部|工具|已有|常称|常稱|底部|开头|开谱|弱起|弹到|彈到|当前|录音|形状|形狀|復原|德語|德语|成条|成條|手写|手动|手動|手寫|手指|手稿|打开|折叠|拍号|拍號|拖动|拖動|持續|持续|指法|按天|按月|搜尋|搜索|摺疊|撤销|播放|支援|收录|收錄|改动|改動|改編|改编|数据|整頁|整页|整首|方框|方案|无需|日均|时期|时长|显示|時期|時長|曲名|曲库|曲庫|曲目|書寫|最后|最後|本机|本機|本頁|本页|术语|柔緩|柔缓|查找|查詢|标准|标出|标注|概覽|概览|樂句|樂章|樂譜|標出|標準|標註|檔名|檔案|欄位|正在|步态|步態|每种|每種|每組|每组|沟通|渐弱|渐强|溝通|滑鼠|演奏|漸弱|漸強|点按|点选|無需|版本|画笔|畫筆|當前|發聲|直線|直线|看譜|看谱|移动|移動|管理|箭头|箭頭|粗細|粗细|粘贴|系統|系统|統計|線上|編號|編訂|練習|繪製|练习|绘制|统计|编号|编订|翻譜|翻譯|翻译|翻谱|翻頁|翻页|老师|老師|自动|自動|英文|蜡笔|蠟筆|行板|術語|表情|複製|規整|规整|解鎖|解锁|訂閱|計時|記錄|詞典|詞條|該頁|語境|語言|調性|識別|譜上|譜旁|譜面|计时|订阅|记录|识别|词典|词条|该页|语境|语言|调性|谱上|谱旁|谱面|貼上|資料|跟譜|跟谱|跟踪|跟蹤|跳轉|跳转|輕巧|輕點|輸入|轻巧|轻点|输入|边缘|选择|逐頁|逐页|速度|選取|選擇|邊緣|释义|釋義|重音|錄音|鎖定|锁定|長按|长按|閃動|開啟|開譜|開頭|闪动|随拍|隐藏|隨拍|隱藏|雙指|雙擊|面板|音乐|音樂|音高|韵致|韻致|頁碼|頁面|頂欄|預覽|顏色|顯示|页码|页面|顶栏|预览|颜色|高亮|點按|點選|鼠标', 'g');
+  const seg = new Intl.Segmenter(L, {granularity:'word'}), HAN = /^\p{Script=Han}+$/u;
+  const PRE = /^[每一二两兩三四五几幾本这這那各某该該此第整全单單首]+$/u;   // 往后黏：每一小节、本页、第一
+  const BACK = '的了吗嗎呢吧着著过過们們地得后後里裡时時中内內旁';         // 往前黏：下载后、文件夹里
+  function units(s){
+    const t = [];
+    let p = 0;
+    const cut = (a, b) => { for(const x of seg.segment(s.slice(a, b))) t.push({a:a+x.index, b:a+x.index+x.segment.length, h:x.isWordLike && HAN.test(x.segment)}); };
+    for(const m of s.matchAll(KEEP)){ cut(p, m.index); t.push({a:m.index, b:m.index+m[0].length, h:true}); p = m.index + m[0].length; }
+    cut(p, s.length);
+    const T = x => s.slice(x.a, x.b), n = x => x.b - x.a;
+    for(let k = 0; k < t.length - 1; k++){ const x = t[k], y = t[k+1];
+      if(x.h && y.h && y.a === x.b && PRE.test(T(x)) && n(x) + n(y) <= 6){ x.b = y.b; t.splice(k+1, 1); k--; } }
+    for(let k = 1; k < t.length; k++){ const x = t[k], w = t[k-1];
+      if(x.h && w.h && w.b === x.a && n(x) === 1 && BACK.includes(T(x)) && n(w) < 7){ w.b = x.b; t.splice(k, 1); k--; } }
+    return t.filter(x => x.h && n(x) > 1);
+  }
+  function wrap(node){
+    const s = node.data, el = node.parentElement;
+    if(!el || !/\p{Script=Han}\p{Script=Han}/u.test(s) || el.closest('sn-w,sn-t,script,style,textarea,option,svg,[contenteditable]')) return;
+    const u = units(s);
+    if(!u.length) return;
+    const box = document.createElement('sn-t');
+    let p = 0;
+    for(const x of u){ if(x.a > p) box.append(s.slice(p, x.a)); const w = document.createElement('sn-w'); w.textContent = s.slice(x.a, x.b); box.append(w); p = x.b; }
+    if(p < s.length) box.append(s.slice(p));
+    node.replaceWith(box);
+  }
+  function walk(root){
+    if(root.nodeType === 3) return wrap(root);
+    if(root.nodeType !== 1) return;
+    const it = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), a = [];
+    while(it.nextNode()) a.push(it.currentNode);
+    a.forEach(wrap);
+  }
+  walk(document.body);
+  const mo = new MutationObserver(rs => { for(const r of rs){ if(r.type === 'characterData') wrap(r.target); else r.addedNodes.forEach(walk); } mo.takeRecords(); });
+  mo.observe(document.body, {childList:true, subtree:true, characterData:true});
+})();
+</script>
 <script>
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const FINE = matchMedia('(pointer:fine)').matches;
@@ -718,7 +771,7 @@ const simFiles = {};
 function simFactory(name){
   return simFiles[name] ??= new Promise(done=>{
     if(SNSims[name]) return done(SNSims[name]);
-    const s=document.createElement('script'); s.src=`components/${name}.js?v=2dc48a6d`; s.async=true;
+    const s=document.createElement('script'); s.src=`components/${name}.js?v=8e5233ed`; s.async=true;
     s.onload=()=>done(SNSims[name]||null); s.onerror=()=>{ s.remove(); done(null); };
     document.head.appendChild(s);
   });
@@ -930,6 +983,6 @@ requestAnimationFrame(frame);
 /* FAQ */
 $$('.qa button').forEach(b=>b.onclick=()=>{ const q=b.parentElement, was=q.classList.contains('open'); $$('.qa').forEach(x=>x.classList.remove('open')); if(!was) q.classList.add('open'); });
 </script>
-<script src="components/r13/onescore-r13.js?v=2dc48a6d"></script>
+<script src="components/r13/onescore-r13.js?v=8e5233ed"></script>
 </body>
 </html>
