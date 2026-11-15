@@ -82,6 +82,18 @@ body>*:not(.nav):not(.totop){transition:opacity var(--veil-ms,0ms) ease}
 .nav .store{height:44px;border-radius:999px;transition:opacity .35s var(--ease),transform .35s var(--ease),background .3s}
 .nav.dark .links,.nav.dark .logo{background:rgba(255,255,255,.08);color:#F2F2F4}
 .nav.dark .links .slider{background:rgba(255,255,255,.12)}
+/* 功能：五章收进一个下拉，样子照语言下拉；电脑上鼠标移上去或点一下就展开 */
+.feat{position:relative;z-index:1}
+.feat-btn{display:flex;align-items:center;gap:6px;padding:0 18px;line-height:32px;font-size:14px;font-weight:400;opacity:.85}
+.feat-btn svg{width:9px;height:6px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;opacity:.6;transition:transform .25s var(--ease)}
+.feat.open .feat-btn svg{transform:rotate(180deg)}
+.feats{display:none;position:absolute;top:46px;left:50%;transform:translateX(-50%);flex-direction:column;padding:8px;border-radius:18px;background:rgba(246,246,244,.96);box-shadow:0 12px 40px -12px rgba(41,45,56,.25);white-space:nowrap}
+.feats::before{content:"";position:absolute;left:0;right:0;top:-14px;height:14px}
+.feat.open .feats{display:flex}
+.links .feats a{padding:0 24px;line-height:44px;text-align:center}
+.feats a[aria-current]{color:var(--blue);opacity:1}
+.nav.dark .feats{background:rgba(28,30,36,.96);color:#F2F2F4}
+.nav.dark .feats a[aria-current]{color:#B0BBF0}
 .nav.dark .store{background:#fff;color:#0B0C0E}
 .menu-btn{display:none}
 /* 语言：电脑在菜单右边、App Store 左边，手机挨着 Menu；下拉照手机菜单的样子，挂在按钮正下方。导航条宽度跟内容走，长语言不挤折行 */
@@ -418,9 +430,9 @@ footer .legal span{margin-left:auto;white-space:nowrap}
   .big .w{opacity:1;filter:none}
 }
 </style>
-<link rel="stylesheet" href="components/r13/dot-r13.css?v=8e5233ed">
-<link rel="stylesheet" href="components/r13/onescore-r13.css?v=8e5233ed">
-<script src="components/r13/i18n-r13.js?v=8e5233ed"></script>
+<link rel="stylesheet" href="components/r13/dot-r13.css?v=397fe137">
+<link rel="stylesheet" href="components/r13/onescore-r13.css?v=397fe137">
+<script src="components/r13/i18n-r13.js?v=397fe137"></script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="sn-mark" viewBox="145 248 510 302"><g data-key="q8xqzuy8nm" transform="translate(400 399.3127136230469) rotate(-90) scale(1 -1)"><path  transform="scale(1.1682242990654206) translate(-125 -214)" d="M92 132C91 128 90 123 90 120C91 116 93 114 97 114C107 114 123 126 130 128C141 132 155 135 169 135C178 135 187 133 195 131C205 129 214 124 223 118C238 106 250 88 250 67C250 30 220 0 183 0C146 0 116 30 116 67V77C83 77 33 17 26 11C22 9 19 7 16 7C8 7 4 18 4 28V34C7 57 24 83 37 102C50 120 59 139 71 157C89 187 108 216 125 246C131 255 155 284 155 300C155 303 154 306 152 308C151 309 149 310 147 310C139 310 126 302 120 300C109 296 95 293 81 293C72 293 63 295 55 297C45 299 36 304 27 310C12 322 0 340 0 361C0 398 30 428 67 428C104 428 134 398 134 361V351C167 351 217 411 224 417C230 421 233 421 235 421C244 421 247 416 247 408C247 382 213 327 206 316L104 155C101 150 95 141 92 132Z"/></g></symbol></svg>
@@ -430,12 +442,14 @@ footer .legal span{margin-left:auto;white-space:nowrap}
   <a class="logo" href="#top" aria-label="StaffNotes"><svg class="mk"><use href="/de/#sn-mark"/></svg></a>
   <div class="links" id="links">
     <i class="slider"></i>
-    <a href="#organize" data-s="organize">Ordnen</a>
-    <a href="#read" data-s="read">Lesen</a>
-    <a href="#practice" data-s="practice">Üben</a>
-    <a href="#play" data-s="play">Spielen</a>
-    <a href="#stats" data-s="stats">Statistik</a>
-    <a href="#pricing" data-s="pricing">Preise</a>
+    <div class="feat" id="feat"><button class="feat-btn" type="button" aria-expanded="false" aria-controls="feats">Funktionen<svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg></button><div class="feats" id="feats">
+      <a href="#organize" data-s="organize">Ordnen</a>
+      <a href="#read" data-s="read">Lesen</a>
+      <a href="#practice" data-s="practice">Üben</a>
+      <a href="#play" data-s="play">Spielen</a>
+      <a href="#stats" data-s="stats">Statistik</a>
+    </div></div>
+    <a href="#pricing" data-s="pricing">Pläne</a>
     <a href="#faq" data-s="faq">FAQ</a>
   </div>
   <button class="menu-btn" type="button" aria-expanded="false" aria-controls="links">Menü</button>
@@ -605,7 +619,7 @@ footer .legal span{margin-left:auto;white-space:nowrap}
         <p class="rv" style="--i:1">Gezählt wird, solange eine Partitur geöffnet ist. Kein Timer, und die Daten bleiben auf Ihrem iPad.</p>
       </div>
       <div class="sim" data-sim="stats" aria-label="Beispielstatistik für einen Monat"></div>
-      <script src="components/stats.js?v=8e5233ed" defer></script>
+      <script src="components/stats.js?v=397fe137" defer></script>
     </div>
 </section>
 
@@ -622,7 +636,7 @@ footer .legal span{margin-left:auto;white-space:nowrap}
 <!-- PRICING -->
 <section class="pricing wrap" id="pricing" data-theme="light">
   <div class="head">
-    <div class="label rv"><span>Preise</span>Basic · Pro</div>
+    <div class="label rv"><span>Pläne</span>Basic · Pro</div>
     <h2 class="sec-title rv"><span class="ln">Basic und Pro</span> <span class="ln">im Monatsabo</span></h2>
   </div>
   <div class="plans">
@@ -683,7 +697,7 @@ footer .legal span{margin-left:auto;white-space:nowrap}
   <footer class="wrap">
     <div class="cols">
       <div class="brand" style="font-size:20px"><span class="bm"><svg class="mk"><use href="/de/#sn-mark"/></svg></span>StaffNotes</div>
-      <div><div class="n">Seiten</div><ul><li><a href="#features">Importieren</a></li><li><a href="#library">Online-Notenbibliothek</a></li><li><a href="#read">Lesen</a></li><li><a href="#practice">Üben</a></li><li><a href="#play">Spielen</a></li><li><a href="#stats">Statistik</a></li><li><a href="#pricing">Preise</a></li><li><a href="#faq">FAQ</a></li></ul></div>
+      <div><div class="n">Seiten</div><ul><li><a href="#features">Importieren</a></li><li><a href="#library">Online-Notenbibliothek</a></li><li><a href="#read">Lesen</a></li><li><a href="#practice">Üben</a></li><li><a href="#play">Spielen</a></li><li><a href="#stats">Statistik</a></li><li><a href="#pricing">Pläne</a></li><li><a href="#faq">FAQ</a></li></ul></div>
       <div><div class="n">Kontakt</div><ul><li><a href="#">Support</a></li><li><a href="#">Pressematerial</a></li></ul></div>
     </div>
     <div class="legal"><a href="#">Datenschutzerklärung</a><a href="#">Nutzungsbedingungen</a><span>© 2026 StaffNotes</span></div>
@@ -771,7 +785,7 @@ const simFiles = {};
 function simFactory(name){
   return simFiles[name] ??= new Promise(done=>{
     if(SNSims[name]) return done(SNSims[name]);
-    const s=document.createElement('script'); s.src=`components/${name}.js?v=8e5233ed`; s.async=true;
+    const s=document.createElement('script'); s.src=`components/${name}.js?v=397fe137`; s.async=true;
     s.onload=()=>done(SNSims[name]||null); s.onerror=()=>{ s.remove(); done(null); };
     document.head.appendChild(s);
   });
@@ -806,18 +820,32 @@ function playOnce(el){
 const scrollSims=freeSims.filter(el=>el.dataset.drive==='scroll');
 
 /* nav slider + section tracking */
+// 菜单三项：功能（下拉里是五章）、方案、常见问题；滚到五章里任何一章，亮的都是「功能」，下拉里那一章标蓝
 const nav=$('#nav'), links=$('#links'), slider=links.querySelector('.slider'), navA=$$('#links a');
-let current=null;
-function moveSlider(a){ if(!a){slider.style.opacity=0;return;} slider.style.opacity=1; slider.style.left=a.offsetLeft+'px'; slider.style.width=a.offsetWidth+'px'; }
-navA.forEach(a=>a.addEventListener('mouseenter',()=>moveSlider(a)));
+const feat=$('#feat'), featBtn=feat.querySelector('.feat-btn'), featA=$$('#feats a');
+const tops=[featBtn,...[...links.children].filter(el=>el.matches('a'))];
+const topOf=s=>!s?null:featA.some(a=>a.dataset.s===s)?featBtn:tops.find(a=>a.dataset.s===s)||null;
+let current=null, curS=null;
+function moveSlider(a){ if(!a){slider.style.opacity=0;return;} slider.style.opacity=1; slider.style.left=(a.getBoundingClientRect().left-links.getBoundingClientRect().left)+'px'; slider.style.width=a.offsetWidth+'px'; }
+tops.forEach(a=>a.addEventListener('mouseenter',()=>moveSlider(a)));
 links.addEventListener('mouseleave',()=>moveSlider(current));
 const osSec=document.querySelector('section.os');
-/* 手机：Menu 展开 7 项，点一项或点外面就收起 */
+/* 手机：Menu 展开三项，点一项或点外面就收起 */
 const menuBtn=$('.menu-btn');
-const menu=on=>{ if(on) nav.style.setProperty('--mx',(menuBtn.offsetLeft+menuBtn.offsetWidth/2)+'px'); nav.classList.toggle('open',on); menuBtn.setAttribute('aria-expanded',on); };
+const menu=on=>{ if(on) nav.style.setProperty('--mx',(menuBtn.offsetLeft+menuBtn.offsetWidth/2)+'px'); else featOpen(false); nav.classList.toggle('open',on); menuBtn.setAttribute('aria-expanded',on); };
 menuBtn.addEventListener('click',e=>{ e.stopPropagation(); langOpen(false); menu(!nav.classList.contains('open')); });
 navA.forEach(a=>a.addEventListener('click',()=>menu(false)));
 document.addEventListener('click',e=>{ if(nav.classList.contains('open') && !links.contains(e.target)) menu(false); });
+/* 功能下拉：点一下开合；电脑上鼠标移上去就开、移走就收，刚被鼠标打开时的那一下点击不把它关掉 */
+let featAt=0, featT;
+const featOpen=on=>{ feat.classList.toggle('open',on); featBtn.setAttribute('aria-expanded',on); };
+const hoverNav=()=>matchMedia('(hover:hover)').matches && getComputedStyle(menuBtn).display==='none';
+featBtn.addEventListener('click',e=>{ e.stopPropagation(); langOpen(false); featOpen(!feat.classList.contains('open') || performance.now()-featAt<500); });
+feat.addEventListener('mouseenter',()=>{ if(!hoverNav()) return; clearTimeout(featT); if(!feat.classList.contains('open')){ featAt=performance.now(); langOpen(false); featOpen(true); } });
+feat.addEventListener('mouseleave',()=>{ if(hoverNav()) featT=setTimeout(()=>featOpen(false),200); });
+featA.forEach(a=>a.addEventListener('click',()=>featOpen(false)));
+document.addEventListener('click',e=>{ if(feat.classList.contains('open') && !feat.contains(e.target)) featOpen(false); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape' && feat.classList.contains('open')){ featOpen(false); featBtn.focus(); } });
 /* 语言：下拉和 Menu 互斥；选了就记下来，下次打开根地址直接进这个语言，带着当前位置走 */
 const lang=$('#lang'), langBtn=lang.querySelector('.lang-btn'), LG=window.SN_LANG||'en';
 const langOpen=on=>{ lang.classList.toggle('open',on); langBtn.setAttribute('aria-expanded',on); };
@@ -901,8 +929,10 @@ function frame(){
   /* active section */
   // 一张谱钉住的时候由它说当前是 Organize、Read、Practice 还是 Play（components/r13/onescore-r13.js）
   const osNav=osSec?._os?.nav;
-  let cur=null; if(osNav!==undefined) cur=navA.find(a=>a.dataset.s===osNav)||null;
-  else sections.forEach((ss,i)=>ss.forEach(s=>{ const b=s.getBoundingClientRect(); if(b.top<vh*.4 && b.bottom>vh*.4) cur=navA[i]; }));
+  let s=null; if(osNav!==undefined) s=osNav||null;
+  else sections.forEach((ss,i)=>ss.forEach(x=>{ const b=x.getBoundingClientRect(); if(b.top<vh*.4 && b.bottom>vh*.4) s=navA[i].dataset.s; }));
+  if(s!==curS){ curS=s; featA.forEach(a=>a.toggleAttribute('aria-current',a.dataset.s===s)); }
+  const cur=topOf(s);
   if(cur!==current){ current=cur; if(!links.matches(':hover')) moveSlider(cur); }
 
   requestAnimationFrame(frame);
@@ -983,6 +1013,6 @@ requestAnimationFrame(frame);
 /* FAQ */
 $$('.qa button').forEach(b=>b.onclick=()=>{ const q=b.parentElement, was=q.classList.contains('open'); $$('.qa').forEach(x=>x.classList.remove('open')); if(!was) q.classList.add('open'); });
 </script>
-<script src="components/r13/onescore-r13.js?v=8e5233ed"></script>
+<script src="components/r13/onescore-r13.js?v=397fe137"></script>
 </body>
 </html>

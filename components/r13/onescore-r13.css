@@ -58,11 +58,16 @@
 @media (max-width:900px){
   #stats{padding:110px 0 80px}
   #stats .st-top{margin-bottom:36px}
-  /* Menu 展开：7 项竖排，挂在菜单条下面 */
+  /* Menu 展开：功能、方案、常见问题竖排，挂在菜单条下面；点「功能」在原地展开五章 */
   .nav.open .links{display:flex;position:absolute;top:52px;left:var(--mx,50%);transform:translateX(-50%);flex-direction:column;align-items:stretch;height:auto;padding:8px;border-radius:18px;background:rgba(246,246,244,.96);box-shadow:0 12px 40px -12px rgba(41,45,56,.25)}
   .nav.open.dark .links{background:rgba(28,30,36,.96)}
   .nav.open .links a{line-height:44px;padding:0 28px;text-align:center}
   .nav.open .links .slider{display:none}
+  .nav.open .feat-btn{width:100%;justify-content:center;line-height:44px;padding:0 28px}
+  .nav.open .feats{position:static;transform:none;box-shadow:none;background:rgba(120,120,120,.08);border-radius:12px;padding:4px 0;margin:2px 0 4px}
+  .nav.open .feats::before{display:none}
+  .nav.open.dark .feats{background:rgba(255,255,255,.06)}
+  .nav.open .links .feats a{line-height:40px}
 }
 /* 手机：整段钉住，上面是阅读器和进度条，下面是文案，一次滑动走一站，文案原地换 */
 @media (max-width:900px){
