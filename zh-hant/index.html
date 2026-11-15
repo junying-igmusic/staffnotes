@@ -5,7 +5,7 @@
 <base href="../">
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>StaffNotes · 彈到哪，譜就跟到哪</title>
+<title>StaffNotes · 不只是 PDF 閱讀器</title>
 <link rel="alternate" hreflang="en" href="https://staffnotes.igmusictech.com/">
 <link rel="alternate" hreflang="zh-Hans" href="https://staffnotes.igmusictech.com/zh/">
 <link rel="alternate" hreflang="zh-Hant" href="https://staffnotes.igmusictech.com/zh-hant/">
@@ -26,7 +26,8 @@
 :root:lang(zh-Hans){--serif:"Timeless Serif",Georgia,"PingFang SC","Noto Sans SC",sans-serif;--sans:"Timeless Sans",-apple-system,system-ui,"PingFang SC","Noto Sans SC",sans-serif}
 :root:lang(zh-Hant){--serif:"Timeless Serif",Georgia,"PingFang TC","Noto Sans TC",sans-serif;--sans:"Timeless Sans",-apple-system,system-ui,"PingFang TC","Noto Sans TC",sans-serif}
 :root:lang(zh) body{letter-spacing:0}
-:root:lang(zh) p,:root:lang(zh) li,:root:lang(zh) h3,:root:lang(zh) .label{text-wrap:pretty}
+/* 段落末行不留单个词或孤字（各语言都开） */
+p,li,.label,:root:lang(zh) h3{text-wrap:pretty}
 :root:lang(de) h1,:root:lang(de) h2,:root:lang(de) h3,:root:lang(de) p,:root:lang(de) li{-webkit-hyphens:auto;hyphens:auto}
 *{box-sizing:border-box;margin:0;padding:0}
 html{background:var(--paper)}
@@ -406,9 +407,9 @@ footer .legal span{margin-left:auto}
   .big .w{opacity:1;filter:none}
 }
 </style>
-<link rel="stylesheet" href="components/r13/dot-r13.css?v=c2310438">
-<link rel="stylesheet" href="components/r13/onescore-r13.css?v=c2310438">
-<script src="components/r13/i18n-r13.js?v=c2310438"></script>
+<link rel="stylesheet" href="components/r13/dot-r13.css?v=b03b9811">
+<link rel="stylesheet" href="components/r13/onescore-r13.css?v=b03b9811">
+<script src="components/r13/i18n-r13.js?v=b03b9811"></script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="sn-mark" viewBox="145 248 510 302"><g data-key="q8xqzuy8nm" transform="translate(400 399.3127136230469) rotate(-90) scale(1 -1)"><path  transform="scale(1.1682242990654206) translate(-125 -214)" d="M92 132C91 128 90 123 90 120C91 116 93 114 97 114C107 114 123 126 130 128C141 132 155 135 169 135C178 135 187 133 195 131C205 129 214 124 223 118C238 106 250 88 250 67C250 30 220 0 183 0C146 0 116 30 116 67V77C83 77 33 17 26 11C22 9 19 7 16 7C8 7 4 18 4 28V34C7 57 24 83 37 102C50 120 59 139 71 157C89 187 108 216 125 246C131 255 155 284 155 300C155 303 154 306 152 308C151 309 149 310 147 310C139 310 126 302 120 300C109 296 95 293 81 293C72 293 63 295 55 297C45 299 36 304 27 310C12 322 0 340 0 361C0 398 30 428 67 428C104 428 134 398 134 361V351C167 351 217 411 224 417C230 421 233 421 235 421C244 421 247 416 247 408C247 382 213 327 206 316L104 155C101 150 95 141 92 132Z"/></g></symbol></svg>
@@ -427,7 +428,7 @@ footer .legal span{margin-left:auto}
     <a href="#faq" data-s="faq">常見問題</a>
   </div>
   <button class="menu-btn" type="button" aria-expanded="false" aria-controls="links">選單</button>
-  <div class="lang" id="lang"><button class="lang-btn" type="button" aria-expanded="false" aria-controls="langs" aria-label="語言：繁體中文">繁</button><div class="langs" id="langs"><a href="/" hreflang="en" lang="en" data-l="en">English</a><a href="/zh/" hreflang="zh-Hans" lang="zh-Hans" data-l="zh">简体中文</a><a href="/zh-hant/" hreflang="zh-Hant" lang="zh-Hant" data-l="zh-hant">繁體中文</a><a href="/de/" hreflang="de" lang="de" data-l="de">Deutsch</a></div></div>
+  <div class="lang" id="lang"><button class="lang-btn" type="button" aria-expanded="false" aria-controls="langs" aria-label="語言：繁體中文">繁中</button><div class="langs" id="langs"><a href="/" hreflang="en" lang="en" data-l="en">English</a><a href="/zh/" hreflang="zh-Hans" lang="zh-Hans" data-l="zh">简体中文</a><a href="/zh-hant/" hreflang="zh-Hant" lang="zh-Hant" data-l="zh-hant">繁體中文</a><a href="/de/" hreflang="de" lang="de" data-l="de">Deutsch</a></div></div>
   <a class="store" aria-disabled="true"><svg viewBox="0 0 24 24"><path d="M16.37 12.6c-.02-2.28 1.86-3.38 1.95-3.43-1.06-1.55-2.71-1.77-3.3-1.79-1.4-.14-2.74.83-3.45.83-.71 0-1.81-.81-2.97-.79-1.53.02-2.94.89-3.73 2.26-1.59 2.76-.41 6.84 1.14 9.08.76 1.1 1.66 2.33 2.84 2.28 1.14-.05 1.57-.74 2.95-.74 1.38 0 1.77.74 2.97.71 1.23-.02 2-1.11 2.75-2.21.87-1.27 1.22-2.5 1.24-2.57-.03-.01-2.38-.91-2.39-3.63zM14.1 5.9c.63-.76 1.05-1.82.94-2.87-.9.04-2 .6-2.65 1.36-.58.67-1.09 1.75-.95 2.78 1 .08 2.03-.51 2.66-1.27z"/></svg><span><b>即將上線</b></span></a>
 </nav>
 
@@ -436,8 +437,8 @@ footer .legal span{margin-left:auto}
   <div class="img" id="heroImg"></div>
   <div class="copy" id="heroCopy">
     <div class="brand rv" style="--i:1"><span class="bm"><svg class="mk"><use href="/zh-hant/#sn-mark"/></svg></span>StaffNotes</div>
-    <h1 id="heroTitle"><span class="ln">彈到哪，</span><span class="ln">譜就跟到哪。</span></h1>
-    <p class="sub rv" style="--i:8">匯入任意 PDF，分圖層標註。<br>彈起來，譜子自己翻頁。</p>
+    <h1 id="heroTitle"><span class="ln">不只是</span><span class="ln">PDF 閱讀器</span></h1>
+    <p class="sub rv" style="--i:8">自動識別曲名、作曲家、樂章和小節。<br>匯入、歸檔、閱讀、標註、練習，<span style="white-space:nowrap">一個 App 完成。</span></p>
   </div>
 </header>
 
@@ -445,8 +446,8 @@ footer .legal span{margin-left:auto}
 <section class="statement wrap grid2" id="overview" data-theme="light">
   <div class="label rv"><span>概覽</span>整理 · 閱讀 · 練習 · 演奏</div>
   <div>
-    <p class="big" id="words">StaffNotes <span class="hl">讀懂的是音樂，不只是 PDF。</span>它認得這首曲子、每個樂章和每一小節，所以能替你歸檔樂譜、跳到任意小節，在你彈的<span style="white-space:nowrap">時候翻頁。</span></p>
-    <a class="cap rv" href="#features"><i>→</i>看看怎麼用</a>
+    <p class="big" id="words">StaffNotes <span class="hl">識別譜上的內容：</span>曲目、樂章和每一小節。匯入時自動歸檔，閱讀時可直接跳到任意樂章或<span style="white-space:nowrap">小節。</span></p>
+    <a class="cap rv" href="#features"><i>→</i>檢視功能</a>
   </div>
 </section>
 
@@ -459,98 +460,98 @@ footer .legal span{margin-left:auto}
         <div class="os-sbox"><div class="fx-sim" data-sim="r13/story-r13" data-drive="scroll"></div></div>
         <div class="fx-prog"><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button></div>
         <div class="os-rbox"><div class="sim" data-sim="r13/reader-r13" data-drive="scroll"></div></div>
-        <div class="os-rprog"><div data-ch="pen"><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="lay"><button><i></i></button><button><i></i></button></div><div data-ch="dict"><button><i></i></button><button><i></i></button></div><div data-ch="prac"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="am"><button><i></i></button><button><i></i></button></div><div data-ch="turn"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="bar"><button><i></i></button><button><i></i></button></div><div data-ch="fol"><button><i></i></button><button><i></i></button><button><i></i></button></div></div>
+        <div class="os-rprog"><div data-ch="pen"><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="lay"><button><i></i></button><button><i></i></button></div><div data-ch="dict"><button><i></i></button><button><i></i></button></div><div data-ch="prac"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="am"><button><i></i></button><button><i></i></button></div><div data-ch="turn"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="bar"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="fol"><button><i></i></button><button><i></i></button></div></div>
       </div>
       <div class="os-copy">
       <div class="fx-copy">
-        <div class="label"><span>匯入</span>任意 PDF · 單份或批次 · 不用打字 <b class="basic-tag">Basic</b></div>
-        <h2 class="sec-title"><span class="ln">放進一份 PDF，</span><span class="ln">它就認得這首曲子。</span></h2>
+        <div class="label"><span>PDF 匯入</span>單份或批次 · 自動識別 · 無需手動輸入 <b class="basic-tag">Basic</b></div>
+        <h2 class="sec-title"><span class="ln">PDF 樂譜</span><span class="ln">自動識別</span></h2>
         <div class="fx-run">
         <div class="fx-nodes"><i></i><i></i><i></i><i></i></div>
         <div class="fx-beats">
-          <div class="fx-beat on"><h3>匯入任意 PDF</h3><p>掃描件、下載的檔案，哪怕叫 <span style="white-space:nowrap">Scan 2026-11-03</span> 也行。一份或整個資料夾都能匯入。</p></div>
-          <div class="fx-beat"><h3>自動識別</h3><p>曲名、作曲家、作品編號，還有每個樂章從<span style="white-space:nowrap">哪一頁開始。</span></p></div>
-          <div class="fx-beat"><h3>存進圖書館</h3><p>按作曲家和時期歸好檔，名字也起好了。</p></div>
-          <div class="fx-beat"><h3>按作曲家找到</h3><p>點開莫札特，K. 545 就在裡面。不用自己<span style="white-space:nowrap">建資料夾。</span></p></div>
+          <div class="fx-beat on"><h3>PDF 匯入</h3><p>掃描件、下載檔案均可，檔名不限，如 <span style="white-space:nowrap">Scan 2026-11-03</span>。支援單份匯入和資料夾<span style="white-space:nowrap">批次匯入。</span></p></div>
+          <div class="fx-beat"><h3>樂譜識別</h3><p>自動識別曲名、作曲家、作品號和各樂章的<span style="white-space:nowrap">起始頁。</span></p></div>
+          <div class="fx-beat"><h3>自動歸檔</h3><p>按作曲家和時期存入圖書館，並自動命名。</p></div>
+          <div class="fx-beat"><h3>作曲家資料夾</h3><p>圖書館自動按作曲家建資料夾，K.&nbsp;545 直接歸入莫札特，無需<span style="white-space:nowrap">手動整理。</span></p></div>
         </div>
       </div>
       </div>
         <div class="os-chcopy sk-g on" data-ch="pen" data-side="L" data-beats="5">
           <div class="label"><span>標註</span>3 種筆 · 6 種顏色 · 每種 5 檔粗細 <b class="basic-tag">Basic</b></div>
-          <h2 class="sec-title">像在紙上一樣標註。</h2>
-          <p>App 裡的筆、顏色和粗細，用滑鼠或手指在這頁上試試。</p>
+          <h2 class="sec-title">手寫標註</h2>
+          <p>與 App 相同的畫筆、顏色和粗細，可用滑鼠或手指在<span style="white-space:nowrap">本頁試用。</span></p>
           <ul>
-            <li tabindex="0" role="button">筆<span>單線筆、蠟筆和螢光筆。</span></li>
-            <li tabindex="0" role="button">僅使用 Apple Pencil<span>手指翻頁，只有 Pencil 能寫。</span></li>
-            <li tabindex="0" role="button">套索<span>圈住標記，剪下、複製或移動。雙指輕點貼上。</span></li>
-            <li tabindex="0" role="button">形狀<span>直線、箭頭、圓和方框，畫出來就是規整的。</span></li>
-            <li tabindex="0" role="button">復原<span>雙指輕點兩下，撤掉上一筆。</span></li>
+            <li tabindex="0" role="button">畫筆工具<span>單線筆、蠟筆、螢光筆。</span></li>
+            <li tabindex="0" role="button">Apple Pencil<span>手指負責翻頁，Pencil 負責書寫。</span></li>
+            <li tabindex="0" role="button">套索工具<span>圈選標記後剪下、複製或移動，雙指輕點貼上。</span></li>
+            <li tabindex="0" role="button">形狀工具<span>直線、箭頭、圓形和方框自動規整。</span></li>
+            <li tabindex="0" role="button">手勢復原<span>雙指雙擊，復原上一筆。</span></li>
           </ul>
         </div>
         <div class="os-chcopy sk-g on" data-ch="lay" data-side="R" data-beats="2">
-          <div class="label"><span>圖層</span>分組 · 每組 6 種顏色 · 每種顏色一層 <b class="basic-tag">Basic</b></div>
-          <h2 class="sec-title">所有版本，留在同一份譜上。</h2>
-          <p>任意一種顏色都能隱藏、鎖定或刪除。分組把老師的標記、指法和上台用的譜分開。</p>
+          <div class="label"><span>圖層</span>3 個分組 · 每組 6 種顏色 · 每種顏色一個圖層 <b class="basic-tag">Basic</b></div>
+          <h2 class="sec-title">標註分層管理</h2>
+          <p>每種顏色一個圖層，上課、指法和上台的標註分組儲存。</p>
           <ul>
-            <li tabindex="0" role="button">隱藏 · 鎖定 · 刪除<span>每種顏色都有自己的眼睛、鎖和垃圾桶。</span></li>
-            <li tabindex="0" role="button">分組<span>上課、指法、上台，點一下整頁就換。</span></li>
+            <li tabindex="0" role="button">圖層管理<span>每個圖層可單獨隱藏、鎖定、刪除。</span></li>
+            <li tabindex="0" role="button">圖層分組<span>上課、指法、上台三組，一鍵切換整頁。</span></li>
           </ul>
         </div>
         <div class="os-chcopy sk-g on" data-ch="dict" data-side="L" data-beats="2">
           <div class="label"><span>音樂詞典</span>5,000 個術語 · 速度、力度、表情 <b class="pro-tag">Pro</b></div>
-          <h2 class="sec-title">譜上每個記號，都有解釋。</h2>
-          <p>在譜上長按一個詞，詞條就在頁面旁邊開啟。</p>
+          <h2 class="sec-title">內建音樂術語詞典</h2>
+          <p>長按譜上的術語，釋義在頁面旁顯示。</p>
           <ul>
-            <li tabindex="0" role="button">長按<span>按住 Allegro，詞條就在譜子旁邊開啟。</span></li>
-            <li tabindex="0" role="button">搜尋<span>譜上沒有？打幾個字母，選中術語。</span></li>
+            <li tabindex="0" role="button">劃詞翻譯<span>長按 Allegro，詞條在譜旁開啟。</span></li>
+            <li tabindex="0" role="button">詞典搜尋<span>譜上沒有的術語，輸入幾個字母即可查詢。</span></li>
           </ul>
         </div>
         <div class="os-chcopy sk-g on" data-ch="prac" data-side="R" data-beats="3">
           <div class="label"><span>練習工具</span>節拍器 · 調音器 · 參考音 <b class="basic-tag">Basic</b></div>
-          <h2 class="sec-title">練習工具，就在譜上。</h2>
-          <p>它們直接在譜頁上方開啟，用的時候不用離開樂譜。</p>
+          <h2 class="sec-title">譜面上的練習工具</h2>
+          <p>無需切換頁面，樂譜始終可見。</p>
           <ul>
-            <li tabindex="0" role="button">節拍器<span>點按定速，任意拍號。頁面邊緣隨拍閃動。</span></li>
-            <li tabindex="0" role="button">調音器<span>A4 可設為 440、442，或你所在音樂廳的音高。</span></li>
-            <li tabindex="0" role="button">參考音<span>任意音、任意八度，調音時一直響著。</span></li>
+            <li tabindex="0" role="button">節拍器<span>點按定速，支援任意拍號，頁面邊緣隨拍閃動。</span></li>
+            <li tabindex="0" role="button">調音器<span>A4 可設為 440、442 或自定義音高。</span></li>
+            <li tabindex="0" role="button">參考音<span>任意音、任意八度，可持續發聲。</span></li>
           </ul>
         </div>
         <div class="os-chcopy sk-g on" data-ch="am" data-side="L" data-beats="2">
-          <div class="label"><span>Apple Music</span>就是這首作品的錄音 · 多位鋼琴家 <b class="basic-tag">Basic</b></div>
-          <h2 class="sec-title">聽你正在看的這首曲子。</h2>
-          <p>選一個錄音，它就在譜子上方的面板裡播放。</p>
+          <div class="label"><span>Apple Music</span>同一作品的錄音 · 多位鋼琴家 <b class="basic-tag">Basic</b></div>
+          <h2 class="sec-title">看譜時直接聽錄音</h2>
+          <p>匹配當前作品的 Apple Music 錄音，在譜面上的面板中播放。</p>
           <ul>
-            <li tabindex="0" role="button">錄音<span>同一首作品，多位鋼琴家的版本，選一個就播。</span></li>
-            <li tabindex="0" role="button">面板或膠囊<span>拖到任意一邊、折成一條，或收進頂欄。</span></li>
+            <li tabindex="0" role="button">錄音合集<span>同一作品多位鋼琴家的版本，點選即播放。</span></li>
+            <li tabindex="0" role="button">多種面板<span>可停靠任意一側、摺疊成條，或收進頂欄。</span></li>
           </ul>
         </div>
         <div class="os-chcopy sk-g on" data-ch="turn" data-side="R" data-beats="3">
-          <div class="label"><span>翻頁</span>頁面預覽 · 跳轉頁面 · 下一首 <b class="basic-tag">Basic</b></div>
-          <h2 class="sec-title">不用一頁頁翻，直達任意一頁。</h2>
-          <p>一份 PDF 裝著整首奏鳴曲，底部的頁碼條帶你去任何位置。</p>
+          <div class="label"><span>翻頁與跳轉</span>頁面預覽 · 頁面跳轉 · 樂章跳轉 <b class="basic-tag">Basic</b></div>
+          <h2 class="sec-title">頁面與樂章快速跳轉</h2>
+          <p>整首作品在同一個 PDF 中，用底部頁碼條定位任意頁。</p>
           <ul>
-            <li tabindex="0" role="button">拖動預覽<span>沿著頁碼拖動，逐頁預覽。</span></li>
-            <li tabindex="0" role="button">跳轉頁面<span>點頁碼，輸入 2，就到了。</span></li>
-            <li tabindex="0" role="button">下一首<span>點一下到 Andante，第一行亮起來。</span></li>
+            <li tabindex="0" role="button">頁面預覽<span>沿頁碼條拖動，逐頁預覽。</span></li>
+            <li tabindex="0" role="button">頁面跳轉<span>點按頁碼，輸入 2，跳到第 2 頁。</span></li>
+            <li tabindex="0" role="button">樂章跳轉<span>一鍵跳到 Andante，首行高亮。</span></li>
           </ul>
         </div>
-        <div class="os-chcopy sk-g on" data-ch="bar" data-side="L" data-beats="2">
-          <div class="label"><span>小節號</span>頁碼和小節，並排顯示 <b class="pro-tag">Pro</b></div>
-          <h2 class="sec-title">直接跳到第 24 小節。</h2>
-          <p>StaffNotes 給每一小節編號，你和老師數的是同一套。</p>
+        <div class="os-chcopy sk-g on" data-ch="bar" data-side="L" data-beats="3">
+          <div class="label"><span>小節號</span>全曲自動編號 · 頁碼與小節並排顯示 <b class="pro-tag">Pro</b></div>
+          <h2 class="sec-title">按小節號跳轉</h2>
+          <p>每一小節自動編號，上課時與老師按同一套小節號溝通。</p>
           <ul>
-            <li tabindex="0" role="button">顯示小節號<span>計數器同時顯示頁碼和小節，全曲共 73 小節。</span></li>
-            <li tabindex="0" role="button">跳到小節<span>點「小節」，輸入 24，那一小節就亮起來。</span></li>
+            <li tabindex="0" role="button">小節號面板<span>同時顯示頁碼和小節號，全曲共 73 小節。</span></li>
+            <li tabindex="0" role="button">小節跳轉<span>點按「小節」，輸入 24，該小節高亮。</span></li>
+            <li tabindex="0" role="button">小節號顯示<span>識別每一小節，在小節開頭標註編號。</span></li>
           </ul>
         </div>
-        <div class="os-chcopy sk-g on" data-ch="fol" data-side="R" data-beats="3">
-          <div class="label"><span>邊彈邊跟譜</span>自動翻譜 <b class="pro-tag">Pro</b></div>
-          <h2 class="sec-title">彈到頁尾，譜自己翻。</h2>
-          <p>StaffNotes 邊聽你彈，邊記著你彈到哪一小節，到最後一小節就翻頁。</p>
+        <div class="os-chcopy sk-g on" data-ch="fol" data-side="R" data-beats="2">
+          <div class="label"><span>邊彈邊跟譜</span>AI 位置識別 · 自動翻譜 <b class="pro-tag">Pro</b></div>
+          <h2 class="sec-title">AI 自動翻譜</h2>
+          <p>透過麥克風識別演奏位置，彈到本頁最後一小節時自動翻頁。</p>
           <ul>
-            <li tabindex="0" role="button">逐小節顯示<span>每一小節都會被找到，並在開頭標上編號。</span></li>
-            <li tabindex="0" role="button">跟譜中<span>一個淡淡的框，停在你正在彈的那一小節上。</span></li>
-            <li tabindex="0" role="button">自動翻譜<span>彈到最後一小節，下一頁就滑進來。</span></li>
+            <li tabindex="0" role="button">AI 位置識別<span>實時標出正在演奏的小節。</span></li>
+            <li tabindex="0" role="button">AI 自動翻譜<span>彈到最後一小節，自動翻到下一頁。</span></li>
           </ul>
         </div>
       </div>
@@ -563,8 +564,8 @@ footer .legal span{margin-left:auto}
   <div class="cols">
     <div>
       <div class="label rv" style="margin-bottom:26px"><span>線上曲庫</span>公版樂譜 · 按版本分組 <b class="basic-tag">Basic</b></div>
-      <h2 class="sec-title rv"><span class="ln">免費樂譜，</span><span class="ln">分好類、起好名。</span></h2>
-      <p class="rv" style="--i:1">按作品、作曲家或作品編號搜尋。Urtext、手稿、編訂版和改編版分組排好，選中的樂譜存進圖書館時<span style="white-space:nowrap">已經起好名字。</span></p>
+      <h2 class="sec-title rv"><span class="ln">公版樂譜</span><span class="ln">免費下載</span></h2>
+      <p class="rv" style="--i:1">按作品、作曲家或作品號搜尋，Urtext、手稿、編訂版和改編版分組顯示，下載後自動命名並存入<span style="white-space:nowrap">圖書館。</span></p>
     </div>
     <div class="ed rv" style="--i:2">
       <div class="ttl">版本與分譜</div>
@@ -589,11 +590,11 @@ footer .legal span{margin-left:auto}
   <div class="st wrap">
       <div class="st-top">
         <div class="label rv" style="margin-bottom:26px"><span>練習統計</span>按天 · 按曲目 · 按作曲家 <b class="basic-tag">Basic</b></div>
-        <h2 class="sec-title rv"><span class="ln">這個月練了什麼，</span><span class="ln">一眼看清。</span></h2>
-        <p class="rv" style="--i:1">StaffNotes 記下每份樂譜開啟了多久。不用手動開始或記錄，資料只留在你的 iPad 上。</p>
+        <h2 class="sec-title rv"><span class="ln">練習時長</span><span class="ln">自動統計</span></h2>
+        <p class="rv" style="--i:1">按樂譜開啟時長自動記錄，無需手動計時，資料僅<span style="white-space:nowrap">儲存在本機。</span></p>
       </div>
       <div class="sim" data-sim="stats" aria-label="一個月的示例統計"></div>
-      <script src="components/stats.js?v=c2310438" defer></script>
+      <script src="components/stats.js?v=b03b9811" defer></script>
     </div>
 </section>
 
@@ -602,7 +603,7 @@ footer .legal span{margin-left:auto}
   <div class="bg" id="bandBg"></div>
   <div class="wrap">
     <div><h2 class="rv">StaffNotes Pro</h2>
-    <p class="rv" style="--i:1">自動翻譜、小節號和音樂詞典，另有云同步、MusicXML 匯入和 forScore 批註匯入。</p>
+    <p class="rv" style="--i:1">小節號、音樂詞典和 AI 自動翻譜，以及雲同步、MusicXML 匯入和標註匯入。</p>
     <a class="cap rv" style="--i:2" href="#pricing"><i>↓</i>比較方案</a></div>
   </div>
 </section>
@@ -611,20 +612,20 @@ footer .legal span{margin-left:auto}
 <section class="pricing wrap" id="pricing" data-theme="light">
   <div class="head">
     <div class="label rv"><span>價格</span>Basic · Pro</div>
-    <h2 class="sec-title rv"><span class="ln">Basic 免費。</span><span class="ln">自動翻譜，升級 Pro。</span></h2>
+    <h2 class="sec-title rv"><span class="ln">Basic 免費使用</span><span class="ln">Pro 解鎖全部功能</span></h2>
   </div>
   <div class="plans">
     <div class="plan rv">
       <div class="top"><h3>Basic</h3><span class="pill basic">Basic</span></div>
       <div class="price">在 App Store 免費下載</div>
       <ul>
-        <li>PDF 匯入，自動識別</li>
+        <li>PDF 匯入與自動識別</li>
         <li>批次匯入</li>
         <li>線上曲庫</li>
-        <li>圖書館按作曲家、時期和合集整理</li>
+        <li>圖書館按作曲家、時期和合集分類</li>
         <li>緊湊顯示和雙頁顯示</li>
-        <li>跳轉頁面和樂章跳轉</li>
-        <li>單線筆、蠟筆、螢光筆、套索、形狀</li>
+        <li>頁面跳轉與樂章跳轉</li>
+        <li><span>單線筆、蠟筆、<span style="white-space:nowrap">螢光筆、</span><span style="white-space:nowrap">套索、形狀</span></span></li>
         <li>圖層與分組</li>
         <li>節拍器、調音器和參考音</li>
         <li>Apple Music 面板</li>
@@ -636,12 +637,12 @@ footer .legal span{margin-left:auto}
       <div class="price">價格以 App Store 顯示為準</div>
       <ul>
         <li>Basic 的全部功能</li>
-        <li class="plus">自動翻譜</li>
+        <li class="plus">AI 自動翻譜</li>
         <li class="plus">小節號</li>
         <li class="plus">音樂詞典</li>
         <li class="plus">雲同步</li>
         <li class="plus">MusicXML 匯入</li>
-        <li class="plus">forScore 批註匯入</li>
+        <li class="plus">標註匯入</li>
       </ul>
     </div>
   </div>
@@ -653,12 +654,12 @@ footer .legal span{margin-left:auto}
   <div class="grid2">
     <div class="label rv"><span>常見問題</span>下載之前</div>
     <div id="qas">
-      <div class="qa open"><button>需要 Apple Pencil 嗎？<i>+</i></button><div class="a"><div><p>不需要。看譜、翻頁和所有練習工具，用手指就行。要在譜上寫字，Pencil 最接近紙筆的手感。</p></div></div></div>
-      <div class="qa"><button>樂譜從哪來？<i>+</i></button><div class="a"><div><p>你自己的 PDF，來自「檔案」或任何能分享 PDF 的 App；也可以直接從內建的線上曲庫下載公版樂譜。</p></div></div></div>
-      <div class="qa"><button>標註會改動 PDF 嗎？<i>+</i></button><div class="a"><div><p>不會。標註都在頁面上方的圖層裡。需要時可以匯出一份帶標註的副本，自己選帶哪些圖層。</p></div></div></div>
-      <div class="qa"><button>Basic 和 Pro 各有什麼？<i>+</i></button><div class="a"><div><p>匯入、看譜、標註、圖書館和全部練習工具都在 Basic 裡，免費。自動翻譜、小節號、音樂詞典、雲同步、MusicXML 和 forScore 匯入屬於 Pro。</p></div></div></div>
-      <div class="qa"><button>能把 forScore 的標註帶過來嗎？<i>+</i></button><div class="a"><div><p>可以。Pro 能匯入 forScore 的 .4sc 和 .4sb 檔案，連同上面的標註。</p></div></div></div>
-      <div class="qa"><button>支援哪些語言？<i>+</i></button><div class="a"><div><p>English、Deutsch 和中文。目錄裡有譯名的曲目，曲名會跟著你的語言顯示。</p></div></div></div>
+      <div class="qa open"><button>需要 Apple Pencil 嗎？<i>+</i></button><div class="a"><div><p>不需要。看譜、翻頁和練習工具都可以用手指操作；在譜上書寫推薦使用 Apple Pencil。</p></div></div></div>
+      <div class="qa"><button>樂譜從哪裡匯入？<i>+</i></button><div class="a"><div><p>可從「檔案」 App 或任何能分享 PDF 的 App 匯入，也可以從內建線上曲庫下載<span style="white-space:nowrap">公版樂譜。</span></p></div></div></div>
+      <div class="qa"><button>標註會改動 PDF 嗎？<i>+</i></button><div class="a"><div><p>不會。標註儲存在頁面上方的圖層中，原 PDF 不變。需要時可匯出帶標註的副本，並選擇包含哪些圖層。</p></div></div></div>
+      <div class="qa"><button>Basic 和 Pro 有什麼區別？<i>+</i></button><div class="a"><div><p>匯入、閱讀、標註、圖書館和全部練習工具屬於 Basic，免費使用。AI 自動翻譜、小節號、音樂詞典、雲同步、MusicXML 匯入和標註匯入屬於 Pro。</p></div></div></div>
+      <div class="qa"><button>可以匯入已有的標註嗎？<i>+</i></button><div class="a"><div><p>可以。Pro 匯入 PDF 時保留裡面的標註，包括在其他 App 裡寫的標註。</p></div></div></div>
+      <div class="qa"><button>支援哪些語言？<i>+</i></button><div class="a"><div><p>支援英語、德語和中文。目錄中有譯名的曲目，曲名按系統語言顯示。</p></div></div></div>
     </div>
   </div>
 </section>
@@ -666,8 +667,8 @@ footer .legal span{margin-left:auto}
 <!-- END -->
 <section class="night" data-theme="dark">
   <div class="end wrap">
-    <h2 class="rv">接著彈吧。</h2>
-    <p class="rv" style="--i:1">StaffNotes，iPad 版。</p>
+    <h2 class="rv">從匯入到練習</h2>
+    <p class="rv" style="--i:1">StaffNotes iPad 版</p>
     <a class="store light rv" style="--i:2" aria-disabled="true"><svg viewBox="0 0 24 24"><path d="M16.37 12.6c-.02-2.28 1.86-3.38 1.95-3.43-1.06-1.55-2.71-1.77-3.3-1.79-1.4-.14-2.74.83-3.45.83-.71 0-1.81-.81-2.97-.79-1.53.02-2.94.89-3.73 2.26-1.59 2.76-.41 6.84 1.14 9.08.76 1.1 1.66 2.33 2.84 2.28 1.14-.05 1.57-.74 2.95-.74 1.38 0 1.77.74 2.97.71 1.23-.02 2-1.11 2.75-2.21.87-1.27 1.22-2.5 1.24-2.57-.03-.01-2.38-.91-2.39-3.63zM14.1 5.9c.63-.76 1.05-1.82.94-2.87-.9.04-2 .6-2.65 1.36-.58.67-1.09 1.75-.95 2.78 1 .08 2.03-.51 2.66-1.27z"/></svg><span><small>即將登陸</small><b>App Store</b></span></a>
   </div>
   <footer class="wrap">
@@ -715,7 +716,7 @@ const simFiles = {};
 function simFactory(name){
   return simFiles[name] ??= new Promise(done=>{
     if(SNSims[name]) return done(SNSims[name]);
-    const s=document.createElement('script'); s.src=`components/${name}.js?v=c2310438`; s.async=true;
+    const s=document.createElement('script'); s.src=`components/${name}.js?v=b03b9811`; s.async=true;
     s.onload=()=>done(SNSims[name]||null); s.onerror=()=>{ s.remove(); done(null); };
     document.head.appendChild(s);
   });
@@ -765,7 +766,7 @@ document.addEventListener('click',e=>{ if(nav.classList.contains('open') && !lin
 /* 语言：下拉和 Menu 互斥；选了就记下来，下次打开根地址直接进这个语言，带着当前位置走 */
 const lang=$('#lang'), langBtn=lang.querySelector('.lang-btn'), LG=window.SN_LANG||'en';
 const langOpen=on=>{ lang.classList.toggle('open',on); langBtn.setAttribute('aria-expanded',on); };
-langBtn.textContent={en:'EN',zh:'简','zh-hant':'繁',de:'DE'}[LG];
+langBtn.textContent={en:'EN',zh:'简中','zh-hant':'繁中',de:'DE'}[LG];
 lang.querySelectorAll('a').forEach(a=>{
   if(a.dataset.l===LG) a.setAttribute('aria-current','true');
   if(/\.html$/.test(location.pathname)) a.href=location.pathname+(a.dataset.l==='en'?'':'?lang='+a.dataset.l);
@@ -927,6 +928,6 @@ requestAnimationFrame(frame);
 /* FAQ */
 $$('.qa button').forEach(b=>b.onclick=()=>{ const q=b.parentElement, was=q.classList.contains('open'); $$('.qa').forEach(x=>x.classList.remove('open')); if(!was) q.classList.add('open'); });
 </script>
-<script src="components/r13/onescore-r13.js?v=c2310438"></script>
+<script src="components/r13/onescore-r13.js?v=b03b9811"></script>
 </body>
 </html>

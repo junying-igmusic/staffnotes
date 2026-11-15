@@ -33,6 +33,7 @@
 .os .fx-nodes{left:4px}
 .os .fx-beat h3{font-size:clamp(24px,1.8vw,30px);margin-bottom:12px}
 .os .fx-beat p{font-size:15px}
+/* r17：导入、整理两块文案叠在 .fx-copy 同一格里，拍 1–3 亮导入那块，拍 4 起亮整理那块；每块一条三节点的线，进度条也分两组 */
 /* 各章文案借了 .sk-g 的样子，淡入淡出完全跟翻页走，不要它自带的过渡；说明跟着当前那一站展开 */
 .os-chcopy{position:absolute;top:50%;opacity:0;pointer-events:none!important}
 .os-chcopy.live{pointer-events:auto!important}
@@ -44,6 +45,7 @@
 .pro-tag{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:999px;background:var(--blue);color:#fff;font-size:11px;font-weight:600;line-height:18px;vertical-align:2px;letter-spacing:.02em}
 /* Basic 和 Pro 同一个尺寸：Pro 实心蓝，Basic 只描蓝边 */
 .basic-tag{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--blue);color:var(--blue);font-size:11px;font-weight:600;line-height:18px;vertical-align:2px;letter-spacing:.02em}
+/* 标注导入是 Coming soon（灰描边），AI 自动翻谱是 Experimental（浅灰底）；会放进衬线大标题里，字体单独指定 */
 /* 统计单独一块，在在线曲库后面、Pro 横条前面 */
 #stats{padding:150px 0 120px}
 #stats .st{margin-top:0;margin-bottom:0}
