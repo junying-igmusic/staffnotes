@@ -337,6 +337,8 @@ h1,h2,h3{text-wrap:balance}
 .plan h3{font-family:var(--serif);font-weight:400;font-size:40px;letter-spacing:-.03em}
 .plan .price{font-size:13px;color:var(--ink2);margin:6px 0 30px}
 .plan .price b{font-family:var(--serif);font-weight:400;font-size:30px;letter-spacing:-.02em;color:var(--ink);margin:0 2px}
+/* 价格数字先不公开：清单直接接在方案名下面 */
+.plan .top+ul{margin-top:28px}
 .plan ul{list-style:none}
 .plan li{display:flex;gap:14px;padding:12px 0;border-top:1px solid var(--line);font-size:15px}
 .plan li::before{content:"";flex:none;width:6px;height:6px;border-radius:50%;margin-top:8px;border:1px solid var(--blue)}
@@ -619,7 +621,6 @@ footer .legal span{margin-left:auto}
   <div class="plans">
     <div class="plan rv">
       <div class="top"><h3>Basic</h3><span class="pill basic">Basic</span></div>
-      <div class="price"><b>€4.49</b> per month</div>
       <ul>
         <li>Automatic score recognition</li>
         <li>Online Library</li>
@@ -633,7 +634,6 @@ footer .legal span{margin-left:auto}
     </div>
     <div class="plan pro rv" style="--i:1">
       <div class="top"><h3>Pro</h3><span class="pill on">Pro</span></div>
-      <div class="price"><b>€12.49</b> per month</div>
       <ul>
         <li>Everything in Basic</li>
         <li class="plus">Lasso tool</li>
