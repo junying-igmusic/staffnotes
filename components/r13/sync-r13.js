@@ -4,6 +4,7 @@
    拍 3：点 Mozart、K. 545，四色笔迹原样打开，放大后换回真阅读器。
    拍 4：mini 从下方升到右下，在第 18 小节上方画「>」，大谱同处出现。
    新首页是 App 概览页个人卡片 + 乐谱页作曲家文件夹的合成。
+   大设备沿用 board 的同一张谱页与笔迹，仅移动其舞台，避免两份图像缩放后换手变糊。
    拍 4 沿用 r18 拍 3 的「>」坐标：1878 年 K. 545 第 1 页像素 x 150–440、y 1193–1241，最细一档蜡笔。
    接口：beat(n, soft) 摆终态；one(n) 只播一拍；play()；reset()。opt.board() 提供谱页和四色笔迹。 */
 (function(){
@@ -34,7 +35,8 @@ const CSS = `
 .sns-sync .y-cv{position:absolute;z-index:1;display:block;pointer-events:none;opacity:0;transition:opacity .45s ease}
 .sns-sync.s-hp .y-cv.h{opacity:1}
 .os-rbox{transition:box-shadow .6s ease}.os-rbox.sy-bare{box-shadow:none}
-.sns-sync .y-room{position:absolute;left:0;top:0;width:${W}px;height:var(--fh);z-index:0;background:var(--room,#F7F6F2);opacity:0;transition:opacity .5s ease}
+.os-rbox.sy-bare,.os-rbox.sy-bare>.sim{background:transparent}
+.sns-sync .y-room{position:absolute;left:0;top:0;width:100%;height:100%;z-index:0;background:var(--room,#F7F6F2);opacity:0;transition:opacity .5s ease}
 .sns-sync.s-room .y-room{opacity:1}
 .sns-sync .y-ipad{position:absolute;left:0;top:0;width:${W + 2*BZB}px;height:calc(var(--fh) + ${2*BZB}px);border-radius:calc(var(--srb) + ${BZB}px);background:#1C1C1E;transform-origin:0 0;
   box-shadow:0 0 0 3px #3A3A3C inset,0 44px 96px -20px rgba(41,45,56,.38),0 12px 28px rgba(41,45,56,.14)}
@@ -43,8 +45,6 @@ const CSS = `
 .sns-sync.s-a .y-ipad.a{opacity:1}
 .sns-sync.s-a.s-afull .y-ipad.a{transform:translate(${-BZB}px,${-BZB}px) scale(1)}
 .sns-sync.s-a.s-agone .y-ipad.a{opacity:0;transform:translate(calc(var(--wx) - ${SL}px),var(--wy)) scale(${ZS});transition:transform .6s cubic-bezier(.4,0,.6,1),opacity .4s ease}
-.sns-sync .y-pg{position:absolute;left:24px;top:var(--py);width:${PW}px;height:${PHu}px}
-.sns-sync .y-ai{position:absolute;left:0;top:0;width:${W}px;height:${H}px;mix-blend-mode:multiply}
 .sns-sync .y-blk{position:absolute;inset:0;background:#0B0B0C;opacity:0;transition:opacity .35s ease}
 .sns-sync.s-aoff .y-blk{opacity:1}
 .sns-sync .y-ipad.b{z-index:3;opacity:0;transform:translate(calc(var(--wx) + ${SL}px),var(--wy)) scale(${ZS});transition:transform .7s cubic-bezier(.25,.8,.2,1),opacity .5s ease}
@@ -116,13 +116,27 @@ const CSS = `
 .sns-sync .y-sc p{margin-top:7px;font-size:11.5px;line-height:1.25}
 .sns-sync .y-sc p small{display:block;font-size:10.5px;color:#8C919B;margin-top:2px}
 .sns-sync.s-open .y-sc.k .th{opacity:0}
-.sns-sync .y-rdb{position:absolute;left:24px;top:var(--py);width:${PW}px;height:${PHu}px;overflow:hidden;background:#fff;transform-origin:0 0;
-  border-radius:${KR}px;opacity:0;transform:translate(${KX - 24}px,calc(${KY}px - var(--py))) scale(${KS});
-  transition:transform .65s cubic-bezier(.3,.75,.15,1),border-radius .65s cubic-bezier(.3,.75,.15,1),opacity .12s linear .5s}
-.sns-sync.s-open .y-rdb{opacity:1;transform:none;border-radius:0;transition-delay:0s}
 .sns-sync .y-rdm{position:absolute;left:${RX}px;top:${RY}px;width:${RW}px;height:${RH}px}
-.sns-sync .y-rdb img,.sns-sync .y-rdb canvas,.sns-sync .y-rdm img,.sns-sync .y-rdm canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block}
-.sns-sync .y-rdb canvas,.sns-sync .y-rdm canvas{mix-blend-mode:multiply}
+.sns-sync .y-rdm img,.sns-sync .y-rdm canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block}
+.sns-sync .y-rdm canvas{mix-blend-mode:multiply}
+/* 谱面始终是原 board：只缩放内部舞台，外层尺寸保持不变，ResizeObserver 仍按真实框宽计算。 */
+.os-rbox:has(.sns-sync.on.s-a:not(.s-b)) .sns-board,
+.os-rbox:has(.sns-sync.on.s-open) .sns-board{z-index:2}
+.os-rbox:has(.sns-sync.on.s-a) .k-stage{transform:translate(var(--sy-x),var(--sy-y)) scale(calc(var(--sy-k)*${ZS}))!important;
+  clip-path:inset(0 round var(--sy-radius));transition:transform .9s cubic-bezier(.3,.7,.2,1),clip-path .9s cubic-bezier(.3,.7,.2,1),opacity .4s ease}
+.os-rbox:has(.sns-sync.on.s-afull) .k-stage{transform:scale(var(--sy-k))!important;clip-path:inset(0)}
+.os-rbox:has(.sns-sync.on.s-agone) .k-stage{transform:translate(var(--sy-away),var(--sy-y)) scale(calc(var(--sy-k)*${ZS}))!important;opacity:0;
+  transition:transform .6s cubic-bezier(.4,0,.6,1),opacity .4s ease}
+.os-rbox:has(.sns-sync.on.s-a:not(.s-b)) .k-stage::after{content:"";position:absolute;inset:0;background:#0B0B0C;opacity:0;transition:opacity .35s ease}
+.os-rbox:has(.sns-sync.on.s-aoff:not(.s-b)) .k-stage::after{opacity:1}
+.os-rbox:has(.sns-sync.on.s-b) .k-stage{transform:translate(var(--sy-kx),var(--sy-ky)) scale(calc(var(--sy-k)*${ZS*KS}))!important;
+  clip-path:inset(var(--sy-top) var(--sy-right) var(--sy-bottom) var(--sy-left) round ${KR}px);opacity:0;transition:none}
+.os-rbox:has(.sns-sync.on.s-open) .k-stage{transform:translate(var(--sy-x),var(--sy-y)) scale(calc(var(--sy-k)*${ZS}))!important;
+  clip-path:inset(var(--sy-top) var(--sy-right) var(--sy-bottom) var(--sy-left));opacity:1;
+  transition:transform .65s cubic-bezier(.3,.75,.15,1),clip-path .65s cubic-bezier(.3,.75,.15,1),opacity .12s linear}
+.os-rbox:has(.sns-sync.on.s-bfull) .k-stage{transform:scale(var(--sy-k))!important;clip-path:inset(0);
+  transition:transform .8s cubic-bezier(.3,.7,.2,1),clip-path .8s cubic-bezier(.3,.7,.2,1)}
+.os-rbox:has(.sns-sync.s-now) .k-stage,.os-rbox:has(.sns-sync.s-now) .k-stage::after{transition:none!important}
 .sns-sync .y-tap{opacity:0;transition:opacity .25s,transform .12s}
 .sns-sync .y-tap.on{opacity:1}
 .sns-sync .y-tap.dn{transform:scale(.75)}
@@ -167,10 +181,9 @@ NS['r13/sync-r13'] = function(root, opt){
   opt = opt || {};
   const K = window.SNSKit;
   root.classList.add('sns-sync');
-  root.innerHTML = `<div class="y-stage"><div class="y-room"></div><canvas class="y-cv h"></canvas>
-    <div class="y-ipad a" aria-hidden="true"><div class="y-bs"><img class="y-pg" src="${A}k545-p1.jpg" alt="" draggable="false"><canvas class="y-ai"></canvas><div class="y-blk"></div></div></div>
+  root.innerHTML = `<div class="y-room"></div><div class="y-stage"><canvas class="y-cv h"></canvas>
+    <div class="y-ipad a" aria-hidden="true"><div class="y-bs"><div class="y-blk"></div></div></div>
     <div class="y-ipad b" aria-hidden="true"><div class="y-bs"><div class="y-home">${home()}</div>
-      <div class="y-rdb"><img src="${A}k545-p1.jpg" alt="" draggable="false"><canvas class="y-bi"></canvas></div>
       <i class="y-tap snd m" style="left:${(X0 + CW/2)*LSB}px;top:${(R2 + CH/2)*LSB}px"></i>
       <i class="y-tap snd k" style="left:${KX + SCW*LSB/2}px;top:${KY + SCH*LSB/2}px"></i>
     </div></div>
@@ -180,16 +193,16 @@ NS['r13/sync-r13'] = function(root, opt){
     <div class="y-pill" role="status">${DEV}<span>${snT('Also open on {d}', {d: 'iPad mini'})}</span></div></div>`;
   const $ = s => root.querySelector(s), rbox = root.closest('.os-rbox');
   const stage = $('.y-stage'), tapM = $('.y-tap.m'), tapK = $('.y-tap.k'), penM = $('.y-pen.m'), cards = [...root.querySelectorAll('.y-it')];
-  const cvA = $('.y-ai'), cvB = $('.y-bi'), cvH = $('.y-cv.h'), cvMI = $('.y-mi'), cvMH = $('.y-mh');
+  const cvH = $('.y-cv.h'), cvMI = $('.y-mi'), cvMH = $('.y-mh');
   const scrA = document.createElement('canvas'), scrB = document.createElement('canvas');
   const HP = hairpin(), st = {hn: 0};
   const stroke = (pts, wi) => ({tool: 'crayon', color: PURPLE, w: K ? K.WIDTHS.crayon[wi]*1.33 : 6, op: 1, pts});
   let k = 1, dpr = 1, fh = H, km = 1, kn = 1, pg = {x: 24, y: 41};
 
   function layout(){
-    const w = root.clientWidth; if (!w) return;
+    const r = root.getBoundingClientRect(), w = r.width; if (!w) return;
     k = w/W; dpr = Math.min(2, window.devicePixelRatio || 1);
-    fh = root.clientHeight ? Math.round(W*root.clientHeight/w) : H;
+    fh = r.height ? Math.round(W*r.height/w) : H;
     stage.style.height = fh + 'px'; stage.style.transform = `scale(${k})`;
     root.style.setProperty('--ms', k < .5 ? 1.45 : 1);
     let room = '#F7F6F2';
@@ -197,17 +210,22 @@ NS['r13/sync-r13'] = function(root, opt){
       const bg = getComputedStyle(el).backgroundColor;
       if (bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent'){ room = bg; break; }
     }
-    const img = opt.board?.()?.querySelector('img.k-page'), ink = opt.board?.()?.querySelector('canvas.k-ink');
+    const img = opt.board?.()?.querySelector('img.k-page');
     pg = {x: parseFloat(img?.style.left) || 24, y: parseFloat(img?.style.top) || Math.max(16, (fh - PHu)/2)};
     const v = {'--wx': (W - (W + 2*BZB)*ZS)/2, '--wy': (fh - (fh + 2*BZB)*ZS)/2,
       '--sx': W - DR - DW*SS, '--sy': fh - DB - DH*SS, '--fh': fh, '--srb': rbox ? parseFloat(getComputedStyle(rbox).borderTopLeftRadius)/k || 26 : 26, '--py': pg.y};
     for (const n in v) root.style.setProperty(n, v[n] + 'px');
+    const sx = v['--wx'] + BZB*ZS, sy = v['--wy'] + BZB*ZS;
+    const boardVars = {'--sy-x':sx*k, '--sy-y':sy*k, '--sy-away':(sx - SL)*k,
+      '--sy-kx':(sx + ZS*(KX - pg.x*KS))*k, '--sy-ky':(sy + ZS*(KY - pg.y*KS))*k,
+      '--sy-top':pg.y, '--sy-right':W - pg.x - PW, '--sy-bottom':fh - pg.y - PHu, '--sy-left':pg.x, '--sy-radius':v['--srb']};
+    for (const n in boardVars) rbox?.style.setProperty(n, boardVars[n] + 'px');
+    rbox?.style.setProperty('--sy-k', k);
     root.style.setProperty('--ss', SS); root.style.setProperty('--room', room);
     for (const tap of [tapM, tapK]) tap.style.setProperty('--dotu', Math.max(18, 30*k)/k/ZS + 'px');
     km = k*dpr; kn = k*dpr*SS*AS*RW/PW;
     Object.assign(cvH.style, {left: pg.x + 'px', top: pg.y + 'px', width: PW + 'px', height: PHu + 'px'});
-    cvA.width = ink?.width || Math.round(W*km); cvA.height = ink?.height || Math.round(H*km);
-    for (const c of [cvB, cvH]){ c.width = Math.round(PW*km); c.height = Math.round(PHu*km); }
+    cvH.width = Math.round(PW*km); cvH.height = Math.round(PHu*km);
     for (const c of [cvMI, cvMH]){ c.width = Math.round(PW*kn); c.height = Math.round(PHu*kn); }
     scrA.width = cvH.width; scrA.height = cvH.height; scrB.width = cvMI.width; scrB.height = cvMI.height;
     drawAll();
@@ -215,15 +233,13 @@ NS['r13/sync-r13'] = function(root, opt){
 
   function clear(c){ const g = c.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, c.width, c.height); return g; }
   function put(g, pts, scr, kk){ if (!K || !pts.length) return; g.setTransform(kk, 0, 0, kk, 0, 0); K.drawStroke(g, stroke(pts, 0), scr, kk); }
-  function drawA(){ const g = clear(cvA), ink = opt.board?.()?.querySelector('canvas.k-ink'); if (ink?.width) g.drawImage(ink, 0, 0, ink.width, ink.height, 0, 0, cvA.width, cvA.height); }
-  function copyPage(c){
-    const g = clear(c), ink = opt.board?.()?.querySelector('canvas.k-ink');
-    if (ink?.width){ const s = ink.width/W; g.drawImage(ink, pg.x*s, pg.y*s, PW*s, PHu*s, 0, 0, c.width, c.height); }
+  function drawMI(){
+    const g = clear(cvMI), ink = opt.board?.()?.querySelector('canvas.k-ink');
+    if (ink?.width){ const s = ink.width/W; g.drawImage(ink, pg.x*s, pg.y*s, PW*s, PHu*s, 0, 0, cvMI.width, cvMI.height); }
   }
-  const drawB = () => copyPage(cvB), drawMI = () => copyPage(cvMI);
   const drawH = () => put(clear(cvH), HP, scrA, km);
   function drawMH(){ const g = clear(cvMH); if (st.hn > 0) put(g, st.hn >= 1 ? HP : K.cut(HP, st.hn), scrB, kn); }
-  function drawAll(){ drawA(); drawB(); drawMI(); drawMH(); drawH(); }
+  function drawAll(){ drawMI(); drawMH(); drawH(); }
 
   const END = [{}, {bare: 1, room: 1, a: 1, aoff: 1}, {bare: 1, room: 1, a: 1, aoff: 1, agone: 1, b: 1, synced: 1, cards: 5}, {}, {dev: 1, pill: 1, hp: 1}];
   function showCards(n){ cards.forEach((c, i) => c.classList.toggle('on', i < n)); $('.y-n').textContent = n; }
@@ -248,7 +264,7 @@ NS['r13/sync-r13'] = function(root, opt){
     const glide = (el, a, b, ms) => tween(ms, p => { const e = ease(p); at(el, [a[0] + (b[0] - a[0])*e, a[1] + (b[1] - a[1])*e]); });
     const lift = async el => { el.classList.add('up'); await wait(250); el.classList.remove('on'); await wait(350); el.classList.remove('up'); };
     if (n === 1){
-      drawA(); root.classList.add('s-now'); show({room:1, a:1, afull:1}); void root.offsetWidth;
+      root.classList.add('s-now'); show({room:1, a:1, afull:1}); void root.offsetWidth;
       requestAnimationFrame(() => root.classList.remove('s-now'));
       await wait(350); root.classList.remove('s-afull'); rbox?.classList.add('sy-bare');
       await wait(1900); root.classList.add('s-aoff');
@@ -261,7 +277,7 @@ NS['r13/sync-r13'] = function(root, opt){
       await wait(560); root.classList.add('s-synced');
       await wait(1300);
     } else if (n === 3){
-      drawB(); tapM.classList.add('on');
+      tapM.classList.add('on');
       await wait(450); K.rip(tapM); tapM.classList.add('dn');
       await wait(120); tapM.classList.remove('dn');
       await wait(80); tapM.classList.remove('on'); root.classList.add('s-mz');
@@ -270,7 +286,10 @@ NS['r13/sync-r13'] = function(root, opt){
       await wait(120); tapK.classList.remove('dn');
       await wait(80); tapK.classList.remove('on'); root.classList.add('s-open');
       await wait(850); root.classList.add('s-bfull'); rbox?.classList.remove('sy-bare');
-      await wait(850); root.classList.add('s-now'); show(END[3]); void root.offsetWidth;
+      // CSS 从下一帧起播；保持 0.8 秒放大和到位后 50ms 停顿，再交回同一张谱。
+      try { await Promise.all([opt.board().querySelector('.k-stage'), $('.y-ipad.b')].flatMap(el => el.getAnimations().map(a => a.finished))); }
+      catch(e){ if (t.dead) throw CANCEL; throw e; }
+      await wait(50); root.classList.add('s-now'); show(END[3]); void root.offsetWidth;
       requestAnimationFrame(() => root.classList.remove('s-now'));
       await wait(550);
     } else if (n === 4){
@@ -320,7 +339,7 @@ NS['r13/sync-r13'] = function(root, opt){
     beat(n, soft){ go(n, false, false, soft); },
     reset(){ go(0, false); },
     visible(on){ if (!on && tok){ snap(cur); done = true; } },
-    destroy(){ stop(); rbox?.classList.remove('sy-bare'); ro.disconnect(); root.removeEventListener('pointerdown', onDown); root.innerHTML = ''; }
+    destroy(){ stop(); rbox?.classList.remove('sy-bare'); if (rbox) for (const n of [...rbox.style]) if (n.startsWith('--sy-')) rbox.style.removeProperty(n); ro.disconnect(); root.removeEventListener('pointerdown', onDown); root.innerHTML = ''; }
   };
 };
 })();
