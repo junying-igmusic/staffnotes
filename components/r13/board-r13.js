@@ -951,7 +951,7 @@ SNSims['r13/board-r13'] = function(root, opts){
   const placeSeb = ()=>{ if (!sebOn || !sel || !sel.box) return; const b = sel.box; seb.style.left = (b.x+b.w/2-107)+'px'; seb.style.top = (b.y+b.h+14)+'px'; };
   const showSeb = on => { sebOn = !!on; if (on){ seb.querySelector('.dot').style.setProperty('--c', K.INKS[st.color]); seb.querySelector('.paste').classList.add('off'); placeSeb(); } seb.classList.toggle('off', !on); };
   const ctr = pts => { const b = K.bbox([{pts, w:0}]); return [b.x+b.w/2, b.y+b.h/2]; };
-  const PASTE = ()=>PG(190,1068);   // 两指轻点的地方：第 4 行第 11 小节上方
+  const PASTE = ()=>PG(711,991);   // 两指轻点的地方：第 16 小节 b″ 上方（和第 14 小节同一个音型，复制的 3 落在这里）
   const DIGIT = {
     1:'M3 2 L5.5 0 L5.5 10',
     2:'M1 3 C1 -0.5 9 -0.5 9 3 C9 6 1 8 1 10 L9.5 10',
@@ -962,15 +962,15 @@ SNSims['r13/board-r13'] = function(root, opts){
   const digit = (d, x, y)=>K.sample(DIGIT[d], PG(x,y)[0], PG(x,y)[1], 3.3*PK);
   // r13：四个演示各用一种颜色，画完的样子（瞬间摆好用，和下面演示里画的一致）
   const COLOR = {palette:2, pencil:0, lasso:1, shapes:3, undo:3};   // Blue、Red、Green、Gold；r14 撤销站那一笔用金色，撤掉后不留
-  const SLUR = ()=>{ const a = PG(236,268), b = PG(760,268); return Array.from({length:30},(_,i)=>{ const t=i/29; return [a[0]+(b[0]-a[0])*t, a[1]-Math.sin(t*Math.PI)*40*PK]; }); };
-  const PENCIL = [[1,506,520],[3,563,516],[5,682,506]];
-  const SHAPES = [['ellipse',[1012,250],[1140,328]],['rectangle',[438,1062],[596,1176]]];
-  const SLIP = ()=>Array.from({length:26},(_,i)=>{ const t = i/25; return PG(560+430*t, 1530-70*t-Math.sin(t*Math.PI)*36+Math.sin(t*Math.PI*3)*6); });   // r14 撤销站：第 5 行谱上划错的一笔
+  const SLUR = ()=>{ const a = PG(212,336), b = PG(552,336); return Array.from({length:30},(_,i)=>{ const t=i/29; return [a[0]+(b[0]-a[0])*t, a[1]-Math.sin(t*Math.PI)*40*PK]; }); };
+  const PENCIL = [[1,436,766],[3,503,762],[5,618,756]];   // r60：底图换成 1878 年旧全集，写在第 11 小节 b′ e″ g″ 上方
+  const SHAPES = [['ellipse',[782,342],[894,430]],['rectangle',[746,798],[870,892]]];   // 第 4 小节颤音、第 12 小节
+  const SLIP = ()=>Array.from({length:26},(_,i)=>{ const t = i/25; return PG(500+430*t, 1392-70*t-Math.sin(t*Math.PI)*36+Math.sin(t*Math.PI*3)*6); });   // r14 撤销站：第 5 行谱上划错的一笔
   const FIN = {
     palette: ()=>[{tool:'crayon', pts:SLUR()}],
     pencil: ()=>PENCIL.map(([d,x,y])=>({tool:'crayon', pts:digit(d,x,y)})),
-    // r14：拖过去的 4，加上两指粘贴落在 PASTE 的那份（中心对准两指中点）
-    lasso: ()=>{ const pts = digit(4,866,766), c = ctr(pts), q = PASTE(); return [{tool:'crayon', pts, dx:44*PK, dy:-4*PK}, {tool:'crayon', pts, dx:q[0]-c[0], dy:q[1]-c[1]}]; },
+    // r14：拖过去的 3，加上两指粘贴落在 PASTE 的那份（中心对准两指中点）
+    lasso: ()=>{ const pts = digit(3,96,978), c = ctr(pts), q = PASTE(); return [{tool:'crayon', pts, dx:44*PK, dy:-4*PK}, {tool:'crayon', pts, dx:q[0]-c[0], dy:q[1]-c[1]}]; },
     shapes: ()=>SHAPES.map(([kind,a,b])=>({tool:'shape', kind, pts:[PG(...a),PG(...b)]})),
     undo: ()=>[]
   };
@@ -1064,16 +1064,17 @@ SNSims['r13/board-r13'] = function(root, opts){
         await tween(SLIDE_MS, p=>slidePage(-(SLIDE-DR)*(1-out(p))));
         slidePage(0);
         await wait(420);
-        tp = PG(820,420); placeTouch(); penTip(true);
-        for (const [d,x,y] of PENCIL) await ink(digit(d,x,y), 'crayon', 340);   // bar 6: g′ b′ g″
+        tp = PG(640,700); placeTouch(); penTip(true);
+        for (const [d,x,y] of PENCIL) await ink(digit(d,x,y), 'crayon', 340);   // bar 11: b′ e″ g″
         await wait(500);
       } else if (name==='lasso'){
-        // r14 批注 83：Pencil 写个 4，套索圈住、拖一下；选中框下面出 App 的编辑条，点 Copy，顶部提示双指粘贴；两根手指在别处轻点，复制的 4 落在那里
+        // r14 批注 83：Pencil 写个 3，套索圈住、拖一下；选中框下面出 App 的编辑条，点 Copy，顶部提示双指粘贴；两根手指在别处轻点，复制的 3 落在那里
+        // r60：3 写在第 14 小节 b″ 上方，拖一下对准音符，再粘到第 16 小节同一个 b″ 上
         await tapPal(`.k-dot[data-i="${COLOR.lasso}"]`);   // r13：先点绿色
-        await toPen(true, PG(980,700));                   // 已经开了只认 Pencil，写和圈都用 Pencil
-        await ink(digit(4, 866, 766), 'crayon', 420);
+        await toPen(true, PG(240,900));                   // 已经开了只认 Pencil，写和圈都用 Pencil
+        await ink(digit(3, 96, 978), 'crayon', 420);
         await tapPal('.k-act.lasso');
-        const c = PG(883,782), rx = 46*PK, ry = 40*PK;
+        const c = PG(113,994), rx = 46*PK, ry = 40*PK;
         const loop = Array.from({length:60},(_,i)=>{ const t = -2.2 + i/59*Math.PI*2.15; const r = 1+0.06*Math.sin(i*.5); return [c[0]+Math.cos(t)*rx*r, c[1]+Math.sin(t)*ry*r]; });
         await moveTo(loop[0], 380);
         lassoPts = [loop[0]]; down();
@@ -1137,11 +1138,11 @@ SNSims['r13/board-r13'] = function(root, opts){
       } else if (name==='undo'){
         // r14 批注 84：Pencil 随手划了一笔（金色，和形状同一层），两根手指在谱上轻点两下，这一笔撤掉，顶部出 Undone（照 App ReaderHistoryInteraction：2 或 3 指双击撤销）
         st.color = COLOR.undo; st.tool = 'crayon'; st.lastInk = 'crayon'; pal.update();
-        tp = PG(660,1420); placeTouch(); penTip(true);
+        tp = PG(600,1300); placeTouch(); penTip(true);
         await ink(SLIP(), 'crayon', 460);
         await wait(500);
         touch.style.opacity = 0; await wait(250); penTip(false);
-        await twoIn(PG(820,1290));
+        await twoIn(PG(820,1228));
         await wait(120);
         await tapTwo(); await wait(90); await tapTwo();
         undo(); pill('undo');

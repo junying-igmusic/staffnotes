@@ -32,7 +32,7 @@ const ICON = {
 const DEL_MSG = 'Deletes this colour layer’s annotations on every page in the current note group. This cannot be undone. The PDF and layers in other groups are kept.';
 const tip = c => `<svg class="tip" viewBox="0 0 16 18"><path d="M8 1.2 13 8v2.4H3V8Z" fill="${c}"/><rect x="3.4" y="11" width="9.2" height="5.8" rx="1.2" fill="#292D38"/></svg>`;
 
-/* ---------- ink, in page pixels of k545-p1.jpg (1300 × 1839) ---------- */
+/* ---------- ink, in page pixels of k545-p1.jpg (1300 × 1839; r60: 1878 Breitkopf & Härtel, AMA Serie 20 N° 15, p. 1) ---------- */
 const DIGIT = {
   1:'M3 2 L5.5 0 L5.5 10',
   2:'M1 3 C1 -0.5 9 -0.5 9 3 C9 6 1 8 1 10 L9.5 10',
@@ -67,20 +67,19 @@ const INK_BY_GROUP = [
     {c:5, d:'M197 462 L188 500 M195 468 C 199 457, 214 458, 212 470 C 210 481, 196 482, 194 473'}
   ],
   [ // Fingering: right hand above, left hand below
-    // r13：右手（Blue）写在各自音符正上方、谱表外；第 1 行 c‴ 等几个在面板底下
-    up(3,352,290), up(5,405,276), up(5,750,273), up(2,862,277), up(5,917,260),
-    up(2,182,553), up(3,209,553), up(1,231,553), up(5,325,536),   // 第 5 小节 b′ c″ d″ 挨得近，2、3 各往外让 2–3 像素
-    up(1,522,543), up(1,607,553), up(5,695,543),
-    // 左手（Green）写在第 1 行低音谱表下面一排：第 1 小节 c g e g、第 2 小节 d g f g（原来第 3 小节那组半截压在面板边上，挪到第 2 小节，指法一样）
-    ...[[5,242],[1,267],[3,295],[1,322],[5,490],[1,517],[2,545],[1,571]].map(([n,x])=>Object.assign(dn(n,x,456),{c:1}))
+    // r60：底图换成 1878 年 Breitkopf 旧全集第 1 页。右手（Blue）：第 1 小节 e″ g″、第 3 小节 g″ c‴，
+    // 第 11 小节 f 那一排八分音符上方空着，整排写满 1 5 3 1 2 5 3 1
+    up(3,284,344), up(5,331,348), up(2,664,362), up(5,703,350),
+    up(1,450,800), up(5,490,798), up(3,522,800), up(1,560,800), up(2,596,800), up(5,635,798), up(3,670,800), up(1,707,800),
+    // 左手（Green）写在第 1 行低音连线下面：第 1 小节 c–e、第 2 小节 d–f 各标两个，写满会读成一串数
+    ...[[5,202],[3,245],[5,387],[2,427]].map(([n,x])=>Object.assign(dn(n,x,546),{c:1}))
   ].map(x=>x.c===undefined ? Object.assign(x,{c:2}) : x),
   [ // Stage: breaths at the phrase ends, two cues
-    {c:4, d:comma(452,236)},
-    {c:4, d:comma(1222,236)},
-    {c:4, d:comma(1222,508)},
-    {c:4, d:comma(486,778)},
-    {c:3, d:'M734 284 L 940 280', hl:true},
-    {c:3, d:'M592 880 L 704 876', hl:true}
+    {c:4, d:comma(540,326)},   // 第 2 小节后
+    {c:4, d:comma(424,770)},   // 第 11 小节 f 之前
+    {c:4, d:comma(868,770)},   // 第 12 小节后
+    {c:3, d:'M380 394 L 478 386', hl:true},    // 第 2 小节 b′ c″ d″ c″（第 3 小节在电脑上会被图层面板盖住）
+    {c:3, d:'M1004 622 L 1112 618', hl:true}   // 第 9 小节升 c″ 那一串
   ]
 ];
 // r13：Lesson 组的笔迹是 board 上画笔章画的四种颜色（Blue 2、Red 0、Green 1、Gold 3），这里不画

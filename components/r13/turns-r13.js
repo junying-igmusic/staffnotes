@@ -1,36 +1,36 @@
 /* 一张谱 r13 用的 turns 副本（components/turns.js、r12 副本都不改）：叠在阅读器的竖屏谱页上，和下面 board 的第 1 页严丝合缝。
    原组件的舞台 600×580、谱页卡片 410 宽不动，整块按 786/410 放大对到阅读器谱页（24, 41, 786×1112，框单位 834 宽）；超出框的部分被框裁掉。
-   卡片透明、第 1 页透明（露出 board 的谱和笔迹），其他页白底盖住整页。K. 545 三个乐章合在一份 10 页的 PDF 里（Allegro 第 1 页、Andante 第 5 页、Rondo 第 9 页）。
+   卡片透明、第 1 页透明（露出 board 的谱和笔迹），其他页白底盖住整页。K. 545 三个乐章合在一份 8 页的 PDF 里（Allegro 第 1 页、Andante 第 4 页、Rondo 第 7 页）。
    照 specs/002-reader-page-scrubbing 与 App 的 ReaderChrome / PageJumpPad：
-   拍 1：手指按住底部页码胶囊横向拖，胶囊上方的卡片显示目标页真实缩略图、乐章名和页码，拖到第 6 页再拖回第 4 页，松手才翻过去；
+   拍 1：手指按住底部页码胶囊横向拖，胶囊上方的卡片显示目标页真实缩略图、乐章名和页码，拖到第 6 页再拖回第 3 页，松手才翻过去；
    拍 2：轻点胶囊，数字面板从胶囊里长出来，按 2，Go 变蓝，按 Go，面板收回，到第 2 页；
-   拍 3：点底栏「2. Andante »」，到第 5 页，Andante 开头那行字用强调蓝渐入、停一下、渐出；
-   拍 4（Show measure numbers）：点「« 1. Allegro」回到第 1 页，胶囊加宽成等宽两半「Page 1 / 10 | Bar 1 / 73」；
-   拍 5（Jump to a bar）：点 Bar 那一半，面板切成小节输入，按 2、4、Go，到第 2 页，第 24 小节闪一下（进跟谱只往回翻一页）。
+   拍 3：点底栏「2. Andante »」，到第 4 页，Andante 开头那行字用强调蓝渐入、停一下、渐出；
+   拍 4（Show measure numbers）：点「« 1. Allegro」回到第 1 页，胶囊加宽成等宽两半「Page 1 / 8 | Bar 1 / 73」；
+   拍 5（Jump to a bar）：点 Bar 那一半，面板切成小节输入，按 3、3、Go，到第 2 页，第 33 小节闪一下（进跟谱只往回翻一页）。
    谱面上不贴 Pro，Pro 只在网页文案的大标题旁（小谭批注 92）。
    用户自己也能玩：拖胶囊翻页、点胶囊开数字面板、按数字和 Go、点乐章钮和翻页圆钮；播放中按下就停掉脚本，先摆到这一拍的终态。
    顶栏和底栏不跟谱页走，照 App 贴着框的上下沿（小谭批注 72）。
    跟谱章：fol(p) 只留顶栏和胶囊，阅读器把这一层盖在跟谱层上面，胶囊跟着跟谱翻到的页数。
-   和跟谱章的承接（小谭批注 77）：leave() 从当前页照 App 的横向整页滑动一页页往回翻到第 1 页，胶囊跟着数回 1 / 10；enter(n) 是倒过来，从第 1 页往前翻到拍 n 那一页。
+   和跟谱章的承接（小谭批注 77）：leave() 从当前页照 App 的横向整页滑动一页页往回翻到第 1 页，胶囊跟着数回 1 / 8；enter(n) 是倒过来，从第 1 页往前翻到拍 n 那一页。
    第 1 页透明，滑的是阅读器的 board 层：阅读器传 base(x) 进来，把那一层平移 x 屏幕 px。
    接口：beat(n, soft) 直接摆拍 n 终态（soft 时按动画退回）；one(n) 只播拍 n；play() 从拍 1 连播到拍 5；reset() 回到起点。 */
 (function(){
 const NS = window.SNSims = window.SNSims || {};
 if (NS['r13/turns-r13']) return;
 
-const W = 600, H = 580, PX = (W-410)/2, N = 10, LAST = 5;
+const W = 600, H = 580, PX = (W-410)/2, N = 8, LAST = 5;
 // 对到阅读器谱页：卡片 410 → 786 框单位，卡片左上角落在 (24, 41)
 const R = 786/410, OX = 24 - PX*R, FW = 834;
 const INK = '#292D38', ACCENT = '#3F529F';
 const base = (()=>{ const c = document.currentScript && document.currentScript.src; return c ? new URL('../../assets/turns/', c).href : 'assets/turns/'; })();
-// 第 3 页（assets/turns/p3.jpg）从同一份 K. 545 PDF 按 1000×1414 渲染，往回翻到第 1 页时要经过它
-const PAGES = [1,2,3,4,5,6], THUMBS = [1,2,3,4,5,6];
-const MOV = ['1. Allegro','2. Andante','3. Rondo: Allegretto'], MSTART = [1,5,9];
-const mvOf = p => p >= 9 ? 2 : p >= 5 ? 1 : 0;
+// 8 页都是 1878 年 Breitkopf & Härtel 旧版莫扎特全集（Serie 20 N° 15，公有领域）的 K. 545，按 1000×1414 渲染（assets/turns/p1–p8、缩略图 t1–t8）
+const PAGES = [1,2,3,4,5,6,7,8], THUMBS = [1,2,3,4,5,6,7,8];
+const MOV = ['1. Allegro','2. Andante','3. Rondo: Allegretto'], MSTART = [1,4,7];
+const mvOf = p => p >= 7 ? 2 : p >= 4 ? 1 : 0;
 // 多语言：界面字查 i18n/turns-stats.json，照 App 的 Page / Bar 译法；乐章名是意大利文速度术语，各语言都不译
 const T = s => window.snT ? snT(s) : s;
 // 每页第一小节和本乐章小节总数（照谱面核过）
-const BAR = {1:[1,73],2:[18,73],3:[36,73],4:[55,73],5:[1,74],6:[17,74]};
+const BAR = {1:[1,73],2:[25,73],3:[50,73],4:[1,74],5:[25,74],6:[48,74],7:[1,73],8:[38,73]};
 // 胶囊：单项 92 宽，页码加小节两项 146 宽，高度不变
 const PW1 = 92, PW2 = 146, PY = H-30, PH = 22, INSET = 11;
 // 13 寸 iPad 上顶部和底部的条封顶 1.12 倍，窗口系数 1.235，相对谱页是 11 寸的 0.907（App UIScale.swift）
@@ -39,8 +39,10 @@ const CS = 0.907;
 const TOPF = (24 + 4*1.12)/1.235, BOTF = 20/1.235;
 // 翻页过场：App 的 UIPageViewController（.scroll，横向，页间距 12），一页连页间距整页滑过去；舞台单位
 const SLIDE = (FW + 12/1.235)/R, SLIDE_MS = 340, REST_MS = 90;
-// Allegro 第 24 小节在第 2 页第三行开头（assets/turns/p2.jpg 1000×1414 上量的：小节线 x 41.5–379.5，高音谱表上线 583、低音谱表下线 680，上下各留 12）；跳到这里，进跟谱只往回翻一页
-const B24 = {x:41.5, y:571, w:338, h:121};
+// Allegro 第 33 小节在第 2 页第三行开头（1300×1839 上量的：小节线 x 93–477.5，高音谱表上线 602.5、低音谱表下线 734.5，换成 1000×1414 再上下各留 12）；跳到这里，进跟谱只往回翻一页
+const B33 = {x:71.5, y:451.5, w:295.8, h:125.5};
+// Andante 那行字在第 4 页左上（1300×1839 上量的 184–284 × 113–132，四周各留 6）
+const AND = {x:178, y:107, w:112, h:31};
 
 const gl = b => `<svg viewBox="0 0 24 24" fill="none" stroke="${INK}" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="${b?'M12 6l-6 6 6 6M19 6l-6 6 6 6':'M5 6l6 6-6 6M12 6l6 6-6 6'}"/></svg>`;
 const chev = b => `<svg viewBox="0 0 24 24" fill="none" stroke="${INK}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="${b?'M14.5 6l-6 6 6 6':'M9.5 6l6 6-6 6'}"/></svg>`;
@@ -59,8 +61,8 @@ const CSS = `
 .sns-turns .t-card .pg.on{opacity:1}
 /* 跳到乐章开头：Andante 那行字强调蓝渐入、停、渐出；跳到小节：那一小节同样闪一下 */
 .sns-turns .tfl,.sns-turns .bfl{position:absolute;border-radius:3px;background:rgba(63,82,159,.2);box-shadow:inset 0 0 0 1px rgba(63,82,159,.75);opacity:0;pointer-events:none}
-.sns-turns .tfl{left:${(410*.146).toFixed(1)}px;top:${(580*.075).toFixed(1)}px;width:${(410*.094).toFixed(1)}px;height:${(580*.028).toFixed(1)}px}
-.sns-turns .bfl{left:${pc(B24.x,1000)};top:${pc(B24.y,1414)};width:${pc(B24.w,1000)};height:${pc(B24.h,1414)};background:rgba(63,82,159,.12)}
+.sns-turns .tfl{left:${pc(AND.x,1300)};top:${pc(AND.y,1839)};width:${pc(AND.w,1300)};height:${pc(AND.h,1839)}}
+.sns-turns .bfl{left:${pc(B33.x,1000)};top:${pc(B33.y,1414)};width:${pc(B33.w,1000)};height:${pc(B33.h,1414)};background:rgba(63,82,159,.12)}
 .sns-turns .tfl.go,.sns-turns .bfl.go{animation:trnFl 2.3s .25s ease both}
 @keyframes trnFl{0%{opacity:0}18%{opacity:1}62%{opacity:1}100%{opacity:0}}
 .sns-turns .ttl{position:absolute;left:50%;top:8px;height:22px;display:grid;place-items:center;padding:0 11px;border-radius:11px;${glass};white-space:nowrap;text-align:center;z-index:2;pointer-events:none}
@@ -271,10 +273,10 @@ NS['r13/turns-r13'] = function(root){
       await wait(300);
       await scrubTo(xFor(1), xFor(6), 1300);
       await wait(450);
-      await scrubTo(xFor(6), xFor(4), 600);
+      await scrubTo(xFor(6), xFor(3), 600);
       await wait(450);
       down(false); line.classList.add('ease');
-      st.page = 4; st.disp = 4; st.frac = null; st.thumb = 0; render();
+      st.page = 3; st.disp = 3; st.frac = null; st.thumb = 0; render();
       await wait(250); await lift();
       await wait(100);
     } else if (n===2){
@@ -290,13 +292,13 @@ NS['r13/turns-r13'] = function(root){
       await wait(350);
       await tapOn(mvNx, ()=>{
         mvNx.classList.remove('press'); void mvNx.offsetWidth; mvNx.classList.add('press');
-        setTimeout(()=>{ if (t.dead) return; st.page = 5; st.disp = 5; render(); tfl.classList.remove('go'); void tfl.offsetWidth; tfl.classList.add('go'); }, 180);
+        setTimeout(()=>{ if (t.dead) return; st.page = 4; st.disp = 4; render(); tfl.classList.remove('go'); void tfl.offsetWidth; tfl.classList.add('go'); }, 180);
       }, 620);
       // 收尾只等到 Andante 那行的闪光（点后 180 + .25s 延迟 + 2.3s）刚好走完，之后的停顿交给自动连播的 1 秒
       await wait(250); await lift();
       await wait(2100);
     } else if (n===4){
-      // 先点「« 1. Allegro」回到第 1 页（第 24 小节在 Allegro 第 2 页），胶囊再加宽成「Page | Bar」两半
+      // 先点「« 1. Allegro」回到第 1 页（第 33 小节在 Allegro 第 2 页），胶囊再加宽成「Page | Bar」两半
       await wait(350);
       await tapOn(mvPr, ()=>{
         mvPr.classList.remove('press'); void mvPr.offsetWidth; mvPr.classList.add('press');
@@ -310,11 +312,11 @@ NS['r13/turns-r13'] = function(root){
       await wait(300);
       await tapOn(brH, ()=>{ brH.classList.add('hit'); setTimeout(()=>brH.classList.remove('hit'), 220); st.pmode = 'bar'; st.pad = true; render(); }, 560);
       await wait(500);
-      await tapOn($('.pad .k[data-k="2"]'), ()=>hitKey('2'), 420);
-      await tapOn($('.pad .k[data-k="4"]'), ()=>hitKey('4'), 420);
+      await tapOn($('.pad .k[data-k="3"]'), ()=>hitKey('3'), 420);
+      await tapOn($('.pad .k[data-k="3"]'), ()=>hitKey('3'), 420);
       await wait(300);
       await tapOn(goB, ()=>{
-        st.pad = false; st.typed = ''; st.page = 2; st.disp = 2; st.bar = 24; render();
+        st.pad = false; st.typed = ''; st.page = 2; st.disp = 2; st.bar = 33; render();
         setTimeout(()=>{ if (t.dead) return; bfl.classList.remove('go'); void bfl.offsetWidth; bfl.classList.add('go'); }, 180);
       }, 460);
       await wait(250); await lift();
@@ -324,11 +326,11 @@ NS['r13/turns-r13'] = function(root){
   // end state of each beat
   function stateAt(n){
     const s = fresh();
-    if (n>=1){ s.page = s.disp = 4; }
+    if (n>=1){ s.page = s.disp = 3; }
     if (n>=2){ s.page = s.disp = 2; }
-    if (n>=3){ s.page = s.disp = 5; }
+    if (n>=3){ s.page = s.disp = 4; }
     if (n>=4){ s.page = s.disp = 1; s.bars = true; }
-    if (n>=5){ s.page = s.disp = 2; s.bar = 24; s.pmode = 'bar'; }
+    if (n>=5){ s.page = s.disp = 2; s.bar = 33; s.pmode = 'bar'; }
     return s;
   }
   function stop(){ if (tok){ tok.dead = true; tok = null; } if (rolling){ const r = rolling; rolling = null; r.res(false); unroll(r); } touch.style.opacity = 0; touch._down = false; tp = null; }
@@ -413,7 +415,7 @@ NS['r13/turns-r13'] = function(root){
     Object.assign(st, {pad:false, typed:'', thumb:0, frac:null}); line.classList.add('ease'); render();
     return st.page === 1 ? Promise.resolve(true) : roll(1, base, 250);
   }
-  // 跟谱章：这一层只留顶栏和胶囊（阅读器把它摆到跟谱层上面、不接点按），谱停在透明的第 1 页，胶囊照小节显示那样「Page p / 10 | Bar …」
+  // 跟谱章：这一层只留顶栏和胶囊（阅读器把它摆到跟谱层上面、不接点按），谱停在透明的第 1 页，胶囊照小节显示那样「Page p / 8 | Bar …」
   function fol(p){
     stop(); done = true; cur = 0;
     const was = st.bars;
@@ -448,7 +450,7 @@ NS['r13/turns-r13'] = function(root){
       const cand = PAGES.filter(p => mvOf(p) === m && BAR[p][0] <= b);
       const p = cand.length ? cand[cand.length - 1] : st.page;
       st.page = st.disp = p; st.bar = b; st.frac = null; render();
-      if (p === 2 && b === 24){ bfl.classList.remove('go'); void bfl.offsetWidth; bfl.classList.add('go'); }
+      if (p === 2 && b === 33){ bfl.classList.remove('go'); void bfl.offsetWidth; bfl.classList.add('go'); }
       return;
     }
     turnTo(near(Math.min(N, v)));
@@ -495,7 +497,7 @@ NS['r13/turns-r13'] = function(root){
     if (!drag.moved && Math.abs(ux - ux0) < 3) return;
     drag.moved = true; line.classList.remove('ease');
     const L = W/2 - drag.pw/2 + INSET, f = Math.min(1, Math.max(0, (ux - L)/(drag.pw - 2*INSET)));
-    // 只有前 6 页有缩略图和谱面，拖到 6 为止
+    // 8 页都有缩略图和谱面
     const pg = Math.min(THUMBS.length, Math.round(f*(N-1)) + 1);
     st.frac = Math.min(f, (THUMBS.length - 1)/(N - 1)); st.disp = pg; st.thumb = pg; render();
   });

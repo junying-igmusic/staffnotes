@@ -10,8 +10,8 @@ const NS = window.SNSims = window.SNSims || {};
 if (NS['r13/dict-r13']) return;
 const W = 834, H = 1194, K = 786/1300, PW = 280, PR = 810, PT = 70, HOLD = 520;
 const A = '#3F529F', INK = '#292D38', SEC = '#646A75', EZ = 'cubic-bezier(.2,.85,.25,1)';
-// 谱上 Allegro（页面像素 178–270 × 251–277，按实际谱图核过）换成舞台单位
-const ALG = {x: 24 + 178*K, y: 41 + 251*K, w: 92*K, h: 26*K};
+// 谱上 Allegro（页面像素 175–267 × 347–372，1878 旧版全集第 1 页上量的）换成舞台单位
+const ALG = {x: 24 + 175*K, y: 41 + 347*K, w: 92*K, h: 25*K};
 const T = {
   'allegro': ['Give the passage a brisk pace.', 'Here the word directs speed; its separate use as a movement title is excluded.'],
   'andante': ['Move at a walking pace.', 'The direction suggests a measured, forward-moving musical gait.'],

@@ -466,7 +466,7 @@ SNSims['r13/story-r13'] = function(root){
   // 标题照 App ScoreSavedNames：德语界面用目录里的德语标题，中文界面和英语一样
   const t545 = snT('Piano Sonata No. 16 in C Major, K. 545'), t331 = snT('Piano Sonata No. 11 in A Major, K. 331');
   const meta = [['m1',t545,300],['m2','Wolfgang Amadeus Mozart · 1756 – 1791',230],['m3',`${snT('Classical')} · ${min(11.5)}`,110]];
-  const mvs = [['1.','Allegro',snT('C Major'),min(3.5),1],['2.','Andante',snT('G Major'),min(6),5],['3.','Rondo: Allegretto',snT('C Major'),min(1.5),9]];
+  const mvs = [['1.','Allegro',snT('C Major'),min(3.5),1],['2.','Andante',snT('G Major'),min(6),4],['3.','Rondo: Allegretto',snT('C Major'),min(1.5),7]];
   const chev = '<svg width="9" height="14" viewBox="0 0 9 14" fill="none" stroke="#292D38" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m1.5 1.5 5.5 5.5-5.5 5.5"/></svg>';
   const back = '<svg width="9" height="14" viewBox="0 0 9 14" fill="none" stroke="#292D38" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 1.5-5.5 5.5 5.5 5.5"/></svg>';
   const down = '<svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="#3F529F" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m1 1 4 4 4-4"/></svg>';
@@ -580,10 +580,10 @@ SNSims['r13/story-r13'] = function(root){
     <div class="doc a ab" style="--fd:.3"><div class="pg"><div class="scan"></div></div><div class="fn">Scan 2026-11-03.pdf</div></div>
     <div class="rd">
       <div class="ttl"><span class="t1">1. Allegro · ${t545}<small>Wolfgang Amadeus Mozart · 1756 – 1791</small></span><span class="t2">2. Andante · ${t545}<small>Wolfgang Amadeus Mozart · 1756 – 1791</small></span></div>
-      <div class="vp"><div class="p1" style="background-image:url(${A}k545-p1.jpg)"></div><div class="p5" style="background-image:url(${A}k545-p5.jpg)"></div></div>
+      <div class="vp"><div class="p1" style="background-image:url(${A}k545-p1.jpg)"></div><div class="p5" style="background-image:url(${A}k545-p4.jpg)"></div></div>
       <div class="bar">
         <div class="mvb pr">${gl(1)}1. Allegro</div>
-        <div class="pgc">${snT('Page')}<span class="pn"><span class="q1">1 / 12</span><span class="q2">5 / 12</span></span><i></i></div>
+        <div class="pgc">${snT('Page')}<span class="pn"><span class="q1">1 / 8</span><span class="q2">4 / 8</span></span><i></i></div>
         <div class="mvb nx n1">2. Andante${gl(0)}</div>
         <div class="mvb nx n2">3. Rondo: Allegretto${gl(0)}</div>
       </div>
