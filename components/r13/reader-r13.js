@@ -2,8 +2,9 @@
    最底下一层是 board-r13：谱页和四色笔迹，全程都在；画笔面板只在画笔章出现，也只有画笔章能在谱上画。
    上面各章的原组件副本各占一层、铺满整个框，只在自己那一章出现：图层 layers-r13、词典 dict-r13、练习工具 practice-r13、
    Apple Music applemusic-r13、翻页与跳转和小节显示 turns-r13（拍 1–3、拍 4–5）、跟谱 follow-r13、云同步 sync-r13。
-   站名：pen1–5、lay1–2、dict1–2、prac1–3、am1–2、turn1–3、bar1–3、fol1–2、sync1–2，共 24 站（r14：画笔加 Undo，图层、Apple Music 各并成两站）。
-   r17：最后加云同步章 sync-r13（状态胶囊「Syncing…」「Also open on iPad mini」，右下角一台 iPad mini 显示同一页和笔迹）。
+   站名：pen1–5、lay1–2、dict1–2、prac1–3、am1–2、turn1–3、bar1–3、fol1–2、sync1–3，共 25 站（r14：画笔加 Undo，图层、Apple Music 各并成两站；r18：云同步改成三站）。
+   r17：最后加云同步章 sync-r13。r18：云同步章重写成「上课写下，回家就在」三拍（小谭 2026-11-16 选 A）：课上在谱页左上角写「♩=80」；回家在 iPad mini 上从图书馆点开 K. 545，笔迹都在；
+   两台同时开着，大 iPad 顶上胶囊「Also open on iPad mini」，mini 上画的「>」大 iPad 同一处随即出现。
    r17：「小节号显示」从跟谱章挪进小节号章（小谭：应该在前面小节的章节里），动画顺序不变：bar3 播的是跟谱层第 1 拍，fol1–2 是跟谱层第 2–3 拍。
    对外用新站名，里面照旧按原来的分法跑（IN）。
    接口照 r12：keys；beat(key, soft) 直接摆到这一站的终态（null 是刚打开的干净谱页；soft 时面板按开合动画退回）；one(key) 先摆上一站终态再只播这一站；
@@ -13,8 +14,8 @@ const NS = window.SNSims = window.SNSims || {};
 if (NS['r13/reader-r13']) return;
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const BASE = (document.currentScript && document.currentScript.src) ? new URL('./', document.currentScript.src).href : 'components/r13/';
-const KEYS = ['pen1','pen2','pen3','pen4','pen5','lay1','lay2','dict1','dict2','prac1','prac2','prac3','am1','am2','turn1','turn2','turn3','bar1','bar2','bar3','fol1','fol2','sync1','sync2'];
-const IN = [...KEYS.slice(0, 19), 'fol1', 'fol2', 'fol3', 'sync1', 'sync2'];
+const KEYS = ['pen1','pen2','pen3','pen4','pen5','lay1','lay2','dict1','dict2','prac1','prac2','prac3','am1','am2','turn1','turn2','turn3','bar1','bar2','bar3','fol1','fol2','sync1','sync2','sync3'];
+const IN = [...KEYS.slice(0, 19), 'fol1', 'fol2', 'fol3', 'sync1', 'sync2', 'sync3'];
 // 画笔五站：Pens（蓝）、Apple Pencil only（红）、Shapes（金）、Lasso（绿）、Undo（双指轻点两下撤销）；2026-11-15 小谭：Basic 的三站在前，Pro 的套索和撤销在后
 const DEMO = ['palette', 'pencil', 'shapes', 'lasso', 'undo'];
 // 画笔五个演示大概多长（毫秒，量过），给进度条用
@@ -38,7 +39,7 @@ const CSS = `
 function load(name){
   return new Promise(done => {
     if (NS['r13/' + name]) return done();
-    const s = document.createElement('script'); s.src = BASE + name + '.js?v=82144dc7'; s.async = false;
+    const s = document.createElement('script'); s.src = BASE + name + '.js?v=2fbce94c'; s.async = false;
     s.onload = s.onerror = () => done(); document.head.appendChild(s);
   });
 }
