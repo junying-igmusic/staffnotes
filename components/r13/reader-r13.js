@@ -2,9 +2,8 @@
    最底下一层是 board-r13：谱页和四色笔迹，全程都在；画笔面板只在画笔章出现，也只有画笔章能在谱上画。
    上面各章的原组件副本各占一层、铺满整个框，只在自己那一章出现：图层 layers-r13、词典 dict-r13、练习工具 practice-r13、
    Apple Music applemusic-r13、翻页与跳转和小节显示 turns-r13（拍 1–3、拍 4–5）、跟谱 follow-r13、云同步 sync-r13。
-   站名：pen1–5、lay1–2、dict1–2、prac1–3、am1–2、turn1–3、bar1–3、fol1–2、sync1–3，共 25 站（r14：画笔加 Undo，图层、Apple Music 各并成两站；r18：云同步改成三站）。
-   r17：最后加云同步章 sync-r13。r18：云同步章重写成「上课写下，回家就在」三拍（小谭 2026-11-16 选 A）：课上在谱页左上角写「♩=80」；回家在 iPad mini 上从图书馆点开 K. 545，笔迹都在；
-   两台同时开着，大 iPad 顶上胶囊「Also open on iPad mini」，mini 上画的「>」大 iPad 同一处随即出现。
+   站名：pen1–5、lay1–2、dict1–2、prac1–3、am1–2、turn1–3、bar1–3、fol1–2、sync1–4，共 26 站（r14：画笔加 Undo，图层、Apple Music 各并成两站；r19：云同步改成四站）。
+   r17：最后加云同步章 sync-r13。r19：云同步章改成「换了 iPad，笔记还在」四拍（小谭 2026-11-16 定）：阅读器拉远成一台 iPad 后熄屏；新 iPad 首页同步回作曲家文件夹；点开 K. 545 笔迹原样都在、放大回阅读器；iPad mini 上画「>」大 iPad 随即出现。
    r17：「小节号显示」从跟谱章挪进小节号章（小谭：应该在前面小节的章节里），动画顺序不变：bar3 播的是跟谱层第 1 拍，fol1–2 是跟谱层第 2–3 拍。
    对外用新站名，里面照旧按原来的分法跑（IN）。
    接口照 r12：keys；beat(key, soft) 直接摆到这一站的终态（null 是刚打开的干净谱页；soft 时面板按开合动画退回）；one(key) 先摆上一站终态再只播这一站；
@@ -14,8 +13,8 @@ const NS = window.SNSims = window.SNSims || {};
 if (NS['r13/reader-r13']) return;
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const BASE = (document.currentScript && document.currentScript.src) ? new URL('./', document.currentScript.src).href : 'components/r13/';
-const KEYS = ['pen1','pen2','pen3','pen4','pen5','lay1','lay2','dict1','dict2','prac1','prac2','prac3','am1','am2','turn1','turn2','turn3','bar1','bar2','bar3','fol1','fol2','sync1','sync2','sync3'];
-const IN = [...KEYS.slice(0, 19), 'fol1', 'fol2', 'fol3', 'sync1', 'sync2', 'sync3'];
+const KEYS = ['pen1','pen2','pen3','pen4','pen5','lay1','lay2','dict1','dict2','prac1','prac2','prac3','am1','am2','turn1','turn2','turn3','bar1','bar2','bar3','fol1','fol2','sync1','sync2','sync3','sync4'];
+const IN = [...KEYS.slice(0, 19), 'fol1', 'fol2', 'fol3', 'sync1', 'sync2', 'sync3', 'sync4'];
 // 画笔五站：Pens（蓝）、Apple Pencil only（红）、Shapes（金）、Lasso（绿）、Undo（双指轻点两下撤销）；2026-11-15 小谭：Basic 的三站在前，Pro 的套索和撤销在后
 const DEMO = ['palette', 'pencil', 'shapes', 'lasso', 'undo'];
 // 画笔五个演示大概多长（毫秒，量过），给进度条用
@@ -39,7 +38,7 @@ const CSS = `
 function load(name){
   return new Promise(done => {
     if (NS['r13/' + name]) return done();
-    const s = document.createElement('script'); s.src = BASE + name + '.js?v=2fbce94c'; s.async = false;
+    const s = document.createElement('script'); s.src = BASE + name + '.js?v=47aba7f3'; s.async = false;
     s.onload = s.onerror = () => done(); document.head.appendChild(s);
   });
 }
@@ -53,7 +52,7 @@ NS['r13/reader-r13'] = function(root){
 
   let L = null, cur = -1, chNow = null, penT0 = 0, penN = 0, penBusy = false, penTok = 0, pending = null, dead = false;
   // 翻页章和跟谱章的承接（小谭批注 77）：进跟谱前翻页层先一页页往回翻到第 1 页（pre），翻完才换层；第 1 页透明，滑的是 board 层
-  let pre = false, preK = 0;
+  let pre = false, preF = false, preK = 0, syncBack = -1;
   const slideBoard = x => { L.board.el.style.transform = x ? `translateX(${x}px)` : ''; };
 
   function init(){
@@ -114,7 +113,7 @@ NS['r13/reader-r13'] = function(root){
   // 只有画笔章：画笔面板出现、谱上能画
   function penMode(on){ L.board.api.pen(on); L.board.el.style.pointerEvents = on ? '' : 'none'; if (!on) L.board.api.visible(false); else L.board.api.visible(true); }
   // 顺带：往回翻到第 1 页还没翻完就换站，直接翻完，不再接跟谱
-  function stopPen(){ penTok++; penBusy = false; if (pre){ pre = false; preK++; L.turns.api.finish(); } }
+  function stopPen(){ penTok++; penBusy = false; if (pre){ pre = false; preK++; L.turns.api.finish(); } if (preF){ preF = false; preK++; } }
   function chapter(ch, soft){
     const want = ch ? CH[ch].c : null, fol = ch === 'fol';
     // 跟谱章：翻页层的顶栏和页码胶囊一直留着，盖在跟谱层上面、只看不点
@@ -129,8 +128,13 @@ NS['r13/reader-r13'] = function(root){
 
   function beat(key, soft){
     if (!L){ pending = [beat, [key, soft]]; return; }
-    const s = parse(key); stopPen();
-    cur = s ? s.ri : -1;
+    let s = parse(key);
+    // 版面层倒退起步时传入目标的上一站；云同步提前摆目标终态，抵达后不重播。
+    const next = s && parse(KEYS[s.ri + 1]);
+    const returning = soft && chNow === 'sync' && s && s.ri < cur && next?.ch === 'sync';
+    if (returning) s = next;
+    syncBack = returning ? s.ri : -1;
+    stopPen(); cur = s ? s.ri : -1;
     if (!s){ strokes([]); chapter(null, soft); return; }
     strokes(s.ch === 'pen' ? DEMO.slice(0, s.n) : DEMO);
     // 从跟谱第 2 站退回第 1 站：不闪回上一站停的第 6 页，跟谱层退回起点等着重播
@@ -148,8 +152,10 @@ NS['r13/reader-r13'] = function(root){
     if (!L){ pending = [one, [key]]; return; }
     const s = parse(key); if (!s){ beat(null); return; }
     if (RM){ beat(key); return; }
-    stopPen(); cur = s.ri;
+    const returning = s.ch === 'sync' && (s.ri < cur || s.ri === syncBack);
+    syncBack = -1; stopPen(); cur = s.ri;
     const c = CH[s.ch];
+    if (returning){ strokes(DEMO); chapter(s.ch, true); L.sync.api.beat(c.o + s.n, true); return; }
     if (s.ch === 'pen'){
       strokes(DEMO.slice(0, s.n - 1)); chapter('pen', true);
       const tok = ++penTok; penBusy = true; penN = s.n; penT0 = performance.now();
@@ -161,6 +167,17 @@ NS['r13/reader-r13'] = function(root){
     if (c.c === 'follow' && L.turns.on && chNow !== 'fol'){
       const k = ++preK; pre = true;
       L.turns.api.leave(slideBoard).then(ok => { if (!ok || k !== preK) return; pre = false; chapter(s.ch, true); L.follow.api.one(c.o + s.n); });
+      return;
+    }
+    // 跟谱先滑回第一页，再等顶底栏退场；进场期间保持 busy，避免自动连播提前换站。
+    if (c.c === 'sync' && chNow === 'fol'){
+      const k = ++preK; preF = true;
+      L.follow.api.beat(0, true);
+      setTimeout(() => {
+        if (k !== preK) return;
+        chapter(s.ch, true);
+        setTimeout(() => { if (k !== preK) return; preF = false; L.sync.api.one(c.o + s.n); }, 350);
+      }, 400);
       return;
     }
     chapter(s.ch, true);
@@ -175,12 +192,13 @@ NS['r13/reader-r13'] = function(root){
     beat, one,
     get busy(){
       if (!L) return !!pending;
+      if (preF) return true;
       if (chNow === 'pen') return penBusy && L.board.api.busy;
       const o = active(); return !!(o && o.api.busy);
     },
     get beatNow(){ return cur; },
     get beatFrac(){
-      if (!L || cur < 0 || pre) return 0;
+      if (!L || cur < 0 || pre || preF) return 0;
       if (chNow === 'pen') return penBusy && L.board.api.busy ? Math.min(1, (performance.now() - penT0)/PEN_MS[penN - 1]) : 1;
       const o = active(), s = parse(KEYS[cur]);
       if (!o || !s) return 1;
@@ -192,8 +210,8 @@ NS['r13/reader-r13'] = function(root){
     get strokeColors(){ return L ? L.board.api.strokeColors : []; },
     get hiddenColors(){ return L ? L.board.api.hidden : []; },
     get parts(){ return L ? Object.fromEntries(Object.entries(L).map(([k, o]) => [k, o.api])) : null; },
-    visible(on){ if (!L) return; OVER.forEach(n => L[n].api.visible?.(on && L[n].on)); L.board.api.visible(on && chNow === 'pen'); },
-    destroy(){ dead = true; ro.disconnect(); if (L) Object.values(L).forEach(o => o.api.destroy?.()); root.innerHTML = ''; }
+    visible(on){ if (!L) return; if (!on && preF) stopPen(); OVER.forEach(n => L[n].api.visible?.(on && L[n].on)); L.board.api.visible(on && chNow === 'pen'); },
+    destroy(){ dead = true; if (L) stopPen(); ro.disconnect(); if (L) Object.values(L).forEach(o => o.api.destroy?.()); root.innerHTML = ''; }
   };
 };
 })();
