@@ -109,22 +109,17 @@ ${G(3)} .dd{transform:${PR};z-index:3;transition:transform calc(.9s*var(--k)) cu
 ${G(3)} .ab{opacity:1;transform:${BIG};z-index:7;transition:transform calc(.95s*var(--k)) cubic-bezier(.2,.7,.2,1) calc(${M4+.05}s*var(--k)),opacity calc(.1s*var(--k)) ease calc(${M4}s*var(--k))}
 .sns-story[data-s="3"] .ab .fn{opacity:1;transition-delay:calc(${M4+.95}s*var(--k))}
 
-/* 图书馆右上角的「导入」按钮和它的菜单（照 App 的 LibraryHeaderBar：导入乐谱、在线曲库）；手机窄版拍 1–4 只看 70–710，按钮跟着往里收 */
+/* 图书馆右上角的「导入」按钮和它的菜单（照 App 的 LibraryHeaderBar：导入乐谱、在线曲库）；手机窄版拍 1–4 只看 70–710，按钮跟着往里收。按钮只在要点它的拍 1、拍 2 出现：拍开头 .2 秒淡入，按下、菜单弹出，菜单收起（TC）时一起淡出；其余各拍都不显示（小谭 2026-11-16「只有需要他的时候才存在」） */
 .sns-story .ib{position:absolute;top:28px;right:17px;height:36px;padding:0 15px 0 12px;border-radius:18px;display:flex;align-items:center;gap:6px;font-size:15px;color:#3F529F;background:#fff;z-index:2;white-space:nowrap;opacity:0;
   box-shadow:0 1px 4px rgba(0,0,0,.06),0 4px 14px -6px rgba(41,45,56,.18),inset 0 0 0 .5px rgba(0,0,0,.05);transition:opacity calc(.3s*var(--k)),right calc(.9s*var(--k)) cubic-bezier(.2,.7,.2,1)}
 .sns-story .ib svg{flex:none}
 .sns-story.narrow:not(.g5) :is(.ib,.mn){right:87px}
-${G(1)} .ib{opacity:1}
-.sns-story[data-s="1"] .ib{animation:snsTap1 calc(.35s*var(--k)) calc(${TI+.25}s*var(--k)) ease both}
-.sns-story[data-s="2"] .ib{animation:snsTap2 calc(.35s*var(--k)) calc(${TI+.25}s*var(--k)) ease both}
+.sns-story[data-s="1"] .ib{animation:snsTap1 calc(.35s*var(--k)) calc(${TI+.25}s*var(--k)) ease both,snsIbV1 calc(${TC+.2}s*var(--k)) linear both}
+.sns-story[data-s="2"] .ib{animation:snsTap2 calc(.35s*var(--k)) calc(${TI+.25}s*var(--k)) ease both,snsIbV2 calc(${TC+.2}s*var(--k)) linear both}
 @keyframes snsTap1{50%{transform:scale(.93)}100%{transform:none}}
 @keyframes snsTap2{50%{transform:scale(.93)}100%{transform:none}}
-/* 桌面宽度：弹窗盖住按钮时先隐去，免得从弹窗右边露出半截 */
-.sns-story:not(.narrow)[data-s="1"] .ib{animation:snsTap1 calc(.35s*var(--k)) calc(${TI+.25}s*var(--k)) ease both,snsIbH1 calc(${QX+.3}s*var(--k)) linear both}
-@keyframes snsIbH1{0%,${pc(TC, QX+.3)}{opacity:1}${pc(TC+.2, QX+.3)},${pc(QX+.05, QX+.3)}{opacity:0}100%{opacity:1}}
-.sns-story:not(.narrow)[data-s="3"] .ib{animation:snsIbH3 calc(${M4+.35}s*var(--k)) linear both}
-@keyframes snsIbH3{0%,${pc(.1, M4+.35)}{opacity:1}${pc(.3, M4+.35)},${pc(M4, M4+.35)}{opacity:0}100%{opacity:1}}
-.sns-story:not(.narrow)[data-s="4"] .ib{opacity:0}
+@keyframes snsIbV1{0%{opacity:0}${pc(.2, TC+.2)}{opacity:1}${pc(TC, TC+.2)}{opacity:1}100%{opacity:0}}
+@keyframes snsIbV2{0%{opacity:0}${pc(.2, TC+.2)}{opacity:1}${pc(TC, TC+.2)}{opacity:1}100%{opacity:0}}
 .sns-story .mn{position:absolute;top:72px;right:17px;min-width:220px;padding:6px 0;border-radius:14px;background:rgba(255,255,255,.98);z-index:7;opacity:0;transform-origin:100% 0;
   box-shadow:0 0 0 .5px rgba(0,0,0,.06),0 12px 36px -10px rgba(41,45,56,.32)}
 .sns-story .mi{position:relative;isolation:isolate;display:flex;align-items:center;gap:12px;height:44px;padding:0 22px 0 16px;font-size:15px;white-space:nowrap}
@@ -403,8 +398,8 @@ ${G(6)} .sc{opacity:1;transform:none;transition-delay:calc((.9s + var(--i)*.12s)
 .sns-story .ttl .t2,.sns-story[data-s="7"] .ttl .t1{opacity:0}
 .sns-story[data-s="7"] .ttl .t2{opacity:1}
 .sns-story[data-s="7"] .ttl>span{transition-delay:calc(${T5+.15}s*var(--k))}
-/* 底栏：页码胶囊居中，上一乐章在左、下一乐章在右 */
-.sns-story .bar{position:absolute;left:0;right:0;top:${H-30}px;height:22px}
+/* 底栏：页码胶囊和可见的下一乐章整组居中 */
+.sns-story .bar{position:absolute;left:0;right:0;top:${H-30}px;height:22px;translate:var(--bx,0px) 0}
 .sns-story .pgc{position:absolute;left:50%;top:0;width:92px;height:22px;margin-left:-46px;display:flex;align-items:center;justify-content:center;gap:5px;border-radius:11px;background:rgba(255,255,255,.9);box-shadow:0 1px 2px rgba(0,0,0,.07),inset 0 0 0 .5px rgba(0,0,0,.06);font-size:8.5px;color:#646A75;overflow:hidden}
 .sns-story .pn{position:relative;display:grid;padding:2px 5px;border-radius:4px;background:#EDEDEF;color:#292D38;font-variant-numeric:tabular-nums}
 .sns-story .pn span{grid-area:1/1;text-align:center;transition:opacity calc(.12s*var(--k))}
@@ -414,6 +409,8 @@ ${G(6)} .sc{opacity:1;transform:none;transition-delay:calc((.9s + var(--i)*.12s)
 .sns-story .pgc i{position:absolute;left:11px;bottom:0;height:1.5px;width:calc((92px - 22px)/12);border-radius:1px;background:#3F529F}
 .sns-story[data-s="7"] .pgc i{width:calc((92px - 22px)*5/12);transition-delay:calc(${T5+.15}s*var(--k))}
 .sns-story .mvb{position:absolute;top:0;height:22px;display:flex;align-items:center;gap:4px;padding:0 9px;border-radius:11px;background:rgba(255,255,255,.9);box-shadow:0 1px 2px rgba(0,0,0,.07),inset 0 0 0 .5px rgba(0,0,0,.06);font-size:8.5px;white-space:nowrap;transition:opacity calc(.2s*var(--k))}
+.sns-story.narrow .mvb{width:22px;padding:0;justify-content:center}
+.sns-story.narrow .mvb span{display:none}
 .sns-story .mvb svg{flex:none;width:8px;height:8px}
 .sns-story .mvb.nx{left:${W/2+52}px}.sns-story .mvb.pr{right:${W/2+52}px}
 .sns-story .mvb.n2,.sns-story .mvb.pr{opacity:0}
@@ -582,13 +579,13 @@ SNSims['r13/story-r13'] = function(root){
       <div class="ttl"><span class="t1">1. Allegro · ${t545}<small>Wolfgang Amadeus Mozart · 1756 – 1791</small></span><span class="t2">2. Andante · ${t545}<small>Wolfgang Amadeus Mozart · 1756 – 1791</small></span></div>
       <div class="vp"><div class="p1" style="background-image:url(${A}k545-p1.jpg)"></div><div class="p5" style="background-image:url(${A}k545-p4.jpg)"></div></div>
       <div class="bar">
-        <div class="mvb pr">${gl(1)}1. Allegro</div>
+        <div class="mvb pr" aria-label="1. Allegro" title="1. Allegro">${gl(1)}<span>1. Allegro</span></div>
         <div class="pgc">${snT('Page')}<span class="pn"><span class="q1">1 / 8</span><span class="q2">4 / 8</span></span><i></i></div>
-        <div class="mvb nx n1">2. Andante${gl(0)}</div>
-        <div class="mvb nx n2">3. Rondo: Allegretto${gl(0)}</div>
+        <div class="mvb nx n1" aria-label="2. Andante" title="2. Andante"><span>2. Andante</span>${gl(0)}</div>
+        <div class="mvb nx n2" aria-label="3. Rondo: Allegretto" title="3. Rondo: Allegretto"><span>3. Rondo: Allegretto</span>${gl(0)}</div>
       </div>
-      <i class="rp" style="left:${W/2+84}px;top:${H-19}px"></i>
-      <i class="tp snd t7" style="left:${W/2+84}px;top:${H-19}px"></i>
+      <i class="rp" style="left:calc(${W/2+52}px + var(--n1h,32px) + var(--bx,0px));top:${H-19}px"></i>
+      <i class="tp snd t7" style="left:calc(${W/2+52}px + var(--n1h,32px) + var(--bx,0px));top:${H-19}px"></i>
     </div>
   </div>`;
   const st = root.firstElementChild;
@@ -596,11 +593,15 @@ SNSims['r13/story-r13'] = function(root){
   let cur = 0, zpan = 0, dotPx = 26;
   const fit=()=>{
     const narrow = root.clientWidth < 560; root.classList.toggle('narrow', narrow);
+    const wN1 = st.querySelector('.mvb.n1').offsetWidth;
+    root.style.setProperty('--bx', -(6 + wN1)/2 + 'px');
+    root.style.setProperty('--n1h', wN1/2 + 'px');
     const s = root.clientWidth/(narrow ? VN : W), pan = narrow ? (cur===5 ? PN : cur===6 ? zpan*(W-VN)/2 : (W-VN)/2) : 0;
     st.style.transform=`translateX(${-pan*s}px) scale(${s})`;
     if(s) root.style.setProperty('--dotu', (dotPx/s).toFixed(2)+'px');
   };
   const ro=new ResizeObserver(fit); ro.observe(root); fit();
+  document.fonts.ready.then(fit);
 
   // 自动连播：每拍按 DUR 播完自动进下一拍，拍 6 播完停在终态
   const DUR = [0, Math.round((QM+1.1)*1000), Math.round((LE+.3)*1000), Math.round((M4+1.35)*1000), Math.round((TV+.3)*1000), 2900, 2600, Math.round((T5+1.3)*1000)];
