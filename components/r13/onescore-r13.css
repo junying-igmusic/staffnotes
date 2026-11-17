@@ -70,6 +70,17 @@ section#stats .st{margin-top:0}
 /* 标题照在线曲库排：小标签、大标题、一段说明 */
 #stats .st-top{margin-bottom:56px}
 #stats .st-top p{color:var(--ink2);max-width:400px;margin-top:22px;font-size:16px}
+/* 自建文件夹单独一块，接在统计后面：左边章节文字（同一张谱里各章的排法），右边图书馆演示和三段进度条 */
+#folders{padding:150px 0 120px}
+#folders .fo{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(40px,6vw,96px);align-items:center}
+#folders .fo-copy{pointer-events:auto}
+#folders .fo-stage{display:grid;justify-items:center;gap:18px}
+#folders .sim{aspect-ratio:640/610;width:min(100%,calc(74vh * 640 / 610))}
+@media (max-width:900px){
+  #folders{padding:110px 0 80px}
+  #folders .fo{grid-template-columns:minmax(0,1fr);gap:36px}
+  #folders .sim{width:100%}
+}
 @media (max-width:900px){
   #stats{padding:110px 0 80px}
   #stats .st-top{margin-bottom:36px}
