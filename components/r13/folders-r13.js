@@ -1,8 +1,8 @@
 /* r17 乐谱管理（自建文件夹）：一张图书馆，三拍，照 App 的管理模式（LibraryManagementViews / LibraryNativeToolbar / HomeView.scoreCell）走。
    拍 1 选择乐谱：点右上角「选择」进管理模式（上面换成管理工具栏，卡片左上角换成圆圈、没选的淡到 .6），依次点 K. 545、Op. 49 No. 2，左上角按点选顺序标 1、2，工具栏长出加入、归属、收藏、删除；
-   拍 2 新建文件夹：点「新建」，弹窗直接是 New Folder 页（✓ 先灰），一个字一个字打名字，✓ 变亮、点它：建好就收起整个弹窗回到图书馆（不退回根页、不再点一次完成），
-        两份谱子飞进「我的分类」里新出现的文件夹，选择清空，管理模式还在；
-   拍 3 加入文件夹：点 K. 331 →「加入」→ 列表点刚建的文件夹，谱子飞进去、数字 2→3，选择清空，弹窗退回根页；点弹窗「完成」、再点工具栏「完成」回到浏览，
+   拍 2 新建文件夹：点「新建」，弹窗直接是 New Folder 页（✓ 先灰），一个字一个字打名字，✓ 变亮、点它：建好就收起整个弹窗、结束这次管理回到普通图书馆
+        （不退回根页、不再点一次完成；右上换回「选择」，选圈和管理工具栏消失），两份谱子飞进「我的分类」里新出现的文件夹；
+   拍 3 加入文件夹：重新点「选择」进管理，点 K. 331 →「加入」→ 列表点刚建的文件夹，谱子飞进去、数字 2→3，选择清空，弹窗退回根页；点弹窗「完成」、再点工具栏「完成」回到浏览，
         点开这个文件夹：它另起一行排在最左，右边排出里面的三份谱子（一份谱可以同时在几个文件夹里，原来的「最近打开」不动）。
    卡片、文件夹封面、点按圆点、飞进文件夹的样子沿用 story-r13；图标路径照 App 的 LibraryManagementIcons（folder、folderAdd、folderJoin、folderMembership、favorite），SF 图标按同样线宽画。
    弹窗照 App 是 384pt 宽、贴工具栏右上角的 popover，这里按 350 宽、内容高 250 画（App 里最小高 260pt）；乐谱数、文件夹数都是样例。
@@ -25,7 +25,7 @@ const CW = 134.8, CH = 190, GAP = 18, X0 = 23.4, R1 = 112, R2 = 407, R3 = R2 + C
 const colX = c => X0 + c*(CW + GAP);
 const TR = colX(3) + CW, PW = 350, PH = 250, PT = 22;
 // 拍长（毫秒），给进度条估算；每拍实际播完以脚本为准
-const DUR = [0, 4900, 6300, 10600];
+const DUR = [0, 4900, 6300, 12100];
 // 中途前进时，上一拍没走完的动作按这个时间倍数补完
 const FAST = .4;
 const NAME = () => snT('Recital');
@@ -63,7 +63,7 @@ const FD = [
 const S = [
   {mg: false, sel: [], rec: [], go: [], pop: null, page: 'root', name: '', open: false},
   {mg: true, sel: ['k545', 'op49'], rec: [], go: [], pop: null, page: 'root', name: '', open: false},
-  {mg: true, sel: [], rec: ['k545', 'op49'], go: [], pop: null, page: 'root', name: '*', open: false},
+  {mg: false, sel: [], rec: ['k545', 'op49'], go: [], pop: null, page: 'root', name: '*', open: false},
   {mg: false, sel: [], rec: ['k545', 'op49', 'k331'], go: [], pop: null, page: 'root', name: '*', open: true}
 ];
 
@@ -366,13 +366,15 @@ NS['r13/folders-r13'] = function(root, opts = {}){
         // 先等再打：中途接手时下一个字也隔一拍才出来
         for (const ch of full.slice([...st8.name].length)){ await wait(gap); st8.name += ch; render(true); }
         await wait(380 + gap); await tap(ok, .5, .5, 600);
-        // 建好就收起整个弹窗回到图书馆：不退回根页、不再点一次完成（弹窗停在新建页淡出）；两份谱子飞进新文件夹，选择清空，管理模式还在
-        set({name: '*', sel: [], pop: null, go: st8.sel.slice()});
+        // 建好就收起整个弹窗并结束管理（照 App 创建成功的收尾）：不退回根页、不再点一次完成（弹窗停在新建页淡出），右上换回「选择」；两份谱子飞进新文件夹
+        set({name: '*', sel: [], pop: null, mg: false, go: st8.sel.slice()});
         await lift();
       }
       await launch(250); await wait(700);
     } else if (n === 3){
       if (!st8.rec.includes('k331') && !st8.go.includes('k331')){
+        // 拍 2 已回到普通图书馆：重新点「选择」进管理
+        if (!st8.mg){ await wait(450); await tap($('.tb.br .gb'), .5, .5, 620); set({mg: true}); await lift(); }
         if (!st8.sel.includes('k331')){ await wait(350); await tap(shelf.k331.querySelector('.th'), .5, .42, 600, shelf.k331); sel('k331'); await lift(); }
         if (st8.pop !== 'add'){
           await wait(300); await tap($('.gb.ad'), .5, .5, 560);
