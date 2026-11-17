@@ -2,8 +2,8 @@
    拍 1 选择乐谱：点右上角「选择」进管理模式（上面换成管理工具栏，卡片左上角换成圆圈、没选的淡到 .6），依次点 K. 545、Op. 49 No. 2，左上角按点选顺序标 1、2，工具栏长出加入、归属、收藏、删除；
    拍 2 新建文件夹：点「新建」，弹窗直接是 New Folder 页（✓ 先灰），一个字一个字打名字，✓ 变亮、点它：建好就收起整个弹窗、结束这次管理回到普通图书馆
         （不退回根页、不再点一次完成；右上换回「选择」，选圈和管理工具栏消失），两份谱子飞进「我的分类」里新出现的文件夹；
-   拍 3 加入文件夹：重新点「选择」进管理，点 K. 331 →「加入」→ 列表点刚建的文件夹，谱子飞进去、数字 2→3，选择清空，弹窗退回根页；点弹窗「完成」、再点工具栏「完成」回到浏览，
-        点开这个文件夹：它另起一行排在最左，右边排出里面的三份谱子（一份谱可以同时在几个文件夹里，原来的「最近打开」不动）。
+   拍 3 加入文件夹：重新点「选择」进管理，点 K. 331 →「加入」→ 列表点刚建的文件夹：点行就存好，和拍 2 一样收起整个弹窗、结束管理回到普通图书馆
+        （不退回根页、不点弹窗「完成」也不点工具栏「完成」），谱子飞进去、数字 2→3；再点开这个文件夹：它另起一行排在最左，右边排出里面的三份谱子（一份谱可以同时在几个文件夹里，原来的「最近打开」不动）。
    卡片、文件夹封面、点按圆点、飞进文件夹的样子沿用 story-r13；图标路径照 App 的 LibraryManagementIcons（folder、folderAdd、folderJoin、folderMembership、favorite），SF 图标按同样线宽画。
    弹窗照 App 是 384pt 宽、贴工具栏右上角的 popover，这里按 350 宽、内容高 250 画（App 里最小高 260pt）；乐谱数、文件夹数都是样例。
    接口（和 dict、follow 一样）：beats、beat(n, soft) 直接摆第 n 拍终态（soft 带过渡退回）、one(n) 先摆第 n−1 拍终态再只播第 n 拍、busy、beatNow、beatFrac、
@@ -25,7 +25,7 @@ const CW = 134.8, CH = 190, GAP = 18, X0 = 23.4, R1 = 112, R2 = 407, R3 = R2 + C
 const colX = c => X0 + c*(CW + GAP);
 const TR = colX(3) + CW, PW = 350, PH = 250, PT = 22;
 // 拍长（毫秒），给进度条估算；每拍实际播完以脚本为准
-const DUR = [0, 4900, 6300, 12100];
+const DUR = [0, 4900, 6300, 10400];
 // 中途前进时，上一拍没走完的动作按这个时间倍数补完
 const FAST = .4;
 const NAME = () => snT('Recital');
@@ -383,12 +383,11 @@ NS['r13/folders-r13'] = function(root, opts = {}){
         }
         const row = $('.rcr');
         await moveTo(at(row, .3, .5), 560); row.classList.add('hl'); await press();
-        set({sel: [], page: 'root', go: st8.sel.slice()}); setTimeout(() => { if (!t.dead) row.classList.remove('hl'); }, 250*t.k);
+        // 点行就存好：加入成功同样收起整个弹窗并结束管理（弹窗停在加入页淡出），右上换回「选择」；K. 331 飞进文件夹
+        set({sel: [], pop: null, mg: false, go: st8.sel.slice()}); setTimeout(() => { if (!t.dead) row.classList.remove('hl'); }, 250*t.k);
         await lift();
       }
       await launch(200); await wait(650);
-      if (st8.pop){ await tap($('.pd'), .5, .5, 600); set({pop: null}); await lift(); }
-      if (st8.mg){ await wait(320); await tap($('.dn'), .5, .5, 560); set({mg: false}); await lift(); }
       if (!st8.open){ await wait(380); await tap(rc.querySelector('.cv'), .5, .5, 600, rc); set({open: true}); await lift(); }
       await wait(1500);
     }
