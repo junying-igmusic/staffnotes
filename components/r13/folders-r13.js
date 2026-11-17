@@ -1,13 +1,17 @@
 /* r17 乐谱管理（自建文件夹）：一张图书馆，三拍，照 App 的管理模式（LibraryManagementViews / LibraryNativeToolbar / HomeView.scoreCell）走。
-   拍 1 选择乐谱：点右上角「选择」进管理模式（上面换成管理工具栏，卡片左上角换成圆圈、没选的淡到 .6），依次点 K. 545、Op. 111，左上角按点选顺序标 1、2，工具栏长出加入、归属、收藏、删除；
-   拍 2 新建文件夹：点「新建」，弹窗直接是 New Folder 页（✓ 先灰），一个字一个字打名字，✓ 变亮、点它：两份谱子飞进「我的分类」里新出现的文件夹，选择清空，
-        弹窗退回根页（已选择 0 份、空状态），管理模式还在；点弹窗的「完成」收起；
+   拍 1 选择乐谱：点右上角「选择」进管理模式（上面换成管理工具栏，卡片左上角换成圆圈、没选的淡到 .6），依次点 K. 545、Op. 49 No. 2，左上角按点选顺序标 1、2，工具栏长出加入、归属、收藏、删除；
+   拍 2 新建文件夹：点「新建」，弹窗直接是 New Folder 页（✓ 先灰），一个字一个字打名字，✓ 变亮、点它：建好就收起整个弹窗回到图书馆（不退回根页、不再点一次完成），
+        两份谱子飞进「我的分类」里新出现的文件夹，选择清空，管理模式还在；
    拍 3 加入文件夹：点 K. 331 →「加入」→ 列表点刚建的文件夹，谱子飞进去、数字 2→3，选择清空，弹窗退回根页；点弹窗「完成」、再点工具栏「完成」回到浏览，
         点开这个文件夹：它另起一行排在最左，右边排出里面的三份谱子（一份谱可以同时在几个文件夹里，原来的「最近打开」不动）。
    卡片、文件夹封面、点按圆点、飞进文件夹的样子沿用 story-r13；图标路径照 App 的 LibraryManagementIcons（folder、folderAdd、folderJoin、folderMembership、favorite），SF 图标按同样线宽画。
    弹窗照 App 是 384pt 宽、贴工具栏右上角的 popover，这里按 350 宽、内容高 250 画（App 里最小高 260pt）；乐谱数、文件夹数都是样例。
    接口（和 dict、follow 一样）：beats、beat(n, soft) 直接摆第 n 拍终态（soft 带过渡退回）、one(n) 先摆第 n−1 拍终态再只播第 n 拍、busy、beatNow、beatFrac、
-   interrupt() 停在当前拍终态、visible(on)、dot(px)、destroy()；在官网页面里自己接上 #folders 的章节列表和进度条，连播 1→2→3。 */
+   one(n, true) 接着上一拍往前走：上一拍没走完的动作从当前画面按 FAST 倍速补完（圆点、打字、飞行都接着走），再播第 n 拍，不摆终态、不重建；
+   interrupt() 原地停住（飞行中的谱子一起停），等 one(n + 1, true) 接着走；visible(on)、dot(px)、destroy()；
+   在官网页面里自己接上 #folders 的章节列表和进度条，连播 1→2→3，滚走时停在当前拍终态。
+   谱图：K. 545 是 Breitkopf & Härtel AMA 1878；两首贝多芬和收藏封面的 K. 545 是 G. Schirmer《Sonata album》c1894–95（archive.org sonataalbumtwent01lebe）；
+   K. 331 是官网用 LilyPond 自刻（work/r17/k331/k331.ly）。来源和生成步骤见 work/organize-1117/HANDOFF.md。 */
 (function(){
 const NS = window.SNSims = window.SNSims || {};
 if (NS['r13/folders-r13']) return;
@@ -21,7 +25,9 @@ const CW = 134.8, CH = 190, GAP = 18, X0 = 23.4, R1 = 112, R2 = 407, R3 = R2 + C
 const colX = c => X0 + c*(CW + GAP);
 const TR = colX(3) + CW, PW = 350, PH = 250, PT = 22;
 // 拍长（毫秒），给进度条估算；每拍实际播完以脚本为准
-const DUR = [0, 4900, 7600, 10600];
+const DUR = [0, 4900, 6300, 10600];
+// 中途前进时，上一拍没走完的动作按这个时间倍数补完
+const FAST = .4;
 const NAME = () => snT('Recital');
 // App 的 LibraryManagementIcons（viewBox 24，线宽 1.5），和 SF 图标用同一套画法
 const P = {
@@ -39,26 +45,26 @@ const I = {
   trash: svg('<path d="M4.5 6.5h15M9.5 6.5V4.8c0-.6.4-1 1-1h3c.6 0 1 .4 1 1v1.7M6.6 6.5l.8 12.2c.1 1 .9 1.8 1.9 1.8h5.4c1 0 1.8-.8 1.9-1.8l.8-12.2M10.2 10.2v6.6M13.8 10.2v6.6"/>'),
   x: svg('<path d="M7 7l10 10M17 7L7 17"/>'), ok: svg('<path d="M5.6 12.6l4.2 4.2 8.6-9.4"/>')
 };
-// 「最近打开」四份：K. 545（1878 年 Breitkopf 全集版第 1 页）、带批注的 Op. 111、K. 331、肖邦夜曲（都是官网已核过来源的素材）
+// 「最近打开」四份，每张图都是这首作品自己的谱页：K. 545（AMA 1878 第 1 页）、Op. 49 No. 2 和 Op. 14 No. 2（Schirmer 首页）、K. 331（LilyPond 自刻）
 const SC = [
   {id: 'k545', img: 'k545-p1.jpg', t: 'Piano Sonata No. 16 in C Major, K. 545', c: 'Wolfgang Amadeus Mozart'},
-  {id: 'op111', img: 'op111-annot.jpg', t: 'Piano Sonata No. 32 in C minor, Op. 111', c: 'Ludwig van Beethoven'},
+  {id: 'op49', img: 'fo-op49-2.jpg', t: 'Piano Sonata No. 20 in G Major, Op. 49 No. 2', c: 'Ludwig van Beethoven'},
   {id: 'k331', img: 'k331-p1.jpg', t: 'Piano Sonata No. 11 in A Major, K. 331', c: 'Wolfgang Amadeus Mozart'},
-  {id: 'chopin', img: 'th-Chopin_Nocturne_Op9_No1.jpg', t: 'Nocturne in B-flat minor, Op. 9 No. 1', c: 'Frédéric Chopin'}
+  {id: 'op14', img: 'fo-op14-2.jpg', t: 'Piano Sonata No. 10 in G Major, Op. 14 No. 2', c: 'Ludwig van Beethoven'}
 ];
 const BY = Object.fromEntries(SC.map(s => [s.id, s]));
 // 「我的分类」照 App 的顺序：最近添加、A–Z、收藏，然后是自建文件夹（新建的排在后面这一格）
 const FD = [
   {k: 'ra', t: 'Recently Added', png: 'added', n: 12, pv: 'k331-p1.jpg', cls: 'wr'},
-  {k: 'az', t: 'A–Z', png: 'all', n: 12, pv: 'th-Brahms_Ballade_Op118_No3.jpg', cls: 'az'},
-  {k: 'fv', t: 'Favorites', icon: 'fav', n: 3, pv: 'th-Chopin_Nocturne_Op9_No1.jpg'}
+  {k: 'az', t: 'A–Z', png: 'all', n: 12, pv: 'fo-op14-2.jpg', cls: 'az'},
+  {k: 'fv', t: 'Favorites', icon: 'fav', n: 3, pv: 'k545-ed2.jpg'}
 ];
-// 每拍终态
+// 每拍终态；go 是已经定下来、还在飞（或还没起飞）的谱子，落进文件夹才进 rec
 const S = [
-  {mg: false, sel: [], rec: [], pop: null, page: 'root', name: '', open: false},
-  {mg: true, sel: ['k545', 'op111'], rec: [], pop: null, page: 'root', name: '', open: false},
-  {mg: true, sel: [], rec: ['k545', 'op111'], pop: null, page: 'root', name: '*', open: false},
-  {mg: false, sel: [], rec: ['k545', 'op111', 'k331'], pop: null, page: 'root', name: '*', open: true}
+  {mg: false, sel: [], rec: [], go: [], pop: null, page: 'root', name: '', open: false},
+  {mg: true, sel: ['k545', 'op49'], rec: [], go: [], pop: null, page: 'root', name: '', open: false},
+  {mg: true, sel: [], rec: ['k545', 'op49'], go: [], pop: null, page: 'root', name: '*', open: false},
+  {mg: false, sel: [], rec: ['k545', 'op49', 'k331'], go: [], pop: null, page: 'root', name: '*', open: true}
 ];
 
 const CSS = `
@@ -211,7 +217,7 @@ NS['r13/folders-r13'] = function(root, opts = {}){
       ${FD.map(folderCard).join('')}
       <div class="it rc"><div class="bp"></div><div class="pv" style="background-image:url(${A}${SC[0].img})"></div>
         <div class="cv"><div class="mk"><span class="dots">···</span><i class="ci"></i></div><div class="n roll"></div>${I.folder}<div class="t"></div></div></div>
-      ${['k545', 'op111', 'k331'].map((id, i) => scoreCard(BY[id], 'fs', colX(i + 1), R3, i)).join('')}
+      ${['k545', 'op49', 'k331'].map((id, i) => scoreCard(BY[id], 'fs', colX(i + 1), R3, i)).join('')}
     </div>
     <div class="tb br"><div class="gb sl">${I.sel}${snT('Select')}</div></div>
     <div class="tb mt">
@@ -288,36 +294,47 @@ NS['r13/folders-r13'] = function(root, opts = {}){
 
   /* ---------- 圆点和飞行 ---------- */
   let tp = null, lastP = null;
-  const anims = new Set();
+  // 飞行中的谱子 id → {a, p}：不跟拍子走，落进文件夹时才记进 rec；中途前进时接着飞，snap/destroy 时取消、不记
+  const flying = new Map();
   const place = () => { if (tp){ dot.style.left = tp[0] + 'px'; dot.style.top = tp[1] + 'px'; } };
   const rip = () => { dot.classList.remove('rip'); void dot.offsetWidth; dot.classList.add('rip'); };
   const hideDot = () => { dot.style.opacity = 0; dot.style.transform = ''; dot.classList.remove('rip'); tp = lastP = null; };
   const at = (el, fx = .5, fy = .5) => { const r = el.getBoundingClientRect(), sr = st.getBoundingClientRect(), k = sr.width/W || 1;
     return [(r.left + r.width*fx - sr.left)/k, (r.top + r.height*fy - sr.top)/k]; };
-  function fly(id, delay){
+  // rate 是播放倍速（补完上一拍时加快）；落进文件夹时：记进 rec、数字滚动、封面一顿，谱子再淡掉
+  function fly(id, delay, rate = 1){
     const g = document.createElement('div'); g.className = 'gh'; g.style.backgroundImage = `url(${A}${BY[id].img})`;
     const i = SC.findIndex(s => s.id === id), x0 = colX(i), y0 = R1, k = .36;
     const x1 = colX(3) + CW*.45 - CW*k/2, y1 = R2 + CH*.48 - CH*k/2;
     g.style.transform = `translate(${x0}px,${y0}px)`; g.style.opacity = 0; st.insertBefore(g, $('.tb'));
     const a = g.animate([
       {transform: `translate(${x0}px,${y0}px) scale(1)`, opacity: 1},
-      // 先往下再往右：弹窗还开着（盖住右上角），谱子从它下面绕过去
-      {transform: `translate(${x0 + (x1 - x0)*.18}px,${y0 + (y1 - y0)*.6}px) scale(.68)`, opacity: 1, offset: .38},
-      {transform: `translate(${x1}px,${y1}px) scale(${k})`, opacity: 1, offset: .86},
-      {transform: `translate(${x1}px,${y1 + 4}px) scale(${k*.9})`, opacity: 0}
-    ], {duration: 950, delay, easing: 'cubic-bezier(.3,.6,.25,1)', fill: 'both'});
-    anims.add(a);
-    const done = () => { anims.delete(a); g.remove(); };
-    a.onfinish = done; a.oncancel = done;
-    return delay + 820;
+      // 先往下再往右：不从右上角的工具栏和弹窗那里穿过去
+      {transform: `translate(${x0 + (x1 - x0)*.18}px,${y0 + (y1 - y0)*.6}px) scale(.68)`, opacity: 1, offset: .44},
+      {transform: `translate(${x1}px,${y1}px) scale(${k})`, opacity: 1}
+    ], {duration: 820, delay, easing: 'cubic-bezier(.3,.6,.25,1)', fill: 'both'});
+    a.playbackRate = rate;
+    let landed; const p = new Promise(r => { landed = r; });
+    a.onfinish = () => {
+      flying.delete(id);
+      st8.go = st8.go.filter(x => x !== id); st8.rec = [...st8.rec, id]; render(true);
+      rc.classList.remove('bump'); void rc.offsetWidth; rc.classList.add('bump');
+      g.animate([{opacity: 1}, {transform: `translate(${x1}px,${y1 + 4}px) scale(${k*.9})`, opacity: 0}], {duration: 130, fill: 'both'}).onfinish = () => g.remove();
+      landed();
+    };
+    a.oncancel = () => { flying.delete(id); g.remove(); landed(); };
+    flying.set(id, {a, p});
   }
 
   /* ---------- 剧情 ---------- */
-  let tok = null, cur = 0, t0 = 0, dur = 0;
+  // cur 是正在播（或刚播完）的拍，done 是画面已经完整走到终态的拍；t.k 是时间倍数（补完上一拍时为 FAST）
+  let tok = null, cur = 0, done = 0, t0 = 0, dur = 0;
+  // 每一步先看画面走到哪了，已经做完的步骤跳过：同一段脚本既能从头播，也能从中途接着补完
   async function run(n, t){
     const chk = () => { if (t.dead) throw CANCEL; };
-    const wait = ms => new Promise(r => setTimeout(r, ms)).then(chk);
+    const wait = ms => new Promise(r => setTimeout(r, ms*t.k)).then(chk);
     const moveTo = (p, ms = 560) => new Promise((res, rej) => {
+      ms *= t.k;
       const a = tp || lastP || [p[0] + 70, p[1] + 150], s0 = performance.now(); tp = a; place(); dot.style.opacity = 1;
       (function f(now){ if (t.dead) return rej(CANCEL); const k = Math.min(1, (now - s0)/ms), e = ease(k);
         tp = [a[0] + (p[0] - a[0])*e, a[1] + (p[1] - a[1])*e]; place(); k < 1 ? requestAnimationFrame(f) : res(); })(s0); });
@@ -327,73 +344,86 @@ NS['r13/folders-r13'] = function(root, opts = {}){
     const tap = async (el, fx, fy, ms, pressEl = el) => { await moveTo(at(el, fx, fy), ms); await press(pressEl); };
     const set = (o, anim = true) => { Object.assign(st8, o); render(anim); };
     const sel = (id) => set({sel: [...st8.sel, id]});
-    const land = (ms) => setTimeout(() => { if (t.dead) return; rc.classList.remove('bump'); void rc.offsetWidth; rc.classList.add('bump'); }, ms);
+    // 定下来的谱子（go）还没起飞的补飞，然后等所有飞行中的都落进文件夹
+    const launch = async (delay) => {
+      st8.go.filter(id => !flying.has(id)).forEach((id, i) => fly(id, delay + i*170, 1/t.k));
+      await Promise.all([...flying.values()].map(f => f.p)); chk();
+    };
     if (n === 1){
-      await wait(350); await tap($('.tb.br .gb'), .5, .5, 620);
-      set({mg: true}); await lift();
-      await wait(420); await tap(shelf.k545.querySelector('.th'), .5, .42, 560, shelf.k545);
-      sel('k545'); await lift();
-      await wait(260); await tap(shelf.op111.querySelector('.th'), .5, .42, 520, shelf.op111);
-      sel('op111'); await lift(); await wait(300);
+      if (!st8.mg){ await wait(350); await tap($('.tb.br .gb'), .5, .5, 620); set({mg: true}); await lift(); }
+      if (!st8.sel.includes('k545')){ await wait(420); await tap(shelf.k545.querySelector('.th'), .5, .42, 560, shelf.k545); sel('k545'); await lift(); }
+      if (!st8.sel.includes('op49')){ await wait(260); await tap(shelf.op49.querySelector('.th'), .5, .42, 520, shelf.op49); sel('op49'); await lift(); }
+      await wait(300);
     } else if (n === 2){
-      await wait(350); await tap($('.gb.nw'), .5, .5, 620);
-      // App 里弹窗一出来就是新建页，不从根页滑过去
-      po.classList.add('nt'); set({page: 'create', name: ''}, false); void po.offsetWidth; po.classList.remove('nt');
-      set({pop: 'create'}); await lift();
-      await wait(600);
-      for (const ch of [...NAME()]){ st8.name += ch; render(true); await wait(snT('Recital').length > 4 ? 120 : 220); }
-      await wait(380); await tap(ok, .5, .5, 600);
-      // App：建好、两份谱子放进去、选择清空，弹窗退回根页（管理模式不退出）
-      const ids = st8.sel.slice();
-      set({name: '*', sel: [], rec: [], page: 'root'});
-      await lift();
-      let tl = 250;
-      ids.forEach((id, i) => { const ld = fly(id, 250 + i*170); setTimeout(() => { if (t.dead) return; st8.rec = ids.slice(0, i + 1); render(true); }, ld); land(ld); tl = ld; });
-      await wait(tl + 700);
-      await tap($('.pd'), .5, .5, 620);
-      set({pop: null}); await lift(); await wait(350);
+      if (st8.name !== '*'){
+        const full = [...NAME()], gap = full.length > 4 ? 120 : 220;
+        if (st8.pop !== 'create'){
+          await wait(350); await tap($('.gb.nw'), .5, .5, 620);
+          // App 里弹窗一出来就是新建页，不从根页滑过去
+          po.classList.add('nt'); set({page: 'create', name: ''}, false); void po.offsetWidth; po.classList.remove('nt');
+          set({pop: 'create'}); await lift(); await wait(600 - gap);
+        }
+        // 先等再打：中途接手时下一个字也隔一拍才出来
+        for (const ch of full.slice([...st8.name].length)){ await wait(gap); st8.name += ch; render(true); }
+        await wait(380 + gap); await tap(ok, .5, .5, 600);
+        // 建好就收起整个弹窗回到图书馆：不退回根页、不再点一次完成（弹窗停在新建页淡出）；两份谱子飞进新文件夹，选择清空，管理模式还在
+        set({name: '*', sel: [], pop: null, go: st8.sel.slice()});
+        await lift();
+      }
+      await launch(250); await wait(700);
     } else if (n === 3){
-      await wait(350); await tap(shelf.k331.querySelector('.th'), .5, .42, 600, shelf.k331);
-      sel('k331'); await lift();
-      await wait(300); await tap($('.gb.ad'), .5, .5, 560);
-      po.classList.add('nt'); set({page: 'add'}, false); void po.offsetWidth; po.classList.remove('nt');
-      set({pop: 'add'}); await lift();
-      await wait(500); await moveTo(at($('.rcr'), .3, .5), 560);
-      const row = $('.rcr'); row.classList.add('hl'); await press();
-      const ids = st8.sel.slice();
-      set({sel: [], page: 'root'}); setTimeout(() => row.classList.remove('hl'), 250);
-      await lift();
-      const ld = fly(ids[0], 200);
-      setTimeout(() => { if (t.dead) return; st8.rec = [...st8.rec, ...ids]; render(true); }, ld); land(ld);
-      await wait(ld + 650);
-      await tap($('.pd'), .5, .5, 600);
-      set({pop: null}); await lift();
-      await wait(320); await tap($('.dn'), .5, .5, 560);
-      set({mg: false}); await lift();
-      await wait(380); await tap(rc.querySelector('.cv'), .5, .5, 600, rc);
-      set({open: true}); await lift(); await wait(1500);
+      if (!st8.rec.includes('k331') && !st8.go.includes('k331')){
+        if (!st8.sel.includes('k331')){ await wait(350); await tap(shelf.k331.querySelector('.th'), .5, .42, 600, shelf.k331); sel('k331'); await lift(); }
+        if (st8.pop !== 'add'){
+          await wait(300); await tap($('.gb.ad'), .5, .5, 560);
+          po.classList.add('nt'); set({page: 'add'}, false); void po.offsetWidth; po.classList.remove('nt');
+          set({pop: 'add'}); await lift(); await wait(500);
+        }
+        const row = $('.rcr');
+        await moveTo(at(row, .3, .5), 560); row.classList.add('hl'); await press();
+        set({sel: [], page: 'root', go: st8.sel.slice()}); setTimeout(() => { if (!t.dead) row.classList.remove('hl'); }, 250*t.k);
+        await lift();
+      }
+      await launch(200); await wait(650);
+      if (st8.pop){ await tap($('.pd'), .5, .5, 600); set({pop: null}); await lift(); }
+      if (st8.mg){ await wait(320); await tap($('.dn'), .5, .5, 560); set({mg: false}); await lift(); }
+      if (!st8.open){ await wait(380); await tap(rc.querySelector('.cv'), .5, .5, 600, rc); set({open: true}); await lift(); }
+      await wait(1500);
     }
   }
   function show(n, soft){
-    st8 = {...S[n], sel: [...S[n].sel], rec: [...S[n].rec]};
+    st8 = {...S[n], sel: [...S[n].sel], rec: [...S[n].rec], go: []};
     hideDot(); rc.classList.remove('bump');
     st.querySelectorAll('.prs,.hl').forEach(e => e.classList.remove('prs', 'hl'));
     render(!!soft);
   }
   function snap(n, soft){
     if (tok){ tok.dead = true; tok = null; }
-    anims.forEach(a => a.cancel()); anims.clear();
+    flying.forEach(f => f.a.cancel()); flying.clear();
     if (!soft) root.classList.add('now');
-    show(n, soft); void root.offsetWidth;
+    show(n, soft); done = n; void root.offsetWidth;
     if (!soft) requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('now')));
   }
-  function go(n, animate, soft){
+  function go(n, animate, soft, cont){
     n = Math.max(0, Math.min(3, n|0));
     if (!animate || RM || n === 0){ snap(n, soft); cur = n; dur = 0; return Promise.resolve(); }
-    snap(n - 1);
-    const t = tok = {dead: false};
+    // 接着上一拍往前走：画面、圆点、飞行中的谱子都不动，旧的计时和回调随旧 token 作废
+    const hand = cont && cur === n - 1 && done < n;
+    if (hand){
+      if (tok) tok.dead = true;
+      st.querySelectorAll('.prs,.hl').forEach(e => e.classList.remove('prs', 'hl')); dot.style.transform = '';
+    } else snap(n - 1);
+    const t = tok = {dead: false, k: 1}, from = done;
     cur = n; t0 = performance.now(); dur = DUR[n];
-    return run(n, t).then(() => { if (tok === t){ tok = null; dur = performance.now() - t0; } return !t.dead; }, e => { if (e !== CANCEL) throw e; return false; });
+    return (async () => {
+      if (from < n - 1){
+        // 上一拍（连按几次时可能更早）没走完的动作，从当前画面按 FAST 倍速可见地补完
+        t.k = FAST; flying.forEach(f => { f.a.playbackRate = 1/FAST; f.a.play(); });
+        for (let k = from + 1; k < n; k++){ await run(k, t); done = k; }
+        t.k = 1;
+      }
+      await run(n, t); done = n;
+    })().then(() => { if (tok === t){ tok = null; dur = performance.now() - t0; } return !t.dead; }, e => { if (e !== CANCEL) throw e; return false; });
   }
   render(false);
 
@@ -401,12 +431,13 @@ NS['r13/folders-r13'] = function(root, opts = {}){
     beats: 3,
     get beatNow(){ return cur; }, get busy(){ return !!tok; },
     get beatFrac(){ return cur === 0 ? 0 : tok ? Math.min(.99, (performance.now() - t0)/DUR[cur]) : 1; },
-    one(n){ return go(n, true); }, beat(n, soft){ go(n, false, !!soft); },
-    interrupt(){ if (tok) snap(cur); },
+    one(n, cont){ return go(n, true, false, !!cont); }, beat(n, soft){ go(n, false, !!soft); },
+    // 原地停住：旧 token 作废，飞行中的谱子暂停（不会再落地改画面），等 one(n + 1, true) 接着走；要摆终态用 beat(n)
+    interrupt(){ if (!tok) return; tok.dead = true; tok = null; flying.forEach(f => f.a.pause()); },
     progress(){},
     visible(on){ page && page.visible(on); },
     dot(px){ dotPx = px; fit(); },
-    destroy(){ if (tok) tok.dead = true; anims.forEach(a => a.cancel()); ro.disconnect(); page && page.destroy(); root.innerHTML = ''; root.classList.remove('sn-fo', 'mg', 'open', 'pop', 'now'); }
+    destroy(){ if (tok) tok.dead = true; flying.forEach(f => f.a.cancel()); flying.clear(); ro.disconnect(); page && page.destroy(); root.innerHTML = ''; root.classList.remove('sn-fo', 'mg', 'open', 'pop', 'now'); }
   };
 
   /* ---------- 官网 #folders：章节列表和进度条，第一次看到时连播 1→2→3，点哪拍从哪拍播到底 ---------- */
@@ -425,7 +456,8 @@ NS['r13/folders-r13'] = function(root, opts = {}){
       const c = ++chain; clearTimeout(gapT); gapT = 0; pend = 0;
       if (RM){ api.beat(n); paint(); return; }
       for (let k = n; k <= 3; k++){
-        const p = api.one(k); kick();
+        // 往下一拍走（自动连播，或播到一半点了下一拍）都接着当前画面走，不摆终态
+        const p = api.one(k, cur === k - 1); kick();
         const ok = await p;
         if (!ok || c !== chain) return;
         if (k < 3){ await new Promise(r => { gapT = setTimeout(r, 1100); }); gapT = 0; if (c !== chain) return; }
@@ -447,7 +479,7 @@ NS['r13/folders-r13'] = function(root, opts = {}){
           kick();
         } else {
           // 滚走了：停在当前这拍的终态，回来时接着播下一拍
-          if (tok || gapT){ chain++; clearTimeout(gapT); gapT = 0; api.interrupt(); pend = cur < 3 ? cur + 1 : 0; }
+          if (tok || gapT){ chain++; clearTimeout(gapT); gapT = 0; if (tok) snap(cur); pend = cur < 3 ? cur + 1 : 0; }
           paint();
         }
       },
