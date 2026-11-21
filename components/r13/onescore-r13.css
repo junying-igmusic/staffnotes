@@ -28,7 +28,7 @@
 .os-rprog button:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:4px}
 .os-copy{position:absolute;inset:0;pointer-events:none}
 .os .fx-copy{position:absolute;left:0;top:50%;transform:translateY(-50%);pointer-events:auto}
-/* Organize 左栏和各章一样：小标签、大标题，下面是四拍的节点线和文案 */
+/* Organize 左栏和各章一样：小标签、大标题，下面是节点线和文案 */
 .os .fx-copy{padding-left:0}
 .os .fx-copy .label{margin-bottom:18px}
 .os .fx-copy h2.sec-title{font-size:clamp(36px,3.4vw,58px);margin-bottom:34px}
@@ -37,11 +37,11 @@
 .os .fx-nodes{left:4px}
 .os .fx-beat h3{font-size:clamp(24px,1.8vw,30px);margin-bottom:12px}
 .os .fx-beat p{font-size:15px}
-/* r17：导入、整理两块文案叠在 .fx-copy 同一格里，拍 1–3 亮导入那块，拍 4 起亮整理那块；每块一条三节点的线，进度条也分两组 */
+/* 导入、整理两块文案叠在 .fx-copy 同一格里，拍 1–3 亮导入那块，拍 4–8 亮整理那块；节点线按 --n 分段，进度条也分两组 */
 .os .fx-copy{display:grid}
 .os .fx-blk{grid-area:1/1;opacity:0;transform:translateY(10px);transition:opacity .25s ease,transform 0s .25s;pointer-events:none}
 .os .fx-blk.on{opacity:1;transform:none;transition:opacity .45s var(--ease) .2s,transform .6s var(--ease) .2s;pointer-events:auto}
-.os .fx-nodes::before{height:calc(var(--b,0)*100%/2)}
+.os .fx-nodes::before{height:calc(var(--b,0)*100%/var(--n,2))}
 .os .fx-prog>div{display:none;gap:6px;flex:1}
 .os .fx-prog>div.on{display:flex}
 /* 各章文案借了 .sk-g 的样子，淡入淡出完全跟翻页走，不要它自带的过渡；说明跟着当前那一站展开 */
@@ -63,28 +63,17 @@
 .soon-tag{box-shadow:inset 0 0 0 1px rgba(41,45,56,.35)}
 .exp-tag{background:rgba(41,45,56,.08)}
 .fx-beat h3 .soon-tag{vertical-align:6px}
-/* 统计单独一块，在在线曲库后面、Pro 横条前面 */
+/* 统计单独一块，接在云同步后面、Pro 横条前面 */
 #stats{padding:150px 0 120px}
 /* stats.js 自带一条旧规则把 .st 往上提了约 150px（原来接在别的块下面），这里要压过它，跟上一块留出正常间距（小谭 2026-11-15） */
 section#stats .st{margin-top:0}
 /* 标题照在线曲库排：小标签、大标题、一段说明 */
 #stats .st-top{margin-bottom:56px}
 #stats .st-top p{color:var(--ink2);max-width:400px;margin-top:22px;font-size:16px}
-/* 自建文件夹单独一块，接在统计后面：左边章节文字（同一张谱里各章的排法），右边图书馆演示和三段进度条 */
-#folders{padding:150px 0 120px}
-#folders .fo{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(40px,6vw,96px);align-items:center}
-#folders .fo-copy{pointer-events:auto}
-#folders .fo-stage{display:grid;justify-items:center;gap:18px}
-#folders .sim{aspect-ratio:640/610;width:min(100%,calc(74vh * 640 / 610))}
-@media (max-width:900px){
-  #folders{padding:110px 0 80px}
-  #folders .fo{grid-template-columns:minmax(0,1fr);gap:36px}
-  #folders .sim{width:100%}
-}
 @media (max-width:900px){
   #stats{padding:110px 0 80px}
   #stats .st-top{margin-bottom:36px}
-  /* Menu 展开：功能、方案、常见问题竖排，挂在菜单条下面；点「功能」在原地展开五章 */
+  /* Menu 展开：功能、方案、常见问题竖排，挂在菜单条下面；点「功能」在原地展开七项 */
   .nav.open .links{display:flex;position:absolute;top:52px;left:var(--mx,50%);transform:translateX(-50%);flex-direction:column;align-items:stretch;height:auto;padding:8px;border-radius:18px;background:rgba(246,246,244,.96);box-shadow:0 12px 40px -12px rgba(41,45,56,.25)}
   .nav.open.dark .links{background:rgba(28,30,36,.96)}
   .nav.open .links a{line-height:44px;padding:0 28px;text-align:center}

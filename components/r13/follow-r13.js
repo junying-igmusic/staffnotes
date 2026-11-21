@@ -175,6 +175,15 @@ NS['r13/follow-r13'] = function(root, opt){
     go(n){ go(n, true); },
     one(n){ go(n, true, true); },
     beat(n, soft){ go(n, false, false, soft); },
+    async leave(tapPrevious){
+      stop();
+      if (!root.classList.contains('full')){ snap(0, true); return true; }
+      if (!await tapPrevious()) return false;
+      cue(-1);
+      const ok = await slide(false);
+      if (ok) snap(0, true);
+      return ok;
+    },
     reset(){ go(0, false); },
     visible(on){ if (!on && tok){ snap(cur); done = true; } },
     destroy(){ stop(); unroll(); anim?.cancel(); ro.disconnect(); root.removeEventListener('pointerdown', onDown); root.innerHTML = ''; }

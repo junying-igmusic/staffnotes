@@ -246,7 +246,7 @@ NS['r13/layers-r13'] = function(root, opts){
 
   /* ---------- scripted beats ---------- */
   const CANCEL = {};
-  const DUR = [0, 9200, 6200];
+  const DUR = [0, 9200, 8100];
   let tok = null, cur = 0, t0 = 0, done = false, tp = null;
   const center = el => { const sr = stage.getBoundingClientRect(), r = el.getBoundingClientRect(), k = sr.width/W || 1; return [(r.left+r.width/2-sr.left)/k, (r.top+r.height/2-sr.top)/k]; };
   function place(){ if (!tp) return; touch.style.left = tp[0]+'px'; touch.style.top = tp[1]+'px'; touch.style.transform = touch._down ? 'scale(.75)' : ''; }
@@ -291,14 +291,20 @@ NS['r13/layers-r13'] = function(root, opts){
       await wait(1400);
       await tapOn(segs[0], ()=>pickGroup(0, true, t), 520);
       await wait(900);
+      await tapOn(btn(2, '.eye'), () => setEye(0, 2, false), 520);
+      await wait(320);
+      await tapOn(btn(1, '.lk'), () => { st.locked[0][1] = false; render(); }, 420);
+      await wait(320);
+      st.open = false; render();
       touch.style.opacity = 0;
       await wait(300);
     }
   }
-  // 每一拍的终态：面板开着、停在 Lesson；Blue 藏着、Green 锁着、Gold 删了
+  // 拍 2 恢复 Blue 和 Green，收起面板；Gold 保持删除。
   function stateAt(n){
     const s = fresh();
     if (n>=1){ s.open = true; s.hidden[0][2] = true; s.locked[0][1] = true; s.deleted[0][3] = true; }
+    if (n>=2){ s.open = false; s.hidden[0][2] = false; s.locked[0][1] = false; }
     return s;
   }
   function stop(){ if (tok){ tok.dead = true; tok = null; done = true; } touch.style.opacity = 0; touch._down = false; tp = null; touch.style.transform = ''; rowsEl.classList.remove('fade'); }

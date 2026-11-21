@@ -33,8 +33,10 @@ const CSS=`
   transition:width .4s ${EZ},opacity .35s}
 .sns-am .amc .op{position:absolute;left:4px;top:4px;height:${CH}px;right:4px}
 .sns-am .amc .gly{position:absolute;left:50%;top:50%;width:24px;height:24px;margin:-12px;color:${INK};transition:opacity .2s,color .2s}
-.sns-am .amc .gly svg{width:24px;height:24px;stroke-width:1.5}
+.sns-am .amc .gly svg{width:24px;height:24px;fill:currentColor;stroke:none;transform:scale(.84)} /* 同 AppIconAppleMusic(Active).svg：24 画布绕中心 84%（11-18 小谭在完整顶栏上缩小） */
 .sns-am .amc.act .gly{color:${A}}
+.sns-am .amc .gly svg.on,.sns-am .amc.act .gly svg.off{display:none}
+.sns-am .amc.act .gly svg.on{display:block}
 .sns-am .amc .rc{position:absolute;top:4px;left:4px;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:rgba(255,255,255,.75);transition:opacity .2s,left .4s ${EZ}}
 .sns-am .amc .rc svg{width:12px;height:12px}
 .sns-am .amc .rc::after{content:"";position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px;border-radius:50%;background:#F7F6F3}
@@ -139,7 +141,9 @@ const I={
  prev:svg('<path d="M12 6v12L3.5 12zM21 6v12l-8.5-6z"/>'),
  next:svg('<path d="M3 6v12l8.5-6zM12 6v12l8.5-6z"/>'),
  chevR:svg('<path d="M9.5 6l6 6-6 6"/>'),chevL:svg('<path d="M14.5 6 8.5 12l6 6"/>'),
- note:svg('<path d="M9 17.5V6l10-2v11.5"/><circle cx="6.8" cy="17.5" r="2.3"/><circle cx="16.8" cy="15.5" r="2.3"/>')
+ note:svg('<path d="M9 17.5V6l10-2v11.5"/><circle cx="6.8" cy="17.5" r="2.3"/><circle cx="16.8" cy="15.5" r="2.3"/>'),
+ // 顶栏 Apple Music 入口：2026-11-18 小谭定 F 双音符（iconsax music 6b3f9cb2dca6 默认；打开时两个符头和横梁填实）
+ entry:'<svg class="off" viewBox="0 0 24 24" fill="currentColor"><path d="M6.28 22.75C4.15 22.75 2.41 21.01 2.41 18.88 2.41 16.75 4.15 15.01 6.28 15.01 8.41 15.01 10.15 16.75 10.15 18.88 10.15 21.01 8.41 22.75 6.28 22.75ZM6.28 16.51C4.97 16.51 3.91 17.57 3.91 18.88 3.91 20.19 4.97 21.25 6.28 21.25 7.59 21.25 8.65 20.19 8.65 18.88 8.65 17.57 7.59 16.51 6.28 16.51Z"/><path d="M9.4 19.63C8.99 19.63 8.65 19.29 8.65 18.88V6.3C8.65 4.72 9.6 3.48 11.12 3.07L17.36 1.37C18.63 1.02 19.7 1.15 20.45 1.73 21.21 2.31 21.59 3.28 21.59 4.61V16.81C21.59 17.22 21.25 17.56 20.84 17.56 20.43 17.56 20.09 17.22 20.09 16.81V4.6C20.09 4.02 19.99 3.26 19.54 2.92 19.05 2.54 18.21 2.69 17.75 2.82L11.51 4.52C10.64 4.76 10.15 5.41 10.15 6.31V18.89C10.15 19.29 9.81 19.63 9.4 19.63Z"/><path d="M17.72 20.67C15.59 20.67 13.85 18.93 13.85 16.8 13.85 14.67 15.59 12.93 17.72 12.93 19.85 12.93 21.59 14.67 21.59 16.8 21.59 18.93 19.85 20.67 17.72 20.67ZM17.72 14.43C16.41 14.43 15.35 15.49 15.35 16.8 15.35 18.11 16.41 19.17 17.72 19.17 19.03 19.17 20.09 18.11 20.09 16.8 20.09 15.49 19.03 14.43 17.72 14.43Z"/><path d="M9.4 10.27C9.07 10.27 8.77 10.05 8.68 9.72 8.57 9.32 8.8 8.9 9.2 8.79L20.64 5.67C21.04 5.56 21.45 5.8 21.56 6.2 21.67 6.6 21.43 7.01 21.03 7.12L9.6 10.24C9.53 10.26 9.46 10.27 9.4 10.27Z"/></svg><svg class="on" viewBox="0 0 24 24" fill="currentColor"><path d="M6.28 22.75C4.15 22.75 2.41 21.01 2.41 18.88 2.41 16.75 4.15 15.01 6.28 15.01 8.41 15.01 10.15 16.75 10.15 18.88 10.15 21.01 8.41 22.75 6.28 22.75Z"/><path d="M9.4 19.63C8.99 19.63 8.65 19.29 8.65 18.88V6.3C8.65 4.72 9.6 3.48 11.12 3.07L17.36 1.37C18.63 1.02 19.7 1.15 20.45 1.73 21.21 2.31 21.59 3.28 21.59 4.61V16.81C21.59 17.22 21.25 17.56 20.84 17.56 20.43 17.56 20.09 17.22 20.09 16.81V4.6C20.09 4.02 19.99 3.26 19.54 2.92 19.05 2.54 18.21 2.69 17.75 2.82L11.51 4.52C10.64 4.76 10.15 5.41 10.15 6.31V18.89C10.15 19.29 9.81 19.63 9.4 19.63Z"/><path d="M17.72 20.67C15.59 20.67 13.85 18.93 13.85 16.8 13.85 14.67 15.59 12.93 17.72 12.93 19.85 12.93 21.59 14.67 21.59 16.8 21.59 18.93 19.85 20.67 17.72 20.67Z"/><path d="M9.4 10.27C9.07 10.27 8.77 10.05 8.68 9.72 8.57 9.32 8.8 8.9 9.2 8.79L20.64 5.67C21.04 5.56 21.45 5.8 21.56 6.2 21.67 6.6 21.43 7.01 21.03 7.12L9.6 10.24C9.53 10.26 9.46 10.27 9.4 10.27Z"/><path d="M9.4 9.52V6.3C9.4 5.05 10.12 4.12 11.32 3.79L17.55 2.09C18.56 1.82 19.41 1.87 19.99 2.33 20.54 2.75 20.84 3.49 20.84 4.61V6.4Z"/></svg>'
 };
 // 界面字接多语言：页面没加载 i18n-r13.js 时照原样返回英文；演奏者名字不翻
 const loc=(s,v)=>window.snT?snT(s,v):s;
@@ -160,7 +164,7 @@ SNSims['r13/applemusic-r13']=function(root){
   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
   root.classList.add('sns-am');
   root.innerHTML=`<div class="st">
-   <div class="amc gl vis v0" data-k="cap"><button class="op" data-k="op" aria-label="Apple Music"><span class="gly">${I.note}</span><span class="rc" data-k="rc">${I.note}</span><span class="tx"><b data-k="ct"></b><i data-k="ca"></i><span class="ln"><u data-k="cl"></u></span></span></button><button class="pp" data-k="cpp"></button></div>
+   <div class="amc gl vis v0" data-k="cap"><button class="op" data-k="op" aria-label="Apple Music"><span class="gly">${I.entry}</span><span class="rc" data-k="rc">${I.note}</span><span class="tx"><b data-k="ct"></b><i data-k="ca"></i><span class="ln"><u data-k="cl"></u></span></span></button><button class="pp" data-k="cpp"></button></div>
    <div class="ol" data-k="olL"></div><div class="ol" data-k="olR"></div>
    <div class="pn gl vis gone" data-k="pn">
     <div class="full" data-k="full">

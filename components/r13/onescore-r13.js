@@ -1,16 +1,10 @@
-/* r13 一张谱的版面控制（one-score-r13.html）：r17 起先是导入三拍（PDF 导入、公版乐谱下载、标注导入）、再是整理两拍（乐谱识别、自动归档），共五拍 →
-   第 5 拍之后不停顿：Mozart 文件夹打开（整理块第 3 条「Composer folders」、整理进度条第 3 格走）→ 圆点点 K. 545 → 卡片放大
-   → 一路落进竖放的整页阅读器（components/r13/reader-r13.js）→ 同一个阅读器从画笔讲到云同步：画笔、图层、词典、练习工具、Apple Music、翻页与跳转、小节显示、跟谱、云同步。
-   导入、整理两块文案（.fx-blk）叠在 .fx-copy 里同一个位置，进度条也分两组（.fx-prog>div），拍 1–3 亮导入那块，拍 4 起亮整理那块。
+/* r13 一张谱的版面控制（one-score-r13.html）：先是导入三拍（内置在线曲库、标注导入、PDF 导入），再是整理五拍（乐谱识别、自动归档、作曲家文件夹、自建文件夹、调整曲目顺序），共八拍 →
+   第 8 拍终态已把 Recital 文件夹展开在画面上（K. 545 在 col 2），过场直接点 K. 545 卡片放大
+   → 一路落进竖放的整页阅读器（components/r13/reader-r13.js）→ 同一个阅读器从画笔讲到云同步：画笔、图层、词典、练习工具、Apple Music、翻页与跳转（含跨谱连播）、小节显示、跟谱、云同步。
+   导入、整理两块文案（.fx-blk）叠在 .fx-copy 里同一个位置，进度条也分两组（.fx-prog>div），拍 1–3 亮导入那块，拍 4–8 亮整理那块。
    谱子大小全程不变（整页竖放，每一站都整页在屏幕里），每换一章阅读器整块换一边，文案在另一边。
    手机（≤900）：阅读器在导航条下面居中，文案在下面原地换，不换边。
-   翻页式照 r11：hero 是起点，之后每个动画一个锚点；滚轮一格、触控板一次滑动（连惯性）、手机一次滑动、一次按键只走一站；往回一下退一站，那一站重播。
-   到站后演示自己播，播完停 HOLD_MS 自动进下一站，一章播完自动进下一章，到跟谱最后一站停住；切到后台、离开这一段、或者用户在谱上按了一下（画、拖、点）就暂停，翻到下一站再接着连播。
-   手机和 iPad（触屏）上演示只看不摸：谱上画不了、面板点不了也拖不了，手指上下滑就是走站（小谭 2026-11-15）。
-   菜单：Import、Organize、Read、Practice、Play 落到各自第一站；钉住段里菜单的滑块跟着当前这一站走（sec._os.nav）。
-   练习统计（#stats）接在云同步后面当最后一站：滚一格停到统计标题，再滚一格才放开到方案；自动连播不进这一站（小谭 2026-11-15）。
-   右下角播放 / 暂停按钮（.os-play）直接管自动连播：暂停后滚动、菜单照常走站，只是不自己往下走；批注工具改 sec._os.auto 时图标跟着变。只在钉住段（hero 之后）出现。
-   减少动态效果：不缩放不平移，一律淡入淡出；自动连播默认停着，点播放才连播。 */
+   菜单：Import、Organize、Read、Practice、Play、Sync、Stats 落到各自第一站；钉住段里菜单的滑块跟着当前这一站走（sec._os.nav）。 */
 (function(){
 const sec = document.querySelector('section.os'); if(!sec) return;
 const RMq = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -23,22 +17,20 @@ const track = q1('.os-track'), pin = q1('.os-pin'), stage = q1('.os-stage'), sbo
 const prog = q1('.fx-prog'), progB = qa('.fx-prog button'), progG = qa('.fx-prog>div');
 const rbox = q1('.os-rbox'), rsim = q1('.os-rbox .sim'), rprog = q1('.os-rprog');
 const copyEl = q1('.os-copy'), fxCopy = q1('.fx-copy'), beats = qa('.fx-beat'), nodes = qa('.fx-nodes i'), lines = qa('.fx-nodes'), blks = qa('.fx-blk');
-const marks = [['read', 'pen'], ['practice', 'prac'], ['play', 'turn']].map(([id, key]) => [document.getElementById(id), key]).filter(m => m[0] && sec.contains(m[0])), ovSec = document.getElementById('overview'), stSec = document.getElementById('stats'), wordsEl = document.getElementById('words'), navEl = document.getElementById('nav');
+const marks = [['read', 'pen'], ['practice', 'prac'], ['play', 'turn'], ['sync', 'sync']].map(([id, key]) => [document.getElementById(id), key]).filter(m => m[0] && sec.contains(m[0])), ovSec = document.getElementById('overview'), stSec = document.getElementById('stats'), wordsEl = document.getElementById('words'), navEl = document.getElementById('nav');
 const cl = (v, a=0, b=1) => Math.min(b, Math.max(a, v)), lp = (a, b, t) => a + (b - a)*t;
 const io = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3)/2;
 
-/* 可调的数：大过场（hero → Overview → Organize、换章）多长；换拍多长；Organize 第 4 拍 → 画笔第 1 拍那整段过场多长；滚轮停多久才算下一下；
+/* 可调的数：大过场（hero → Overview → Organize、换章）多长；换拍多长；Organize 第 8 拍 → 画笔第 1 拍那整段过场多长；滚轮停多久才算下一下；
    演示播完停多久自动进下一站；手机上手指滑多远算一下（毫秒、像素） */
 const BIG = 1000, BEAT = 500, LONG = 1600, QUIET = 250, HOLD_MS = 0, SWIPE = 24;
-// Organize 第 3 拍 → 画笔第 1 拍：先 FOLD 毫秒播 Mozart 文件夹打开（story 第 4 拍），接着 LONG 毫秒点 K. 545、放大、挪进阅读器；往回走最后 UNFOLD 毫秒文件夹合上
-const FOLD = 1350, UNFOLD = 700;
 // story 舞台 780×580，放大后谱页 x=185、宽 410、满高；手机只看中间 640 宽，谱页在 115
 const SW = 780, SH = 580, VX = 185, VN = 640;
 // 阅读器：竖放的 iPad 框 834×1194 pt，K. 545 整页在 (24, 41)，786 宽（和 reader-r13.js 一致）；电脑和手机一样
 const RD = {W: 834, H: 1194, px: 24, py: 41, pw: 786};
-// 时间线，单位是屏高：锚点是一个点（AH 只是让它离边界有一点距离），拍与拍之间隔 BT；FB 是文件夹打开那一截，TR 是点 K. 545 → 画笔那段过场，X 是换章
-const AH = .03, BT = .4, NB = 5, ORG = AH + (NB - 1)*BT, FB = BT, TR = 2.2, X = 1.1;
-const S_Z = ORG + FB, S_P = S_Z + TR;
+// 时间线，单位是屏高：锚点是一个点（AH 只是让它离边界有一点距离），拍与拍之间隔 BT；8 拍后直接接 TR（点 K. 545 → 画笔那段过场），X 是换章
+const AH = .03, BT = .4, NB = 8, ORG = AH + (NB - 1)*BT, TR = 2.2, X = 1.1;
+const S_Z = ORG, S_P = S_Z + TR;
 // 那段过场的样子：前 P0 是手指点 K. 545；之后一条先慢后快再慢的缓动 w，放大到 w = WA 到顶，w = WB 起就开始挪向阅读器，两段叠着，中间不停
 const P0 = .22, WA = .6, WB = .4;
 // 各章：data-ch 是阅读器里这一章的站名前缀（pen1、pen2……），data-side 是阅读器在哪边，data-beats 是几站
@@ -53,7 +45,7 @@ const LEN = CH[CH.length - 1].e;
 });
 const desk = () => innerWidth > 900;
 
-/* 锚点：hero（起点）、Overview、导入三拍和整理两拍（k: 'org'，b 1–5）、各章每一站、练习统计（st，最后一站）。abs 是不在钉住段里、按页面位置算的；big 是进这个锚点那段算大过场，long 是整理第 2 拍 → 画笔那整段（含文件夹打开） */
+/* 锚点：hero（起点）、Overview、导入三拍和整理五拍（k: 'org'，b 1–8）、各章每一站、练习统计（st，最后一站）。abs 是不在钉住段里、按页面位置算的；big 是进这个锚点那段算大过场，long 是整理第 8 拍 → 画笔第 1 拍那段过场 */
 let A = null;
 function buildA(){
   A = [{k: 'hero', abs: 1}, {k: 'ov', abs: 1, big: 1}];
@@ -75,7 +67,7 @@ function layout(){
   // 钉住的这一屏按看得见的高度来定：iPhone Safari 的 100vh 比工具栏露出时的可视高度高，最后一站会被顶上去
   pin.style.height = vh + 'px';
   track.style.height = (LEN + 1)*vh + 'px';
-  // 菜单里的 Read、Practice、Play 各有一个记号，落在各自第一站（没有脚本时链接也能滑到这里）
+  // 菜单里的 Read、Practice、Play、Sync 各有一个记号，落在各自第一站（没有脚本时链接也能滑到这里）
   marks.forEach(([m, key]) => { const c = CH.find(c => c.key === key); if(c) Object.assign(m.style, {top: (c.s + X + AH/2)*vh + 'px', height: '1px'}); });
   if(d){
     // Organize：左 4 份文案、右 8 份谱子
@@ -133,29 +125,30 @@ function fitCopy(){
   });
 }
 
-/* ---------- 导入、整理：五拍自己播；第 6 格（整理组第 3 格）是文件夹打开到点进阅读器那段过场；进度条点一下跳到那一拍 ---------- */
+/* ---------- 导入三拍 + 整理五拍：八拍全是正式驻留站，进度条点一下跳到那一拍 ---------- */
 mountSim(sim).then(a => { api = a; dotSync(); });
 mountSim(rsim).then(a => { rd = a; });
 // story 里的圆点和阅读器里的一样大：框宽 834 时 30 px，再小也不小于 18 px
 function dotSync(){ if(api && G && api.dot) api.dot(Math.max(18, 30*G.fw/RD.W)); }
 progB.forEach((b, i) => { b.setAttribute('aria-label', beats[i].querySelector('h3').firstChild.textContent.trim());
   b.addEventListener('click', () => { if(!api || !A) return;
-    const k = i < NB ? A.findIndex(a => a.k === 'org' && a.b === i + 1) : A.findIndex(a => a.k === 'ch');
+    const k = A.findIndex(a => a.k === 'org' && a.b === i + 1);
     if(engaged && k === cur && !anim){ seq++; arrive(k, 'replay'); } else goTo(k); }); });
 function syncCopy(y){
-  const n = api.beatNow, f = api.beatFrac, aL = A.find(a => a.k === 'org' && a.b === NB).v, pF = cl((y - aL)/(S_Z - aL));   // 最后一格跟着文件夹打开那一截走，点 K. 545 时正好走满
-  progB.forEach((b, i) => b.style.setProperty('--p', i === NB ? (n > NB ? pF : 0) : i < n - 1 || n > NB ? 1 : i === n - 1 ? f : 0));
+  const n = api.beatNow, f = api.beatFrac;
+  progB.forEach((b, i) => b.style.setProperty('--p', i < n - 1 || n > NB ? 1 : i === n - 1 ? f : 0));
   if(n !== shown){ shown = n; const k = Math.max(1, n) - 1, g = k < 3 ? 0 : 1;
     beats.forEach((el, i) => el.classList.toggle('on', i === k)); nodes.forEach((el, i) => el.classList.toggle('on', i < Math.max(1, n)));
-    lines.forEach((el, j) => el.style.setProperty('--b', cl(k - 3*j, 0, 2)));
+    if(lines[0]) lines[0].style.setProperty('--b', cl(k, 0, 2));
+    if(lines[1]) lines[1].style.setProperty('--b', cl(k - 3, 0, 4));
     blks.forEach((el, j) => el.classList.toggle('on', j === g)); progG.forEach((el, j) => el.classList.toggle('on', j === g)); }
 }
-// 点 K. 545 一开始文件夹那一拍还没播完，就直接摆到第 4 拍的终态再走
+// 点 K. 545 一开始若第 8 拍还没播完，就直接摆到第 8 拍终态（Recital 已展开，K. 545 在 col 2）再放大
 function zoomTo(p, ch, eo){
   const e = eo ?? -1;
   if(Math.abs(p - lastZ) < 1e-4 && Math.abs(ch - lastC) < 1e-3 && Math.abs(e - lastE) < 1e-4) return;
   lastZ = p; lastC = ch; lastE = e;
-  if(p > 0 && (api.beatNow <= NB || api.busy)){ api.settle(NB + 1); played = true; }
+  if(p > 0 && (api.beatNow < NB || api.busy)){ api.settle(NB); played = true; }
   api.zoom(p, ch, eo);
 }
 // 往上滚远了就复位，下次进来重新播；不是翻页走过来的（拖滚动条），故事在视野里、还没进这一段就先播第一拍
@@ -291,26 +284,25 @@ function step(d){
   anim = {t0: performance.now(), dur: RMq && real ? 0 : k.long ? LONG : k.big ? BIG : BEAT, lin: !!k.long, how: d > 0 ? 'next' : 'back'};
   Object.assign(anim, real ? {real: true, from: scrollY, to: pos(i)} : {from: vy, to: to.v});
   // Organize 拍与拍之间舞台不动，下一拍立刻开播（beat(n) 先把上一拍摆到终态）
-  if(from.k === 'org' && to.k === 'org'){ played = true; api.beat(to.b); anim.how = 'pre'; }
-  // 整理第 2 拍 → 画笔第 1 拍：先播文件夹打开（进度停在 S_Z 之前，画面只有 story 自己在动），再接点 K. 545 和放大；往回先倒放放大，再让文件夹合上
-  if(k.long && !RMq){
-    if(d > 0){ played = true; api.beat(NB + 1); Object.assign(anim, {fold: FOLD, dur: FOLD + LONG}); }
-    else Object.assign(anim, {unfold: UNFOLD, dur: LONG + UNFOLD, how: 'rev'});
+  if(from.k === 'org' && to.k === 'org'){
+    played = true;
+    if (d < 0){ api.settle(to.b); anim.how = 'rev'; }
+    else { api.beat(to.b); anim.how = 'pre'; }
   }
+  // 整理第 8 拍 → 画笔第 1 拍：第 8 拍终态已展开 Recital 文件夹，直接从 col 2 的 K. 545 放大进阅读器；往回走倒放放大并重播第 8 拍
+  if(k.long && d > 0 && !RMq){ played = true; api.settle(NB); }
   if(from.k === 'hero') wordsSet(false);
   // 阅读器：往前走先把这一站摆到终态再动；往回走，面板顺着 App 的开合动画退回上一站开始前的样子，到站再重播
   if(rd){
-    if(d > 0 && from.k === 'ch' && rd.busy){ rKey = from.key; rd.beat(from.key, true); }
-    if(d < 0){ rKey = to.k === 'ch' ? prevKey(to) : null; rd.beat(rKey, true); }
+    if(d > 0 && from.k === 'ch' && rd.busy && !(from.key === 'sync3' && to.key === 'sync4')){ rKey = from.key; rd.beat(from.key, true); }
+    if(d < 0){
+      const turnBack = to.key === 'turn3' || to.key === 'turn4';
+      rKey = to.k === 'ch' ? (turnBack ? to.key : prevKey(to)) : null;
+      rd.beat(rKey, true);
+      if (turnBack) anim.how = 'rev';
+    }
   }
   cur = i; seq++; doneAt = 0; if(!real) pinTo(i);
-}
-// 两段过场里，按时间算这一帧的进度 y（两段都匀速，接缝处速度不变方向）
-function animY(a, now){
-  const t = now - a.t0;
-  if(a.fold) return t < a.fold ? lp(a.from, S_Z, t/a.fold) : lp(S_Z, a.to, cl((t - a.fold)/LONG));
-  if(a.unfold){ if(t < LONG) return lp(a.from, S_Z, t/LONG); if(!a.shut){ a.shut = 1; api.rev(NB); } return lp(S_Z, a.to, cl((t - LONG)/a.unfold)); }
-  return null;
 }
 // 接手停在锚点 i（不播）
 function engageAt(i){ engaged = true; cur = i; seq++; doneAt = 0; anim = null; if(A[i].v != null) vy = A[i].v; }
@@ -337,8 +329,8 @@ function arrive(i, how){
   if(a.k === 'hero'){ wordsSet(false); rSet(null); }
   else if(a.k === 'ov'){ if(how === 'back') wordsSet(true); else wordsPlay(); rSet(null); }
   else if(a.k === 'st'){}
-  else if(a.k === 'org'){ if(how !== 'pre' && how !== 'rev' && (how !== 'enter' || !played)){ played = true; api.beat(a.b); } rSet(null); }
-  else if(rd){ rKey = a.key; RMq ? rd.beat(a.key) : rd.one(a.key); }
+  else if(a.k === 'org'){ if(how === 'jump' && a.b === 7){ played = true; api.settle(a.b); } else if(how !== 'pre' && how !== 'rev' && (how !== 'enter' || !played)){ played = true; api.beat(a.b); } rSet(null); }
+  else if(rd){ rKey = a.key; RMq || how === 'rev' ? rd.beat(a.key) : rd.one(a.key); }
 }
 // 这一站的演示播完了没有
 function finished(a){
@@ -455,8 +447,8 @@ CH.forEach(c => [c.li, c.btn].forEach(els => els.forEach((el, k) => {
   el.addEventListener('click', go);
   el.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); go(); } });
 })));
-// 菜单和页脚的 Import、Organize、Read、Practice、Play、Stats、回到顶部直接落到锚点；其他链接（Pricing、FAQ……）放开，交给页面自己滑过去
-const NAVTO = {import: 'org1', features: 'org1', organize: 'org4', read: 'pen1', practice: 'prac1', play: 'turn1', stats: 'st'};
+// 菜单和页脚的 Import、Organize、Read、Practice、Play、Sync、Stats、回到顶部直接落到锚点；其他链接（Pricing、FAQ……）放开，交给页面自己滑过去
+const NAVTO = {import: 'org1', features: 'org1', organize: 'org4', read: 'pen1', practice: 'prac1', play: 'turn1', sync: 'sync1', stats: 'st'};
 document.addEventListener('click', e => {
   if(e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || !api || !rd || !G || !A) return;
   const a = e.target.closest?.('a[href^="#"]'); if(!a) return;
@@ -466,8 +458,8 @@ document.addEventListener('click', e => {
   e.preventDefault(); history.replaceState(null, '', '#' + id);
   leap(() => land(i, 'jump'));
 }, true);
-// 菜单该亮哪一项：钉住段盖住屏幕 40% 那条线时由这里说了算（导入三拍 → Import，整理两拍 → Organize，画笔、图层、词典 → Read，练习工具、Apple Music → Practice，翻页、小节、跟谱、云同步 → Play），其他地方交还给页面
-const NAVK = {pen: 'read', lay: 'read', dict: 'read', prac: 'practice', am: 'practice', turn: 'play', bar: 'play', fol: 'play', sync: 'play'};
+// 菜单该亮哪一项：钉住段盖住屏幕 40% 那条线时由这里说了算
+const NAVK = {pen: 'read', lay: 'read', dict: 'read', prac: 'practice', am: 'practice', turn: 'play', bar: 'play', fol: 'play', sync: 'sync'};
 function navKey(){
   if(!G || !A) return undefined;
   const r = track.getBoundingClientRect(), ln = G.vh*.4;
@@ -494,7 +486,7 @@ document.fonts?.ready.then(layout);
     if(anim){
       const k = anim.dur ? cl((now - anim.t0)/anim.dur) : 1, e = anim.lin ? k : io(k);
       if(anim.real){ scrollTo({top: Math.round(lp(anim.from, anim.to, e)), behavior: 'instant'}); lastY = scrollY; }
-      else { const ay = animY(anim, now); vy = ay ?? lp(anim.from, anim.to, e); }
+      else vy = lp(anim.from, anim.to, e);
       if(k >= 1){ fin = anim; if(anim.real && A[cur].v != null) vy = A[cur].v; }
     }
     // 停在这一段里但不是翻页进来的（刷新后停在半路、拖完滚动条）：落到最近的锚点

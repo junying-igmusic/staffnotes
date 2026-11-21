@@ -17,8 +17,8 @@
 @font-face{font-family:"Timeless Serif";src:url(assets/TimelessSerif-Book.ttf) format("truetype");font-display:swap}
 @font-face{font-family:"Timeless Sans";src:url(assets/TimelessSans-W460.ttf) format("truetype");font-display:swap}
 /* 中文衬线：App 文件夹名用的思源宋体，取 Regular 一档；只截官网用到的字（字体许可 assets/sn-serif-OFL.txt） */
-@font-face{font-family:"SN Serif SC";src:url(assets/sn-serif-sc.woff2?v=9e9ac5f3) format("woff2");font-display:swap}
-@font-face{font-family:"SN Serif TC";src:url(assets/sn-serif-tc.woff2?v=9e2e0c9d) format("woff2");font-display:swap}
+@font-face{font-family:"SN Serif SC";src:url(assets/sn-serif-sc.woff2?v=02eb800e) format("woff2");font-display:swap}
+@font-face{font-family:"SN Serif TC";src:url(assets/sn-serif-tc.woff2?v=918ab453) format("woff2");font-display:swap}
 :root{
   --paper:#F7F6F2;--card:#FFFFFF;--well:#EAECEB;--ink:#292D38;--ink2:#646A75;--line:rgba(41,45,56,.12);
   --blue:#3F529F;--night:#171B24;--night2:#232936;--blue-n:#B0BBF0;--on-night:#EEEDE8;--on-night2:#8E94A3;
@@ -434,9 +434,9 @@ footer .legal span{margin-left:auto;white-space:nowrap}
   .big .w{opacity:1;filter:none}
 }
 </style>
-<link rel="stylesheet" href="components/r13/dot-r13.css?v=98dfcfb5">
-<link rel="stylesheet" href="components/r13/onescore-r13.css?v=98dfcfb5">
-<script src="components/r13/i18n-r13.js?v=98dfcfb5"></script>
+<link rel="stylesheet" href="components/r13/dot-r13.css?v=f81e33a6">
+<link rel="stylesheet" href="components/r13/onescore-r13.css?v=f81e33a6">
+<script src="components/r13/i18n-r13.js?v=f81e33a6"></script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="sn-mark" viewBox="145 248 510 302"><g data-key="q8xqzuy8nm" transform="translate(400 399.3127136230469) rotate(-90) scale(1 -1)"><path  transform="scale(1.1682242990654206) translate(-125 -214)" d="M92 132C91 128 90 123 90 120C91 116 93 114 97 114C107 114 123 126 130 128C141 132 155 135 169 135C178 135 187 133 195 131C205 129 214 124 223 118C238 106 250 88 250 67C250 30 220 0 183 0C146 0 116 30 116 67V77C83 77 33 17 26 11C22 9 19 7 16 7C8 7 4 18 4 28V34C7 57 24 83 37 102C50 120 59 139 71 157C89 187 108 216 125 246C131 255 155 284 155 300C155 303 154 306 152 308C151 309 149 310 147 310C139 310 126 302 120 300C109 296 95 293 81 293C72 293 63 295 55 297C45 299 36 304 27 310C12 322 0 340 0 361C0 398 30 428 67 428C104 428 134 398 134 361V351C167 351 217 411 224 417C230 421 233 421 235 421C244 421 247 416 247 408C247 382 213 327 206 316L104 155C101 150 95 141 92 132Z"/></g></symbol></svg>
@@ -452,6 +452,7 @@ footer .legal span{margin-left:auto;white-space:nowrap}
       <a href="#read" data-s="read">阅读</a>
       <a href="#practice" data-s="practice">练习</a>
       <a href="#play" data-s="play">演奏</a>
+      <a href="#sync" data-s="sync">云同步</a>
       <a href="#stats" data-s="stats">统计</a>
     </div></div>
     <a href="#pricing" data-s="pricing">方案</a>
@@ -484,13 +485,13 @@ footer .legal span{margin-left:auto;white-space:nowrap}
 <!-- ONE SCORE (r13): one K. 545 from the dropped PDF to one portrait reader, full page, that tells every feature with the original demos. components/r13/onescore-r13.js drives it -->
 <section class="show os" id="organize" data-theme="light">
   <div class="os-track wrap">
-    <div class="os-mark" id="features"></div><div class="os-mark" id="import"></div><div class="os-mark" id="read"></div><div class="os-mark" id="practice"></div><div class="os-mark" id="play"></div>
+    <div class="os-mark" id="features"></div><div class="os-mark" id="import"></div><div class="os-mark" id="read"></div><div class="os-mark" id="practice"></div><div class="os-mark" id="play"></div><div class="os-mark" id="sync"></div>
     <div class="os-pin">
       <div class="os-stage">
         <div class="os-sbox"><div class="fx-sim" data-sim="r13/story-r13" data-drive="scroll"></div></div>
-        <div class="fx-prog"><div class="on"><button><i></i></button><button><i></i></button><button><i></i></button></div><div><button><i></i></button><button><i></i></button><button><i></i></button></div></div>
+        <div class="fx-prog"><div class="on"><button><i></i></button><button><i></i></button><button><i></i></button></div><div><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button></div></div>
         <div class="os-rbox"><div class="sim" data-sim="r13/reader-r13" data-drive="scroll"></div></div>
-        <div class="os-rprog"><div data-ch="pen"><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="lay"><button><i></i></button><button><i></i></button></div><div data-ch="dict"><button><i></i></button><button><i></i></button></div><div data-ch="prac"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="am"><button><i></i></button><button><i></i></button></div><div data-ch="turn"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="bar"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="fol"><button><i></i></button><button><i></i></button></div><div data-ch="sync"><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button></div></div>
+        <div class="os-rprog"><div data-ch="pen"><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="lay"><button><i></i></button><button><i></i></button></div><div data-ch="dict"><button><i></i></button><button><i></i></button></div><div data-ch="prac"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="am"><button><i></i></button><button><i></i></button></div><div data-ch="turn"><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="bar"><button><i></i></button><button><i></i></button><button><i></i></button></div><div data-ch="fol"><button><i></i></button><button><i></i></button></div><div data-ch="sync"><button><i></i></button><button><i></i></button><button><i></i></button><button><i></i></button></div></div>
       </div>
       <div class="os-copy">
       <div class="fx-copy">
@@ -507,14 +508,16 @@ footer .legal span{margin-left:auto;white-space:nowrap}
         </div>
         </div>
         <div class="fx-blk">
-        <div class="label"><span>整理</span>自动识别 · 自动归档 · 作曲家文件夹</div>
-        <h2 class="sec-title"><span class="ln">PDF 乐谱</span><span class="ln">自动识别</span></h2>
+        <div class="label"><span>整理</span>自动识别 · 自动归档 · 自建文件夹</div>
+        <h2 class="sec-title"><span class="ln">自动识别归档</span><span class="ln">自建文件夹编排</span></h2>
         <div class="fx-run">
-        <div class="fx-nodes"><i></i><i></i><i></i></div>
+        <div class="fx-nodes" style="--n:4"><i></i><i></i><i></i><i></i><i></i></div>
         <div class="fx-beats">
           <div class="fx-beat"><h3>乐谱识别 <b class="basic-tag">Basic</b></h3><p>自动识别曲名、作曲家、作品号和各乐章的<span style="white-space:nowrap">起始页。</span></p></div>
           <div class="fx-beat"><h3>自动归档 <b class="basic-tag">Basic</b></h3><p>按作曲家和时期存入图书馆，并自动命名。</p></div>
           <div class="fx-beat"><h3>作曲家文件夹 <b class="basic-tag">Basic</b></h3><p>图书馆自动按作曲家建文件夹，无需<span style="white-space:nowrap">手动整理。</span></p></div>
+          <div class="fx-beat"><h3>自建文件夹 <b class="basic-tag">Basic</b></h3><p>按独奏会、老师或学期建文件夹，一份乐谱可同时留在多个<span style="white-space:nowrap">文件夹里。</span></p></div>
+          <div class="fx-beat"><h3>调整曲目顺序 <b class="basic-tag">Basic</b></h3><p>在自建文件夹里拖动排序，按演出曲目单或练习先后<span style="white-space:nowrap">排好。</span></p></div>
         </div>
         </div>
         </div>
@@ -568,14 +571,15 @@ footer .legal span{margin-left:auto;white-space:nowrap}
             <li tabindex="0" role="button">多种面板 <b class="basic-tag">Basic</b><span>可停靠任意一侧、折叠成条，或收进顶栏。</span></li>
           </ul>
         </div>
-        <div class="os-chcopy sk-g on" data-ch="turn" data-side="R" data-beats="3">
-          <div class="label"><span>翻页与跳转</span>页面预览 · 页面跳转 · 乐章跳转</div>
+        <div class="os-chcopy sk-g on" data-ch="turn" data-side="R" data-beats="4">
+          <div class="label"><span>翻页与跳转</span>页面预览 · 页面跳转 · 乐章跳转 · 曲目连播</div>
           <h2 class="sec-title">页面与乐章跳转</h2>
-          <p>整首作品在同一个 PDF 中，用底部页码条定位任意页。</p>
+          <p>用底部页码条定位任意页或乐章；从自建文件夹打开时，还能按顺序<span style="white-space:nowrap">连播切换。</span></p>
           <ul>
             <li tabindex="0" role="button">页面预览 <b class="basic-tag">Basic</b><span>沿页码条拖动，逐页预览。</span></li>
             <li tabindex="0" role="button">页面跳转 <b class="basic-tag">Basic</b><span>输入页码，跳到该页。</span></li>
             <li tabindex="0" role="button">乐章跳转 <b class="basic-tag">Basic</b><span>一键跳到任一乐章开头，首行高亮。</span></li>
+            <li tabindex="0" role="button">按文件夹顺序连播 <b class="basic-tag">Basic</b><span>从自建文件夹打开时，末页再翻一页直接进入下一首，底栏两端也可随时切换前后曲目。</span></li>
           </ul>
         </div>
         <div class="os-chcopy sk-g on" data-ch="bar" data-side="L" data-beats="3">
@@ -622,29 +626,10 @@ footer .legal span{margin-left:auto;white-space:nowrap}
         <p class="rv" style="--i:1">按乐谱打开时长自动记录，无需手动计时，练习记录跟着账号走，换了 iPad <span style="white-space:nowrap">也接着算。</span></p>
       </div>
       <div class="sim" data-sim="stats" aria-label="一个月的示例统计"></div>
-      <script src="components/stats.js?v=98dfcfb5" defer></script>
+      <script src="components/stats.js?v=f81e33a6" defer></script>
     </div>
 </section>
 
-<!-- FOLDERS: your own folders, made by hand in the library's select mode (components/r13/folders-r13.js) -->
-<section id="folders" data-theme="light" data-nav="organize">
-  <div class="fo wrap">
-    <div class="fo-copy sk-g on">
-      <div class="label rv"><span>整理</span>自建文件夹 · 一份谱可放多处</div>
-      <h2 class="sec-title rv"><span class="ln">自建文件夹</span><span class="ln">乐谱随你归类</span></h2>
-      <p class="rv" style="--i:1">为独奏会、老师或学期建文件夹，任何乐谱都能<span style="white-space:nowrap">放进去。</span></p>
-      <ul class="rv" style="--i:2">
-        <li tabindex="0" role="button">选择乐谱 <b class="basic-tag">Basic</b><span>点“选择”，再点乐谱，按点选顺序编号。</span></li>
-        <li tabindex="0" role="button">新建文件夹 <b class="basic-tag">Basic</b><span>起个名字，选中的乐谱直接放进去。</span></li>
-        <li tabindex="0" role="button">加入文件夹 <b class="basic-tag">Basic</b><span>随时往里添。一份乐谱可以同时在几个文件夹里。</span></li>
-      </ul>
-    </div>
-    <div class="fo-stage">
-      <div class="sim" data-sim="r13/folders-r13" aria-label="在图书馆里选择乐谱、新建文件夹并加入乐谱的演示"></div>
-      <div class="fx-prog fo-prog"><button type="button"><i></i></button><button type="button"><i></i></button><button type="button"><i></i></button></div>
-    </div>
-  </div>
-</section>
 
 <!-- BAND: the next two reading features are Pro -->
 <section class="band" id="band" data-theme="dark">
@@ -720,7 +705,7 @@ footer .legal span{margin-left:auto;white-space:nowrap}
   <footer class="wrap">
     <div class="cols">
       <div class="brand" style="font-size:20px"><span class="bm"><svg class="mk"><use href="/zh/#sn-mark"/></svg></span>StaffNotes</div>
-      <div><div class="n">页面</div><ul><li><a href="#import">导入</a></li><li><a href="#organize">整理</a></li><li><a href="#read">阅读</a></li><li><a href="#practice">练习</a></li><li><a href="#play">演奏</a></li><li><a href="#stats">统计</a></li><li><a href="#pricing">方案</a></li><li><a href="#faq">常见问题</a></li></ul></div>
+      <div><div class="n">页面</div><ul><li><a href="#import">导入</a></li><li><a href="#organize">整理</a></li><li><a href="#read">阅读</a></li><li><a href="#practice">练习</a></li><li><a href="#play">演奏</a></li><li><a href="#sync">云同步</a></li><li><a href="#stats">统计</a></li><li><a href="#pricing">方案</a></li><li><a href="#faq">常见问题</a></li></ul></div>
       <div><div class="n">联系</div><ul><li><a href="#">支持</a></li><li><a href="#">媒体资料</a></li></ul></div>
     </div>
     <div class="legal"><a href="#">隐私政策</a><a href="#">使用条款</a><span>© 2026 StaffNotes</span></div>
@@ -735,7 +720,7 @@ footer .legal span{margin-left:auto;white-space:nowrap}
 (()=>{
   const L = document.documentElement.lang;
   if(!/^zh/.test(L) || !window.Intl || !Intl.Segmenter) return;
-  const KEEP = new RegExp('AI 位置識別|AI 位置识别|AI 自动翻谱|AI 自動翻譜|作曲家文件夹|作曲家資料夾|練習時長統計|练习时长统计|小節號面板|小節號顯示|小节号显示|小节号面板|边弹边跟谱|邊彈邊跟譜|乐章跳转|乐谱识别|位置識別|位置识别|公版乐谱|公版樂譜|划词翻译|劃詞翻譯|图层分组|图层管理|圖層分組|圖層管理|在线曲库|套索工具|小節識別|小節跳轉|小节识别|小节跳转|录音合集|形状工具|形狀工具|手写标注|手势撤销|手勢復原|手寫標註|标注分层|标注导入|樂章跳轉|樂譜識別|標註分層|標註匯入|画笔工具|畫筆工具|線上曲庫|練習工具|練習時長|练习工具|练习时长|自动命名|自动归档|自动翻谱|自动识别|自動命名|自動歸檔|自動翻譜|自動識別|詞典搜尋|词典搜索|錄音合集|頁面跳轉|頁面預覽|页面跳转|页面预览|上一步|上一笔|上一筆|上一頁|上一页|下一个|下一個|下一頁|下一页|云同步|作品号|作品號|作曲家|剪貼簿|剪贴板|區域性|单线笔|参考音|參考音|双钢琴|單線筆|图书馆|圖書館|小節號|小节号|扫描件|掃描件|播放器|改編版|改编版|文件名|文件夹|未找到|校音器|歌唱性|生卒年|節拍器|編訂版|編訂者|编订版|编订者|自定义|自定義|节拍器|荧光笔|螢光筆|装饰音|裝飾音|該小節|調音器|该小节|資料夾|起始頁|起始页|近七日|鋼琴家|钢琴家|閱讀器|阅读器|雙鋼琴|雲同步|頁碼條|页码条|麥克風|麦克风|一鍵|一键|上台|上課|上课|下載|下载|中文|乐句|乐章|乐谱|书写|任一|任意|位置|作品|保留|停靠|儲存|免費|免费|內建|全曲|八度|公版|其他|内置|分享|分层|分層|分組|分组|分譜|分谱|切换|切換|划词|删除|刪除|剪下|剪切|副本|劃詞|力度|功能|包括|匯入|匯出|匹配|单个|双击|双指|发声|另含|合集|同一|命名|單個|图层|圆形|圓形|圖層|在线|复制|大調|大调|套索|字段|字母|存入|定位|定速|实时|實時|导入|导出|小調|小调|局部|工具|已有|常称|常稱|底部|开头|开谱|弱起|弹到|彈到|当前|录音|形状|形狀|復原|德語|德语|成条|成條|手写|手动|手動|手寫|手指|手稿|打开|折叠|拍号|拍號|拖动|拖動|持續|持续|指法|按天|按月|搜尋|搜索|摺疊|撤销|播放|支援|收录|收錄|改动|改動|改編|改编|数据|整頁|整页|整首|方框|方案|无需|日均|时期|时长|显示|時期|時長|曲名|曲库|曲庫|曲目|書寫|最后|最後|本机|本機|本頁|本页|术语|柔緩|柔缓|查找|查詢|标准|标出|标注|概覽|概览|樂句|樂章|樂譜|標出|標準|標註|檔名|檔案|欄位|正在|步态|步態|每种|每種|每組|每组|沟通|渐弱|渐强|溝通|滑鼠|演奏|漸弱|漸強|点按|点选|無需|版本|画笔|畫筆|當前|發聲|直線|直线|看譜|看谱|移动|移動|管理|箭头|箭頭|粗細|粗细|粘贴|系統|系统|統計|線上|編號|編訂|練習|繪製|练习|绘制|统计|编号|编订|翻譜|翻譯|翻译|翻谱|翻頁|翻页|老师|老師|自动|自動|英文|蜡笔|蠟筆|行板|術語|表情|複製|規整|规整|解鎖|解锁|訂閱|計時|記錄|詞典|詞條|該頁|語境|語言|調性|識別|譜上|譜旁|譜面|计时|订阅|记录|识别|词典|词条|该页|语境|语言|调性|谱上|谱旁|谱面|貼上|資料|跟譜|跟谱|跟踪|跟蹤|跳轉|跳转|輕巧|輕點|輸入|轻巧|轻点|输入|边缘|选择|逐頁|逐页|速度|選取|選擇|邊緣|释义|釋義|重音|錄音|鎖定|锁定|長按|长按|閃動|開啟|開譜|開頭|闪动|随拍|隐藏|隨拍|隱藏|雙指|雙擊|面板|音乐|音樂|音高|韵致|韻致|頁碼|頁面|頂欄|預覽|顏色|顯示|页码|页面|顶栏|预览|颜色|高亮|點按|點選|鼠标', 'g');
+  const KEEP = new RegExp('按文件夹顺序连播|依資料夾順序連播|AI 位置識別|调整曲目顺序|調整曲目順序|AI 位置识别|AI 自动翻谱|AI 自動翻譜|作曲家文件夹|作曲家資料夾|練習時長統計|练习时长统计|小節號面板|小節號顯示|小节号显示|小节号面板|边弹边跟谱|邊彈邊跟譜|自建文件夹|自建資料夾|曲目连播|曲目連播|连播切换|連播切換|调整顺序|調整順序|演出曲目|乐章跳转|乐谱识别|位置識別|位置识别|公版乐谱|公版樂譜|划词翻译|劃詞翻譯|图层分组|图层管理|圖層分組|圖層管理|在线曲库|套索工具|小節識別|小節跳轉|小节识别|小节跳转|录音合集|形状工具|形狀工具|手写标注|手势撤销|手勢復原|手寫標註|标注分层|标注导入|樂章跳轉|樂譜識別|標註分層|標註匯入|画笔工具|畫筆工具|線上曲庫|練習工具|練習時長|练习工具|练习时长|自动命名|自动归档|自动翻谱|自动识别|自動命名|自動歸檔|自動翻譜|自動識別|詞典搜尋|词典搜索|錄音合集|頁面跳轉|頁面預覽|页面跳转|页面预览|節目單|曲目单|独奏会|獨奏會|下一首|上一首|上一步|上一笔|上一筆|上一頁|上一页|下一个|下一個|下一頁|下一页|云同步|作品号|作品號|作曲家|剪貼簿|剪贴板|區域性|单线笔|参考音|參考音|双钢琴|單線筆|图书馆|圖書館|小節號|小节号|扫描件|掃描件|播放器|改編版|改编版|文件名|文件夹|未找到|校音器|歌唱性|生卒年|節拍器|編訂版|編訂者|编订版|编订者|自定义|自定義|节拍器|荧光笔|螢光筆|装饰音|裝飾音|該小節|調音器|该小节|資料夾|起始頁|起始页|近七日|鋼琴家|钢琴家|閱讀器|阅读器|雙鋼琴|雲同步|頁碼條|页码条|麥克風|麦克风|一鍵|一键|上台|上課|上课|下載|下载|中文|乐句|乐章|乐谱|书写|任一|任意|位置|作品|保留|停靠|儲存|免費|免费|內建|全曲|八度|公版|其他|内置|分享|分层|分層|分組|分组|分譜|分谱|切换|切換|划词|删除|刪除|剪下|剪切|副本|劃詞|力度|功能|包括|匯入|匯出|匹配|单个|双击|双指|发声|另含|合集|同一|命名|單個|图层|圆形|圓形|圖層|在线|复制|大調|大调|套索|字段|字母|存入|定位|定速|实时|實時|导入|导出|小調|小调|局部|工具|已有|常称|常稱|底部|开头|开谱|弱起|弹到|彈到|当前|录音|形状|形狀|復原|德語|德语|成条|成條|手写|手动|手動|手寫|手指|手稿|打开|折叠|拍号|拍號|拖动|拖動|持續|持续|指法|按天|按月|搜尋|搜索|摺疊|撤销|播放|支援|收录|收錄|改动|改動|改編|改编|数据|整頁|整页|整首|方框|方案|无需|日均|时期|时长|显示|時期|時長|曲名|曲库|曲庫|曲目|書寫|最后|最後|本机|本機|本頁|本页|术语|柔緩|柔缓|查找|查詢|标准|标出|标注|概覽|概览|樂句|樂章|樂譜|標出|標準|標註|檔名|檔案|欄位|正在|步态|步態|每种|每種|每組|每组|沟通|渐弱|渐强|溝通|滑鼠|演奏|漸弱|漸強|点按|点选|無需|版本|画笔|畫筆|當前|發聲|直線|直线|看譜|看谱|移动|移動|管理|箭头|箭頭|粗細|粗细|粘贴|系統|系统|統計|線上|編號|編訂|練習|繪製|练习|绘制|统计|编号|编订|翻譜|翻譯|翻译|翻谱|翻頁|翻页|老师|老師|自动|自動|英文|蜡笔|蠟筆|行板|術語|表情|複製|規整|规整|解鎖|解锁|訂閱|計時|記錄|詞典|詞條|該頁|語境|語言|調性|識別|譜上|譜旁|譜面|计时|订阅|记录|识别|词典|词条|该页|语境|语言|调性|谱上|谱旁|谱面|貼上|資料|跟譜|跟谱|跟踪|跟蹤|跳轉|跳转|輕巧|輕點|輸入|轻巧|轻点|输入|边缘|选择|逐頁|逐页|速度|選取|選擇|邊緣|释义|釋義|重音|錄音|鎖定|锁定|長按|长按|閃動|開啟|開譜|開頭|闪动|随拍|隐藏|隨拍|隱藏|雙指|雙擊|面板|音乐|音樂|音高|韵致|韻致|頁碼|頁面|頂欄|預覽|顏色|顯示|页码|页面|顶栏|预览|颜色|高亮|點按|點選|鼠标', 'g');
   const seg = new Intl.Segmenter(L, {granularity:'word'}), HAN = /^\p{Script=Han}+$/u;
   const PRE = /^[每一二两兩三四五几幾本这這那各某该該此第整全单單首]+$/u;   // 往后黏：每一小节、本页、第一
   const BACK = '的了吗嗎呢吧着著过過们們地得后後里裡时時中内內旁';         // 往前黏：下载后、文件夹里
@@ -808,7 +793,7 @@ const simFiles = {};
 function simFactory(name){
   return simFiles[name] ??= new Promise(done=>{
     if(SNSims[name]) return done(SNSims[name]);
-    const s=document.createElement('script'); s.src=`components/${name}.js?v=98dfcfb5`; s.async=true;
+    const s=document.createElement('script'); s.src=`components/${name}.js?v=f81e33a6`; s.async=true;
     s.onload=()=>done(SNSims[name]||null); s.onerror=()=>{ s.remove(); done(null); };
     document.head.appendChild(s);
   });
@@ -1007,6 +992,6 @@ requestAnimationFrame(frame);
 /* FAQ */
 $$('.qa button').forEach(b=>b.onclick=()=>{ const q=b.parentElement, was=q.classList.contains('open'); $$('.qa').forEach(x=>x.classList.remove('open')); if(!was) q.classList.add('open'); });
 </script>
-<script src="components/r13/onescore-r13.js?v=98dfcfb5"></script>
+<script src="components/r13/onescore-r13.js?v=f81e33a6"></script>
 </body>
 </html>
