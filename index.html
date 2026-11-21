@@ -17,6 +17,8 @@ if(P[l])location.replace(P[l]+location.search+location.hash)}catch(e){}})()</scr
 <link rel="icon" href="favicon.ico" sizes="32x32">
 <link rel="icon" href="assets/logo-mark.svg?v=2" type="image/svg+xml">
 <style>
+/* Geist Serif Regular by Vercel (license: assets/geist-serif-OFL.txt). Timeless Serif covers missing symbols. */
+@font-face{font-family:"Geist Serif";src:url(assets/GeistSerif-Regular.woff2) format("woff2");font-display:swap}
 @font-face{font-family:"Timeless Serif";src:url(assets/TimelessSerif-Book.ttf) format("truetype");font-display:swap}
 @font-face{font-family:"Timeless Sans";src:url(assets/TimelessSans-W460.ttf) format("truetype");font-display:swap}
 /* 中文衬线：App 文件夹名用的思源宋体，取 Regular 一档；只截官网用到的字（字体许可 assets/sn-serif-OFL.txt） */
@@ -26,12 +28,12 @@ if(P[l])location.replace(P[l]+location.search+location.hash)}catch(e){}})()</scr
   --paper:#F7F6F2;--card:#FFFFFF;--well:#EAECEB;--ink:#292D38;--ink2:#646A75;--line:rgba(41,45,56,.12);
   --blue:#3F529F;--night:#171B24;--night2:#232936;--blue-n:#B0BBF0;--on-night:#EEEDE8;--on-night2:#8E94A3;
   --red:#B64C50;--green:#39836B;--gold:#D9AC2B;--purple:#8064AD;
-  --serif:"Timeless Serif",Georgia,serif;--sans:"Timeless Sans",-apple-system,system-ui,sans-serif;
+  --serif:"Geist Serif","Timeless Serif",Georgia,serif;--sans:"Timeless Sans",-apple-system,system-ui,sans-serif;
   --ease:cubic-bezier(.2,.7,.2,1);--wrap:min(1180px,calc(100vw - 48px));
 }
-/* 中文：拉丁字母照旧用 Timeless；衬线处汉字用思源宋体，其余落到苹方；德语长词自动断字 */
-:root:lang(zh-Hans){--serif:"Timeless Serif","SN Serif SC",Georgia,"PingFang SC","Noto Sans SC",serif;--sans:"Timeless Sans",-apple-system,system-ui,"PingFang SC","Noto Sans SC",sans-serif}
-:root:lang(zh-Hant){--serif:"Timeless Serif","SN Serif TC","SN Serif SC",Georgia,"PingFang TC","Noto Sans TC",serif;--sans:"Timeless Sans",-apple-system,system-ui,"PingFang TC","Noto Sans TC",sans-serif}
+/* 中文：拉丁字母用 Geist Serif；衬线处汉字用思源宋体，其余落到苹方；德语长词自动断字 */
+:root:lang(zh-Hans){--serif:"Geist Serif","Timeless Serif","SN Serif SC",Georgia,"PingFang SC","Noto Sans SC",serif;--sans:"Timeless Sans",-apple-system,system-ui,"PingFang SC","Noto Sans SC",sans-serif}
+:root:lang(zh-Hant){--serif:"Geist Serif","Timeless Serif","SN Serif TC","SN Serif SC",Georgia,"PingFang TC","Noto Sans TC",serif;--sans:"Timeless Sans",-apple-system,system-ui,"PingFang TC","Noto Sans TC",sans-serif}
 :root:lang(zh) body{letter-spacing:0}
 /* 段落末行不留单个词或孤字（各语言都开） */
 p,li,.label,:root:lang(zh) h3{text-wrap:pretty}
@@ -270,7 +272,7 @@ h1,h2,h3{text-wrap:balance}
 .dictsec h2{font-family:var(--serif);font-weight:400;font-size:clamp(44px,5.2vw,80px);line-height:1;letter-spacing:-.035em;margin:22px 0 26px}
 .dictsec p{color:var(--on-night2);max-width:420px;font-size:17px}
 .dictsec .terms{display:flex;flex-wrap:wrap;gap:8px;margin-top:34px;max-width:440px}
-.dictsec .terms button{font-family:var(--serif);font-style:italic;font-size:16px;padding:4px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:none;color:var(--on-night);cursor:pointer;transition:background .2s,border-color .2s,color .2s}
+.dictsec .terms button{font-family:var(--serif);font-size:16px;padding:4px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:none;color:var(--on-night);cursor:pointer;transition:background .2s,border-color .2s,color .2s}
 .dictsec .terms button:hover{border-color:rgba(255,255,255,.4)}
 .dictsec .terms button.on{background:var(--on-night);border-color:var(--on-night);color:#0E1117}
 .dictsec .frame{width:min(760px,56vw)}
