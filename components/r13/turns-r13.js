@@ -44,6 +44,9 @@ const endGl = b => `<svg viewBox="0 0 24 24" fill="${INK}" stroke="${INK}" strok
   ? '<path d="M5.5 6.2v11.6"/><path d="M18.2 6.6v10.8L9.6 12z"/>'
   : '<path d="M18.5 6.2v11.6"/><path d="M5.8 6.6v10.8L14.4 12z"/>'}</svg>`;
 const chev = b => `<svg viewBox="0 0 24 24" fill="none" stroke="${INK}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="${b?'M14.5 6l-6 6 6 6':'M9.5 6l6 6-6 6'}"/></svg>`;
+// SF Symbols music.note（跳乐章，照 PDFReaderView.jumpToMovement）、music.note.list（切曲目）
+const noteGl = `<svg viewBox="0 0 24 24" fill="none" stroke="${INK}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5V3.5l5 2.2"/><ellipse cx="11" cy="17.8" rx="3.6" ry="2.8" fill="${INK}" stroke="none"/></svg>`;
+const listGl = `<svg viewBox="0 0 24 24" fill="none" stroke="${INK}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5.5h10M3 10.5h10M3 15.5h6M18 17.5V5l3.5 1.6"/><ellipse cx="15.4" cy="17.8" rx="2.9" ry="2.3" fill="${INK}" stroke="none"/></svg>`;
 const goArrow = '<svg viewBox="0 0 27 22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h20M15.5 3.5 23 11l-7.5 7.5"/></svg>';
 const bksp = '<svg viewBox="0 0 20 17"><path fill="currentColor" d="M6.3 1h11a2.2 2.2 0 0 1 2.2 2.2v10.6A2.2 2.2 0 0 1 17.3 16h-11a1.6 1.6 0 0 1-1.2-.5L.6 9.6a1.6 1.6 0 0 1 0-2.2l4.5-5.9A1.6 1.6 0 0 1 6.3 1Zm3.4 4.6a.8.8 0 0 0-1.1 1.1l1.8 1.8-1.8 1.8a.8.8 0 1 0 1.1 1.1l1.8-1.8 1.8 1.8a.8.8 0 1 0 1.1-1.1l-1.8-1.8 1.8-1.8a.8.8 0 1 0-1.1-1.1l-1.8 1.8Z"/></svg>';
 
@@ -146,6 +149,15 @@ const CSS = `
 .sns-turns.roll .t-card{overflow:visible}
 .sns-turns.roll .t-card .pg{transition:none}
 .sns-turns .tpill .h.br.hit{background:rgba(63,82,159,.14);border-radius:9px}
+/* 名字胶囊（App 的 ReaderStatusPill：跳乐章、切曲目时盖在顶部曲名卡片上，图标 + 名字，2.4 秒后收起；按 App 尺寸的一半画） */
+.sns-turns .tst{position:absolute;left:50%;top:8px;height:22px;min-width:65px;max-width:330px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:4.5px;padding:0 11px;border-radius:11px;${glass};white-space:nowrap;font-size:7.5px;font-weight:500;line-height:1;z-index:3;pointer-events:none;opacity:0;translate:-50% calc(var(--ty,0px) - 5px);scale:calc(${CS}*var(--tts,1)*.92);transform-origin:50% 0;transition:opacity .2s ease,translate .28s cubic-bezier(.2,.7,.2,1),scale .28s cubic-bezier(.2,.7,.2,1)}
+.sns-turns .tst.on{opacity:1;translate:-50% var(--ty,0px);scale:calc(${CS}*var(--tts,1))}
+.sns-turns .tst svg{flex:none;width:9px;height:9px}
+.sns-turns .tst span{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.sns-turns .ttl{transition:translate .28s cubic-bezier(.2,.7,.2,1),opacity .2s ease}
+.sns-turns.toast .ttl{opacity:0}
+.sns-turns .mv.ico{width:22px;padding:0;justify-content:center}
+.sns-turns .mv.ico span{display:none}
 .sns-turns .pad .chip.bm{background:rgba(63,82,159,.14);color:${ACCENT};font-weight:600}
 `;
 (function inject(){
@@ -170,6 +182,7 @@ NS['r13/turns-r13'] = function(root, opts){
   root.innerHTML = `<i class="bk"></i><div class="t-stage">
     <div class="t-card">${PAGES.map(p=>`<div class="pg${p===1?' p1':''}" data-p="${p}"${p===1?'':` style="background-image:url(${base}p${p}.jpg)"`}></div>`).join('')}<div class="pg k331s" data-p="k331s" style="background-image:url(${cAssets}k331-start.jpg)"></div><div class="pg k331" data-p="k331" style="background-image:url(${cAssets}k331-end.jpg)"></div><i class="tfl"></i><i class="bfl"></i></div>
     <div class="ttl">${MOV.map((m,i)=>`<span data-m="${i}">${TTL(i)}</span>`).join('')}<span data-m="k331s">${TTL331('1. Andante grazioso')}</span><span data-m="k331">${TTL331('3. Alla Turca: Allegretto')}</span></div>
+    <div class="tst" aria-hidden="true"></div>
     <div class="bar">
       <div class="sc pv">${endGl(1)}<span></span></div>
       <div class="mv tpr">${gl(1)}<span></span></div>
@@ -188,12 +201,24 @@ NS['r13/turns-r13'] = function(root, opts){
   const pgs = [...root.querySelectorAll('.t-card .pg')], pgK331 = $('.pg.k331'), pgK331s = $('.pg.k331s'), pg1 = $('.pg.p1'), ttls = [...root.querySelectorAll('.ttl>span')];
   const scPv = $('.sc.pv'), scNx = $('.sc.nx'), mvPr = $('.mv.tpr'), mvNx = $('.mv.nx'), cvPv = $('.cv.pv'), cvNx = $('.cv.nx');
   const th = $('.th'), thIm = [...root.querySelectorAll('.th .im>div')], tfl = $('.tfl'), bfl = $('.bfl'), ty = $('.pad .ty'), goB = $('.pad .go');
+  const tst = $('.tst');
   const pnPg = $('.h.pg .pn'), pnBr = $('.h.br .pn'), brH = $('.h.br'), chip = $('.pad .chip'), tcap = $('.pad .tcap'), pad = $('.pad'), bk = $('.bk');
 
   /* state */
   const fresh = () => ({page:1, disp:1, total:N, k331:false, playlist:false, frac:null, thumb:0, pad:false, typed:'', bars:false, bar:null, pmode:'page'});
   let st = fresh();
-  let PC = W/2, drag = null, movedAt = 0;
+  // 页码胶囊在底栏正中（App ReaderChrome.pageControls：左右两半等宽，胶囊固定占中间）
+  const PC = W/2;
+  let drag = null, movedAt = 0;
+  let tstT = 0;
+  const toast = (title, score) => {
+    clearTimeout(tstT);
+    tst.innerHTML = `${score ? listGl : noteGl}<span></span>`; tst.querySelector('span').textContent = title;
+    tst.classList.remove('on'); root.classList.remove('toast'); void tst.offsetWidth;
+    tst.classList.add('on'); root.classList.add('toast');
+    tstT = setTimeout(toastOff, 2400);
+  };
+  function toastOff(){ clearTimeout(tstT); tst.classList.remove('on'); root.classList.remove('toast'); }
   const widths = new Map();
   const ruler = document.createElement('span');
   ruler.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;font-size:8.5px';
@@ -248,16 +273,10 @@ NS['r13/turns-r13'] = function(root, opts){
     // 按这一页可见的整组居中；手机留 8 框单位
     const hw = nar ? (FW/2/R - 8)/(CS*bs) : W/2 - PX - 4, gap = nar ? 5 : 31;
     let wPr = movement(mvPr, prev), wNx = movement(mvNx, next);
-    let Lx = hasPr ? gap + wPr : (hasCvP ? 27 : 0), Rx = hasNx ? gap + wNx : (hasCvN ? 27 : 0);
-    const excess = Lx + pw + Rx - 2*hw;
-    if (excess > 0){
-      if (wPr > wNx) wPr = Math.max(40, wPr - excess); else wNx = Math.max(40, wPr < wNx ? wNx - excess : wNx - excess);
-      Lx = hasPr ? gap + wPr : (hasCvP ? 27 : 0); Rx = hasNx ? gap + wNx : (hasCvN ? 27 : 0);
-    }
-    if (!(st.thumb || drag || st.pad)){
-      const pc = W/2 + (Lx - Rx)/2;
-      if (pc !== PC){ PC = pc; movedAt = performance.now(); }
-    }
+    // 每侧只用自己那半边：放得下全名就全名，放不下截断，连 40 都放不下就只留图标（App titleLimit）
+    const side = hw - pw/2 - gap;
+    const fit = (el, w) => { const ico = w > 0 && !nar && side < 40; el.classList.toggle('ico', ico); return ico ? 22 : Math.min(w, side); };
+    wPr = fit(mvPr, wPr); wNx = fit(mvNx, wNx);
     const L = PC - pw/2, R2 = PC + pw/2;
     root.classList.toggle('playlist', st.playlist);
     root.classList.toggle('bars', st.bars); root.classList.toggle('padon', st.pad); root.classList.toggle('k331', is331);
@@ -319,7 +338,7 @@ NS['r13/turns-r13'] = function(root, opts){
     by = (fh - BOTF - oy)/R - (PY + PH);
     root.style.setProperty('--ty', ((TOPF - oy)/R - 8).toFixed(2) + 'px');
     root.style.setProperty('--by', by.toFixed(2) + 'px');
-    root.style.setProperty('--tps', Math.max(1, .85/s).toFixed(3));
+    root.style.setProperty('--tps', '1.35');
     nar = s < .5; bs = nar ? 1.25 : 1;
     root.classList.toggle('nar', nar);
     root.style.setProperty('--bs', bs); root.style.setProperty('--tts', nar ? 1.25 : 1);
@@ -395,7 +414,7 @@ NS['r13/turns-r13'] = function(root, opts){
       await wait(350);
       await tapOn(mvNx, ()=>{
         mvNx.classList.remove('press'); void mvNx.offsetWidth; mvNx.classList.add('press');
-        setTimeout(()=>{ if (t.dead) return; st.page = 4; st.disp = 4; render(); tfl.classList.remove('go'); void tfl.offsetWidth; tfl.classList.add('go'); }, 180);
+        setTimeout(()=>{ if (t.dead) return; st.page = 4; st.disp = 4; render(); toast(MOV[1]); tfl.classList.remove('go'); void tfl.offsetWidth; tfl.classList.add('go'); }, 180);
       }, 620);
       await wait(250); await lift();
       await wait(2100);
@@ -404,8 +423,9 @@ NS['r13/turns-r13'] = function(root, opts){
       await wait(420);
       await tapOn(scPv, () => pulseScore(scPv), 530);
       tfl.classList.remove('go');
-      const cross = async (from, to, dir, next) => {
+      const cross = async (from, to, dir, next, name) => {
         root.classList.add('roll');
+        toast(name, true);
         const put = (el, x) => {
           el.style.transform = `translateX(${x}px)`;
           if (el === pg1 && baseSlide) baseSlide(x*sc);
@@ -417,11 +437,12 @@ NS['r13/turns-r13'] = function(root, opts){
           if (to === pg1) bk.style.transform = `translateX(${dir*SLIDE*e*sc}px)`;
         });
         st = next; render();
+        void root.offsetWidth;
         from.style.transform = to.style.transform = bk.style.transform = '';
         if (baseSlide) baseSlide(0);
         root.classList.remove('roll');
       };
-      await cross(pgOf(4), pgK331s, 1, {...fresh(), k331:true, playlist:true, total:12});
+      await cross(pgOf(4), pgK331s, 1, {...fresh(), k331:true, playlist:true, total:12}, tK331());
       await wait(410);
       await moveTo([vis(xFor(1, 12)), vy() + by], 490);
       down(true); line.classList.remove('ease');
@@ -433,7 +454,7 @@ NS['r13/turns-r13'] = function(root, opts){
       await wait(490);
       pgK331.classList.remove('scrub-flash');
       await tapOn(cvNx, () => {}, 440);
-      await cross(pgK331, pg1, -1, {...fresh(), playlist:true});
+      await cross(pgK331, pg1, -1, {...fresh(), playlist:true}, tK545());
       await wait(160); await lift();
       await wait(240);
       pulseScore(scPv);
@@ -479,6 +500,7 @@ NS['r13/turns-r13'] = function(root, opts){
     root.classList.remove('roll', 'chrome-off');
     prevTap?.cancel();
     pgK331.classList.remove('scrub-flash');
+    toastOff();
     pgs.forEach(el => el.style.transform = ''); bk.style.transform = '';
     if (baseSlide) baseSlide(0);
     scPv.classList.remove('press'); scNx.classList.remove('press');
@@ -639,17 +661,17 @@ NS['r13/turns-r13'] = function(root, opts){
     const scB = t.closest('.sc');
     if (scB && !scB.classList.contains('off')){
       fingerAt(e, true); down(true); pulseScore(scB);
-      if (scB === scPv && !st.k331){ st.k331 = true; st.page = st.disp = 1; st.total = 12; render(); }
-      else if (scB === scNx && st.k331){ st.k331 = false; st.page = st.disp = 1; st.total = N; render(); }
+      if (scB === scPv && !st.k331){ st.k331 = true; st.page = st.disp = 1; st.total = 12; render(); toast(tK331(), true); }
+      else if (scB === scNx && st.k331){ st.k331 = false; st.page = st.disp = 1; st.total = N; render(); toast(tK545(), true); }
       return;
     }
     const mv = t.closest('.mv'), cv = t.closest('.cv');
     if (mv || cv){ fingerAt(e, true); down(true); }
-    if (mv && mv._to){ mv.classList.remove('press'); void mv.offsetWidth; mv.classList.add('press'); if (PAGES.includes(mv._to)) setTimeout(()=>turnTo(mv._to, mv === mvNx), 180); }
+    if (mv && mv._to){ mv.classList.remove('press'); void mv.offsetWidth; mv.classList.add('press'); if (PAGES.includes(mv._to)) setTimeout(()=>{ turnTo(mv._to, mv === mvNx); toast(MOV[mvOf(mv._to)]); }, 180); }
     else if (cv){
       if (st.k331){
-        if (cv === cvNx && st.page === 12){ st.k331 = false; st.total = N; st.page = st.disp = 1; }
-        else st.page = st.disp = cv === cvNx ? 12 : 1;
+        if (cv === cvNx && st.page === 12){ st.k331 = false; st.total = N; st.page = st.disp = 1; render(); toast(tK545(), true); return; }
+        st.page = st.disp = cv === cvNx ? 12 : 1;
         render(); return;
       }
       const p = st.page, nxt = cv === cvNx ? PAGES.find(q => q > p) : [...PAGES].reverse().find(q => q < p);
