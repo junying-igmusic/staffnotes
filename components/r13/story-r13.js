@@ -56,7 +56,7 @@ const PN = (colX(1) + colX(4) + CW)/2 - VN/2;
 // 拍 7–8 自建文件夹视图网格：桌面 4 列（780 宽内对称留边 79）、窄屏 3 列（70..710 可视 640 宽内对称留边 68）
 const X7D = 79, G7D = 26, X7N = 138, G7N = 48;
 const x7 = (c, nar) => (nar ? X7N : X7D) + c*(SW + (nar ? G7N : G7D));
-const Y7_1 = 62, Y7_2 = 350, EY1 = 72, EY2 = 330, ORH = 60;
+const Y7_1 = 62, Y7_2 = 350, ROW7 = Y7_2 - Y7_1, RISE7N = 120, ORH = 60;
 // 拍 4 字段展开：TF 时点开，FS 是卡片列表往上滚的距离
 const TF = 4.1, FS = 394, FR = 39;
 const FU = .55, FH = .8, FD = .5, FL = FU + FH + FD, FP = [FU/FL, (FU + FH)/FL].map(v => (v*100).toFixed(1) + '%'), TV = TF + .12 + FL + .35;
@@ -398,10 +398,11 @@ ${G(7)} .lib2{opacity:1;translate:none}
 .sns-story.pre7 .lib2{translate:0 -${H}px}
 .sns-story.g7 .lib .sc{opacity:0;transform:translate(calc(${colX(4)-colX(1)}px - var(--i)*${CW+GAP}px),${R1-R3}px)}
 .sns-story .lib2 .recent2{position:absolute;inset:0;transition:translate .62s cubic-bezier(.2,.7,.2,1)}
-.sns-story .lib2.open .recent2{translate:0 -320px}
-.sns-story .lib2 .nv2.recital2{position:absolute;top:14px;left:${X7N}px;width:${SW*3+G7N*2}px;opacity:0;transition:opacity .25s}
-.sns-story.narrow .lib2.open .recital2{opacity:1;transition-delay:.4s}
-.sns-story.narrow .lib2.open .rc2{visibility:hidden;transition:visibility 0s .4s}
+.sns-story .lib2.open .recent2{translate:0 -${ROW7}px;visibility:hidden;transition:translate .62s cubic-bezier(.2,.7,.2,1),visibility 0s .62s}
+.sns-story.org-open .library-viewport{overflow:visible;clip-path:inset(0 0 -24px)}
+/* 手机露出第三排，底边仍在进度条上方。 */
+.sns-story.narrow.org-open .library-viewport{clip-path:inset(${-RISE7N}px 0 -188px)}
+.sns-story.narrow.g7 .lib2.open{translate:0 ${-RISE7N}px}
 .sns-story .lib2.open .tb2.br{opacity:0}
 .sns-story .lib2 .sc2.fs{transition-delay:var(--member-delay,0s)}
 .sns-story .lib2.now2 *,.sns-story .lib2.now2 *::before,.sns-story .lib2.now2 *::after{transition:none!important}
@@ -501,9 +502,8 @@ ${G(7)} .lib2{opacity:1;translate:none}
 @keyframes snsCr2{50%{opacity:0}}
 
 /* 拍 8 长按液态玻璃上下文菜单（4 项：Select Contents / Reorder Scores / Rename… / 红色 Delete…） */
-.sns-story .lib2 .ctx2{position:absolute;top:${EY1 + SH7 - 12}px;left:var(--ctx-x,${X7D}px);min-width:222px;border-radius:14px;background:rgba(252,252,254,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:10;overflow:hidden;
+.sns-story .lib2 .ctx2{position:absolute;top:${Y7_2 + 18}px;left:var(--ctx-x,${X7D}px);min-width:222px;border-radius:14px;background:rgba(252,252,254,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:10;overflow:hidden;
   opacity:0;transform:scale(.88);transform-origin:24px 0;box-shadow:0 0 0 .5px rgba(0,0,0,.08),0 16px 44px -10px rgba(23,27,36,.34);transition:opacity .22s,transform .32s cubic-bezier(.2,.8,.2,1)}
-.sns-story.narrow .lib2 .ctx2{top:64px;left:${X7N}px}
 .sns-story .lib2.ctx .ctx2{opacity:1;transform:none}
 .sns-story .lib2 .cmi2{position:relative;height:40px;padding:0 14px 0 16px;display:flex;align-items:center;justify-content:space-between;gap:16px;font-size:14.5px;white-space:nowrap;transition:background .15s}
 .sns-story .lib2 .cmi2+.cmi2::before{content:"";position:absolute;left:0;right:0;top:0;border-top:.5px solid rgba(60,60,67,.16)}
@@ -535,7 +535,7 @@ ${G(7)} .lib2{opacity:1;translate:none}
 
 /* 大过场放大阅读器（从展开行 col 2 的 K. 545 放大成 410×580 阅读器谱纸） */
 .sns-story .rd{position:absolute;left:0;top:0;width:${W}px;height:${H}px;z-index:8;pointer-events:none;transform-origin:0 0;opacity:0;
-  transform:translate(${x7(2,false)-VX*ZS}px,${EY1}px) scale(${ZS});transition:transform calc(.65s*var(--k)) cubic-bezier(.3,.75,.15,1),opacity calc(.12s*var(--k)) linear calc(.5s*var(--k))}
+  transform:translate(${x7(2,false)-VX*ZS}px,${Y7_2}px) scale(${ZS});transition:transform calc(.65s*var(--k)) cubic-bezier(.3,.75,.15,1),opacity calc(.12s*var(--k)) linear calc(.5s*var(--k))}
 .sns-story[data-s="9"] .rd{opacity:1;transform:none;transition-delay:0s}
 .sns-story .rd .ttl,.sns-story .rd .bar{z-index:2;opacity:0;transition:opacity calc(.3s*var(--k))}
 .sns-story[data-s="9"] .rd .ttl,.sns-story[data-s="9"] .rd .bar{opacity:1;transition-delay:calc(.55s*var(--k))}
@@ -740,7 +740,6 @@ SNSims['r13/story-r13'] = function(root){
         <div class="hd2 hr1">${snT('Recently opened')} <small>3</small></div>
         ${SC7.map(s => scCard7(s, 'rs2')).join('')}
       </div>
-      <div class="nv2 recital2"><h4>${NAME7()}</h4><div class="gb2 r">${snT('Done')}</div></div>
       <div class="hd2 hr2">${snT('My Collections')} <small class="roll2 hn2"><span>3</span></small></div>
       <div class="fd2 rc2"><div class="bp2"></div><div class="pv2" style="background-image:url(${A}k545-p1.jpg)"></div>
         <div class="cv2"><div class="mk2"><span class="dots2">···</span><i class="ci2"></i></div><div class="n2 roll2"></div>${I2.folder}<div class="t2"></div></div></div>
@@ -774,7 +773,7 @@ SNSims['r13/story-r13'] = function(root){
       </div>
     </div></div>
     <i class="snd d2"></i>
-    <i class="tp snd tz" style="left:${x7(2,false)+SW/2}px;top:${EY1+SH7/2}px"></i>
+    <i class="tp snd tz" style="left:${x7(2,false)+SW/2}px;top:${Y7_2+SH7/2}px"></i>
     <div class="doc c2 cc" style="--fd:.87"><div class="pg" style="background-image:url(${P[6]})"></div></div>
     <div class="doc c cc" style="--fd:.75"><div class="pg" style="background-image:url(${P[6]})"></div></div>
     <div class="doc d2 dd" style="--fd:1.32"><div class="pg" style="background-image:url(${P[7]})"></div></div>
@@ -824,12 +823,13 @@ SNSims['r13/story-r13'] = function(root){
   let st7 = S7[6](), zp = 0;
 
   const folderX = (col, nar) => nar ? 82 + col*160 : x7(col, false);
-  const scoreX = (idx, nar) => x7(idx + (nar ? 0 : 1), nar);
+  const scoreX = (idx, nar) => x7((idx + 1) % (nar ? 3 : 4), nar);
   function render7(anim){
     const s = st7, nar = isNar();
     const nm = s.name === '*' ? NAME7() : s.name;
     lib2.classList.toggle('mg', s.mg);
     lib2.classList.toggle('open', s.open);
+    root.classList.toggle('org-open', s.open);
     lib2.classList.toggle('pop', s.pop);
     lib2.classList.toggle('ctx', s.ctx);
     lib2.classList.toggle('modal', s.modal);
@@ -858,25 +858,29 @@ SNSims['r13/story-r13'] = function(root){
     });
 
     // 系统文件夹在前，自建文件夹按新到旧排列。
-    hr2.style.left = (folderX(0, nar) + 2) + 'px';
-    hr2.style.top = (s.open ? EY2 - 34 : 314) + 'px';
+    hr2.style.left = ((s.open ? x7(0, nar) : folderX(0, nar)) + 2) + 'px';
+    hr2.style.top = (s.open ? 24 : 314) + 'px';
     const rcX = s.open ? x7(0, nar) : folderX(2, nar);
     rc2.style.left = rcX + 'px';
-    rc2.style.top = (s.open ? EY1 : Y7_2) + 'px';
+    rc2.style.top = Y7_2 + 'px';
     rc2.style.opacity = s.made ? 1 : 0;
     rc2.style.transform = s.made ? 'none' : 'translateY(16px) scale(.97)';
     lib2.style.setProperty('--ctx-x', rcX + 'px');
 
     fxList2.forEach((el, i) => {
-      const col = i === 0 ? (s.made && !s.open ? 3 : 2) : i - 1;
-      el.style.left = folderX(col, nar) + 'px';
-      el.style.top = (s.open ? EY2 : Y7_2) + 'px';
+      if (s.open){
+        el.style.left = x7(i === 0 ? Number(nar) : i - 1, nar) + 'px';
+        el.style.top = (i === 0 ? Y7_2 + ROW7 : Y7_1) + 'px';
+      } else {
+        el.style.left = folderX(i === 0 ? (s.made ? 3 : 2) : i - 1, nar) + 'px';
+        el.style.top = Y7_2 + 'px';
+      }
     });
 
     s.order.forEach((id, idx) => {
       const el = fsMap2[id];
       el.style.left = (s.open ? scoreX(idx, nar) : folderX(2, nar)) + 'px';
-      el.style.top = (s.open ? EY1 : Y7_2) + 'px';
+      el.style.top = (Y7_2 + (s.open && nar && idx === 2 ? ROW7 : 0)) + 'px';
       if (!(zp > 0 && id === 'k545')) el.style.opacity = s.open ? 1 : 0;
       el.style.transform = s.open ? 'none' : 'scale(.88)';
       el.style.setProperty('--member-delay', (s.open && anim && !s.dragId && !s.modal ? idx*.1 : 0) + 's');
@@ -904,7 +908,7 @@ SNSims['r13/story-r13'] = function(root){
     st.style.transform = `translateX(${-pan*s}px) scale(${s})`;
     if(s) root.style.setProperty('--dotu', (dotPx/s).toFixed(2)+'px');
     tz.style.left = (scoreX(st7.order.indexOf('k545'), narrow) + SW/2) + 'px';
-    tz.style.top = (EY1 + SH7/2) + 'px';
+    tz.style.top = (Y7_2 - (narrow ? RISE7N : 0) + SH7/2) + 'px';
     render7(false);
   };
   const ro = new ResizeObserver(fit); ro.observe(root);
@@ -1004,7 +1008,7 @@ SNSims['r13/story-r13'] = function(root){
       await lift(false);
       await wait(440);
       // 移到已展开的 Recital 文件夹上长按弹出菜单
-      await moveTo(at7(isNar() ? q2('.recital2 h4') : rc2), 400);
+      await moveTo(at7(rc2), 400);
       dot2.style.transform = 'scale(.78)'; dot2.classList.add('hld'); rc2.classList.add('hold');
       await wait(450);
       dot2.classList.remove('hld'); rc2.classList.remove('hold'); dot2.style.transform = '';
@@ -1095,6 +1099,7 @@ SNSims['r13/story-r13'] = function(root){
   const ttl = rd.querySelector('.ttl'), bar = rd.querySelector('.bar');
   const cl = v => Math.max(0, Math.min(1, v)), lp = (a, b, t) => a + (b - a)*t;
   const io = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3)/2;
+  const zoomOrigin = () => ({x:sck2.offsetLeft, y:sck2.offsetTop - (isNar() ? RISE7N : 0)});
   let za = 0;
   function zoom(p, ch = 1, eo){
     p = cl(p); zp = p;
@@ -1104,7 +1109,7 @@ SNSims['r13/story-r13'] = function(root){
       sck2Tap.style.transform = ''; sck2.style.opacity = st7.open ? 1 : 0;
       tz.classList.remove('rip'); za = 0; zpan = 0; fit(); return;
     }
-    const kx = sck2.offsetLeft, ky = sck2.offsetTop;
+    const {x:kx, y:ky} = zoomOrigin();
     tz.style.left = (kx + SW/2) + 'px'; tz.style.top = (ky + SH7/2) + 'px';
     const a = cl(p/.22), e = eo ?? io(cl((p - .2)/.8));
     if(RM){
@@ -1128,7 +1133,10 @@ SNSims['r13/story-r13'] = function(root){
   }
   return {
     zoom, get zoomNow(){ return zp; },
-    zpage: e => ({x: lp(scoreX(st7.order.indexOf('k545'), isNar()), VX, e), y: lp(EY1, 0, e), w: 410*lp(ZS, 1, e)}),
+    zpage(e){
+      const {x,y} = zoomOrigin();
+      return {x:lp(x, VX, e), y:lp(y, 0, e), w:410*lp(ZS, 1, e)};
+    },
     settle(n){ clearTimeout(timer); timer = 0; auto = false; settle(Math.max(0, Math.min(LAST, n|0))); t0 = performance.now(); dur = 0; },
     get busy(){ return !!(timer || tok7); },
     beats: LAST, get beatNow(){ return cur; },

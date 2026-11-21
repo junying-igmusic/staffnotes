@@ -66,6 +66,7 @@ const CSS = `
 .sns-turns .ttl{position:absolute;left:50%;top:8px;height:22px;display:grid;place-items:center;padding:0 11px;border-radius:11px;${glass};white-space:nowrap;text-align:center;z-index:2;pointer-events:none}
 .sns-turns .ttl>span{grid-area:1/1;font-size:7.2px;line-height:1.12;opacity:0;transition:opacity .2s}
 .sns-turns .ttl>span.on{opacity:1}
+.sns-turns.playlist .ttl>span{transition:none}
 .sns-turns .ttl small{display:block;font-size:5.9px;color:#8C919B}
 /* 底栏 */
 .sns-turns .t-stage>.bar>*{position:absolute;top:${PY}px;height:${PH}px;cursor:pointer;transition:left .45s cubic-bezier(.3,.8,.2,1),right .45s cubic-bezier(.3,.8,.2,1),width .45s cubic-bezier(.3,.8,.2,1),max-width .45s cubic-bezier(.3,.8,.2,1),opacity .2s}
@@ -258,6 +259,7 @@ NS['r13/turns-r13'] = function(root, opts){
       if (pc !== PC){ PC = pc; movedAt = performance.now(); }
     }
     const L = PC - pw/2, R2 = PC + pw/2;
+    root.classList.toggle('playlist', st.playlist);
     root.classList.toggle('bars', st.bars); root.classList.toggle('padon', st.pad); root.classList.toggle('k331', is331);
     pgs.forEach(el => {
       const dp = el.dataset.p;

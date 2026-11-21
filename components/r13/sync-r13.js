@@ -24,6 +24,7 @@ const RW = AW*PW/W, RH = RW*1839/1300, RX = (AW - RW)/2, RY = (AH - RH)/2;
 const BZB = 38, ZS = .66, SL = 110;
 const LSB = W/625, X0 = 20, GAP = 15, CW = 134.8, CH = 190, SCW = 136, SCH = 192, R1 = 108, R2 = 402;
 const colX = c => X0 + c*(CW + GAP);
+const ROW = R2 - R1;
 const KX = colX(2)*LSB, KY = R2*LSB, KS = SCW*LSB/PW, KR = 5*LSB/KS;
 const glass = 'background:rgba(255,255,255,.92);box-shadow:0 1px 2px rgba(0,0,0,.07),0 3px 10px -4px rgba(41,45,56,.16),inset 0 0 0 .5px rgba(0,0,0,.07)';
 // SF Symbols ipad.and.iphone 的简画
@@ -98,9 +99,11 @@ const CSS = `
 .sns-sync .y-it .t{position:absolute;left:12px;right:8px;bottom:14px;font:16.1px/1.08 var(--serif,"Timeless Serif",Georgia,serif);overflow:hidden;text-overflow:ellipsis}
 .sns-sync .y-it svg.ic{background:none}
 .sns-sync .y-recent{position:absolute;inset:0;transition:translate .55s cubic-bezier(.2,.7,.2,1)}
-.sns-sync.s-mz .y-recent{translate:0 -380px}
-.sns-sync.s-mz .y-it.recital{translate:${colX(0)-colX(2)}px 0;transition:translate .55s cubic-bezier(.2,.7,.2,1)}
-.sns-sync.s-mz :is(.y-hd.collections,.y-it:not(.recital)){translate:0 260px;opacity:0;transition:translate .55s cubic-bezier(.2,.7,.2,1),opacity .2s .25s}
+.sns-sync.s-mz .y-recent{translate:0 -${ROW}px;visibility:hidden;transition:translate .55s cubic-bezier(.2,.7,.2,1),visibility 0s .55s}
+.sns-sync :is(.y-hd.collections,.y-home .y-it){transition:translate .55s cubic-bezier(.2,.7,.2,1),opacity .35s ease,transform .35s cubic-bezier(.3,.8,.2,1)}
+.sns-sync.s-mz :is(.y-hd.collections,.y-it.collection){translate:0 -${ROW}px}
+.sns-sync.s-mz .y-it.recital{translate:${colX(0)-colX(2)}px 0}
+.sns-sync.s-mz .y-it.term{translate:${colX(0)-colX(3)}px ${ROW}px}
 .sns-sync .y-sc{position:absolute;width:${SCW}px;opacity:0;transform:translateY(6px);transition:opacity .3s ease,transform .35s cubic-bezier(.3,.8,.2,1)}
 .sns-sync .y-sc.on,.sns-sync.s-mz .y-sc.member{opacity:1;transform:none}
 .sns-sync .y-sc.member{transform:translateX(var(--from)) scale(.88);transition-delay:var(--stagger)}
@@ -177,7 +180,7 @@ function home(){
     ['This Term', 2, 'k545-p1.jpg']
   ];
   const folderIcon = '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>';
-  const card = ([name,n,pv], i) => `<div class="y-it${i === 2 ? ' recital' : ''}" style="left:${colX(i)}px;top:${R2}px"><div class="bp"></div><div class="pv" style="background-image:url(${A}${pv})"></div><div class="cv"><div class="dots">···</div><div class="n">${n}</div>${i === 0 ? `<i class="ic" style="mask-image:url(${A}fld-added.png)"></i>` : folderIcon}<div class="t">${snT(name)}</div></div></div>`;
+  const card = ([name,n,pv], i) => `<div class="y-it${[' collection',' collection',' recital',' term'][i]}" style="left:${colX(i)}px;top:${R2}px"><div class="bp"></div><div class="pv" style="background-image:url(${A}${pv})"></div><div class="cv"><div class="dots">···</div><div class="n">${n}</div>${i === 0 ? `<i class="ic" style="mask-image:url(${A}fld-added.png)"></i>` : folderIcon}<div class="t">${snT(name)}</div></div></div>`;
   const score = ([img,title,composer], x, y, cls, style = '') => `<div class="y-sc ${cls}" style="left:${x}px;top:${y}px;${style}"><div class="th" style="background-image:url(${A}${img})"></div><p>${snT(title)}</p><small>${snT(composer)}</small></div>`;
   const spin = Array.from({length:8}, (_, i) => `<path d="M12 2v5" transform="rotate(${45*i} 12 12)" opacity="${1 - i*.8/7}"/>`).join('');
   return `<div class="y-pill y-status" role="status">
