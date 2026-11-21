@@ -53,10 +53,10 @@ const VX = (W-410)/2, ZS = SW/410, T5 = 2.9;
 const VN = 640;
 // 手机拍 5：第 2–5 列在 VN 宽的窗口里居中
 const PN = (colX(1) + colX(4) + CW)/2 - VN/2;
-// 拍 7–8 自建文件夹视图网格：桌面 4 列（780 宽内对称留边 79）、窄屏 3 列（70..710 可视 640 宽内对称留边 68）
-const X7D = 79, G7D = 26, X7N = 138, G7N = 48;
+// 拍 7–8 自建文件夹视图网格：桌面和窄屏统一四列，窄屏左边 82、列距 160
+const X7D = 79, G7D = 26, X7N = 82, G7N = 24;
 const x7 = (c, nar) => (nar ? X7N : X7D) + c*(SW + (nar ? G7N : G7D));
-const Y7_1 = 62, Y7_2 = 350, ROW7 = Y7_2 - Y7_1, RISE7N = 120, ORH = 60;
+const Y7_1 = 62, Y7_2 = 350, ROW7 = Y7_2 - Y7_1, ORH = 60;
 // 拍 4 字段展开：TF 时点开，FS 是卡片列表往上滚的距离
 const TF = 4.1, FS = 394, FR = 39;
 const FU = .55, FH = .8, FD = .5, FL = FU + FH + FD, FP = [FU/FL, (FU + FH)/FL].map(v => (v*100).toFixed(1) + '%'), TV = TF + .12 + FL + .35;
@@ -400,9 +400,6 @@ ${G(7)} .lib2{opacity:1;translate:none}
 .sns-story .lib2 .recent2{position:absolute;inset:0;transition:translate .62s cubic-bezier(.2,.7,.2,1)}
 .sns-story .lib2.open .recent2{translate:0 -${ROW7}px;visibility:hidden;transition:translate .62s cubic-bezier(.2,.7,.2,1),visibility 0s .62s}
 .sns-story.org-open .library-viewport{overflow:visible;clip-path:inset(0 0 -24px)}
-/* 手机露出第三排，底边仍在进度条上方。 */
-.sns-story.narrow.org-open .library-viewport{clip-path:inset(${-RISE7N}px 0 -188px)}
-.sns-story.narrow.g7 .lib2.open{translate:0 ${-RISE7N}px}
 .sns-story .lib2.open .tb2.br{opacity:0}
 .sns-story .lib2 .sc2.fs{transition-delay:var(--member-delay,0s)}
 .sns-story .lib2.now2 *,.sns-story .lib2.now2 *::before,.sns-story .lib2.now2 *::after{transition:none!important}
@@ -822,8 +819,7 @@ SNSims['r13/story-r13'] = function(root){
   };
   let st7 = S7[6](), zp = 0;
 
-  const folderX = (col, nar) => nar ? 82 + col*160 : x7(col, false);
-  const scoreX = (idx, nar) => x7((idx + 1) % (nar ? 3 : 4), nar);
+  const scoreX = (idx, nar) => x7((idx + 1) % 4, nar);
   function render7(anim){
     const s = st7, nar = isNar();
     const nm = s.name === '*' ? NAME7() : s.name;
@@ -858,9 +854,9 @@ SNSims['r13/story-r13'] = function(root){
     });
 
     // 系统文件夹在前，自建文件夹按新到旧排列。
-    hr2.style.left = ((s.open ? x7(0, nar) : folderX(0, nar)) + 2) + 'px';
+    hr2.style.left = (x7(0, nar) + 2) + 'px';
     hr2.style.top = (s.open ? 24 : 314) + 'px';
-    const rcX = s.open ? x7(0, nar) : folderX(2, nar);
+    const rcX = x7(s.open ? 0 : 2, nar);
     rc2.style.left = rcX + 'px';
     rc2.style.top = Y7_2 + 'px';
     rc2.style.opacity = s.made ? 1 : 0;
@@ -869,18 +865,18 @@ SNSims['r13/story-r13'] = function(root){
 
     fxList2.forEach((el, i) => {
       if (s.open){
-        el.style.left = x7(i === 0 ? Number(nar) : i - 1, nar) + 'px';
+        el.style.left = x7(i === 0 ? 0 : i - 1, nar) + 'px';
         el.style.top = (i === 0 ? Y7_2 + ROW7 : Y7_1) + 'px';
       } else {
-        el.style.left = folderX(i === 0 ? (s.made ? 3 : 2) : i - 1, nar) + 'px';
+        el.style.left = x7(i === 0 ? (s.made ? 3 : 2) : i - 1, nar) + 'px';
         el.style.top = Y7_2 + 'px';
       }
     });
 
     s.order.forEach((id, idx) => {
       const el = fsMap2[id];
-      el.style.left = (s.open ? scoreX(idx, nar) : folderX(2, nar)) + 'px';
-      el.style.top = (Y7_2 + (s.open && nar && idx === 2 ? ROW7 : 0)) + 'px';
+      el.style.left = (s.open ? scoreX(idx, nar) : x7(2, nar)) + 'px';
+      el.style.top = Y7_2 + 'px';
       if (!(zp > 0 && id === 'k545')) el.style.opacity = s.open ? 1 : 0;
       el.style.transform = s.open ? 'none' : 'scale(.88)';
       el.style.setProperty('--member-delay', (s.open && anim && !s.dragId && !s.modal ? idx*.1 : 0) + 's');
@@ -908,7 +904,7 @@ SNSims['r13/story-r13'] = function(root){
     st.style.transform = `translateX(${-pan*s}px) scale(${s})`;
     if(s) root.style.setProperty('--dotu', (dotPx/s).toFixed(2)+'px');
     tz.style.left = (scoreX(st7.order.indexOf('k545'), narrow) + SW/2) + 'px';
-    tz.style.top = (Y7_2 - (narrow ? RISE7N : 0) + SH7/2) + 'px';
+    tz.style.top = (Y7_2 + SH7/2) + 'px';
     render7(false);
   };
   const ro = new ResizeObserver(fit); ro.observe(root);
@@ -930,7 +926,7 @@ SNSims['r13/story-r13'] = function(root){
   };
 
   function launchFly7(ids, tok){
-    const nar = isNar(), x1 = folderX(2, nar) + SW*.45 - SW*.36/2, y1 = Y7_2 + SH7*.48 - SH7*.36/2, k = .36;
+    const nar = isNar(), x1 = x7(2, nar) + SW*.45 - SW*.36/2, y1 = Y7_2 + SH7*.48 - SH7*.36/2, k = .36;
     return Promise.all(ids.map((id, idx) => new Promise(res => {
       const i = SC7.findIndex(s => s.id === id), x0 = x7(i, nar), y0 = Y7_1;
       const g = document.createElement('div'); g.className = 'gh2'; g.style.backgroundImage = `url(${A}${BY7[id].img})`;
@@ -1099,7 +1095,7 @@ SNSims['r13/story-r13'] = function(root){
   const ttl = rd.querySelector('.ttl'), bar = rd.querySelector('.bar');
   const cl = v => Math.max(0, Math.min(1, v)), lp = (a, b, t) => a + (b - a)*t;
   const io = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3)/2;
-  const zoomOrigin = () => ({x:sck2.offsetLeft, y:sck2.offsetTop - (isNar() ? RISE7N : 0)});
+  const zoomOrigin = () => ({x:sck2.offsetLeft, y:sck2.offsetTop});
   let za = 0;
   function zoom(p, ch = 1, eo){
     p = cl(p); zp = p;
